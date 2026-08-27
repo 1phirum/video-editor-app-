@@ -1,0 +1,37 @@
+********* Start testing of BackendTests *********
+Config: Using QtTest library 6.11.0, Qt 6.11.0 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 13.1.0), windows 11
+PASS   : BackendTests::initTestCase()
+PASS   : BackendTests::projectTimelinePersistence()
+QWARN  : BackendTests::ffmpegImportAndExport() FFmpeg preview failed: C:/Users/USER/AppData/Local/Temp/cutpro_backend_tests-mxYLoc/source.mp4 QList(-ss, 0.500, -frames:v, 1, -vf, scale=320:-2:force_original_aspect_ratio=decrease, -q:v, 3) Unknown error [image2 @ 0000021648bae840] Could not open file : C:/Users/USER/AppData/Local/cutpro_backend_tests/cache/timeline-previews/5b1ff481703d82b91c463171.jpg?
+[vost#0:0/mjpeg @ 000002164a740200] Error submitting a packet to the muxer: Permission denied?
+    Last message repeated 1 times?
+[out#0/image2 @ 000002164a741980] Error muxing a packet?
+[out#0/image2 @ 000002164a741980] Task finished with error code: -13 (Permission denied)?
+[out#0/image2 @ 000002164a741980] Terminating thread with return code -13 (Permission denied)?
+
+QWARN  : BackendTests::ffmpegImportAndExport() FFmpeg preview failed: C:/Users/USER/AppData/Local/Temp/cutpro_backend_tests-mxYLoc/source.mp4 QList(-frames:v, 1, -vf, fps=12.000000,scale=160:90:force_original_aspect_ratio=increase,crop=160:90,tile=12x1, -q:v, 3) Unknown error [image2 @ 0000016322e05900] Could not open file : C:/Users/USER/AppData/Local/cutpro_backend_tests/cache/timeline-previews/32fc1a36517383f60fc52680.jpg?
+[vost#0:0/mjpeg @ 00000163213550c0] Error submitting a packet to the muxer: Permission denied?
+    Last message repeated 1 times?
+[out#0/image2 @ 0000016322e11040] Error muxing a packet?
+[out#0/image2 @ 0000016322e11040] Task finished with error code: -13 (Permission denied)?
+[out#0/image2 @ 0000016322e11040] Terminating thread with return code -13 (Permission denied)?
+
+QWARN  : BackendTests::ffmpegImportAndExport() FFmpeg preview failed: C:/Users/USER/AppData/Local/Temp/cutpro_backend_tests-mxYLoc/source.mp4 QList(-filter_complex, [0:a]aformat=channel_layouts=mono,showwavespic=s=1600x320:colors=0x63a4ff,format=rgba,crop=1600:160:0:0[wave], -map, [wave], -frames:v, 1) Unknown error [image2 @ 000001ffef364880] Could not open file : C:/Users/USER/AppData/Local/cutpro_backend_tests/cache/timeline-previews/eca20d6236c36358cac09ff4.png?
+[vost#0:0/png @ 000001ffef3656c0] Error submitting a packet to the muxer: Permission denied?
+    Last message repeated 1 times?
+[out#0/image2 @ 000001ffef35d540] Error muxing a packet?
+[out#0/image2 @ 000001ffef35d540] Task finished with error code: -13 (Permission denied)?
+[out#0/image2 @ 000001ffef35d540] Terminating thread with return code -13 (Permission denied)?
+
+FAIL!  : BackendTests::ffmpegImportAndExport() '!thumbnailPath.isEmpty()' returned FALSE. ()
+C:/premier-pro/python-app/tests/backend_tests.cpp(209) : failure location
+PASS   : BackendTests::lumetriPipelineBuildsNativeFfmpegChain()
+PASS   : BackendTests::timelineEditingFeatures()
+SKIP   : BackendTests::suppliedMediaShortExport() CUTPRO_TEST_MEDIA is not set
+C:/premier-pro/python-app/tests/backend_tests.cpp(363) : failure location
+SKIP   : BackendTests::pythonWhisperTranscription() CUTPRO_WHISPER_TEST_MEDIA is not set
+C:/premier-pro/python-app/tests/backend_tests.cpp(390) : failure location
+PASS   : BackendTests::subtitleImportExport()
+PASS   : BackendTests::cleanupTestCase()
+Totals: 6 passed, 1 failed, 2 skipped, 0 blacklisted, 501ms
+********* Finished testing of BackendTests *********

@@ -1,0 +1,46 @@
+{
+    "classes": [
+        {
+            "className": "EffectPreviewGenerator",
+            "final": true,
+            "lineNumber": 11,
+            "object": true,
+            "qualifiedClassName": "EffectPreviewGenerator",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "effectId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "animated",
+                            "type": "bool"
+                        },
+                        {
+                            "name": "url",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 0,
+                    "lineNumber": 27,
+                    "name": "previewReady",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "effect_preview_generator.h",
+    "outputRevision": 69
+}

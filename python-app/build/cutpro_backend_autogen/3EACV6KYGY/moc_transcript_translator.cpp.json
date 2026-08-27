@@ -1,0 +1,69 @@
+{
+    "classes": [
+        {
+            "className": "TranscriptTranslator",
+            "lineNumber": 9,
+            "object": true,
+            "qualifiedClassName": "TranscriptTranslator",
+            "signals": [
+                {
+                    "access": "public",
+                    "index": 0,
+                    "lineNumber": 25,
+                    "name": "stateChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "success",
+                            "type": "bool"
+                        },
+                        {
+                            "name": "segments",
+                            "type": "QVariantList"
+                        },
+                        {
+                            "name": "targetLanguage",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "error",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 1,
+                    "lineNumber": 26,
+                    "name": "finished",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "success",
+                            "type": "bool"
+                        },
+                        {
+                            "name": "message",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 2,
+                    "lineNumber": 28,
+                    "name": "testFinished",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "transcript_translator.h",
+    "outputRevision": 69
+}

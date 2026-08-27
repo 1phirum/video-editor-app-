@@ -1,0 +1,88 @@
+{
+    "classes": [
+        {
+            "className": "MediaImportQueue",
+            "final": true,
+            "lineNumber": 48,
+            "object": true,
+            "qualifiedClassName": "MediaImportQueue",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "total",
+                            "type": "int"
+                        }
+                    ],
+                    "index": 0,
+                    "lineNumber": 90,
+                    "name": "started",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "items",
+                            "type": "QVariantList"
+                        }
+                    ],
+                    "index": 1,
+                    "lineNumber": 92,
+                    "name": "itemsReady",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 2,
+                    "lineNumber": 93,
+                    "name": "progressChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "message",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 3,
+                    "lineNumber": 95,
+                    "name": "warning",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "accepted",
+                            "type": "int"
+                        },
+                        {
+                            "name": "skipped",
+                            "type": "int"
+                        },
+                        {
+                            "name": "cancelled",
+                            "type": "bool"
+                        }
+                    ],
+                    "index": 4,
+                    "lineNumber": 96,
+                    "name": "finished",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "media_import_queue.h",
+    "outputRevision": 69
+}

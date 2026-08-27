@@ -1,0 +1,5 @@
+C:/premier-pro/python-app/build-verify/cutpro_backend_autogen/include/../ISMKEKEPX5/moc_backend.cpp.json
+C:/premier-pro/python-app/build-verify/cutpro_backend_autogen/include/../ISMKEKEPX5/moc_effect_preview_generator.cpp.json
+C:/premier-pro/python-app/build-verify/cutpro_backend_autogen/include/../ISMKEKEPX5/moc_ffmpeg_preview_decoder.cpp.json
+C:/premier-pro/python-app/build-verify/cutpro_backend_autogen/include/../ISMKEKEPX5/moc_project_database.cpp.json
+C:/premier-pro/python-app/build-verify/cutpro_backend_autogen/include/../ISMKEKEPX5/moc_transcript_translator.cpp.json

@@ -1,0 +1,52 @@
+{
+    "classes": [
+        {
+            "className": "TranscriptTranslator",
+            "lineNumber": 8,
+            "object": true,
+            "qualifiedClassName": "TranscriptTranslator",
+            "signals": [
+                {
+                    "access": "public",
+                    "index": 0,
+                    "lineNumber": 21,
+                    "name": "stateChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "success",
+                            "type": "bool"
+                        },
+                        {
+                            "name": "segments",
+                            "type": "QVariantList"
+                        },
+                        {
+                            "name": "targetLanguage",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "error",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 1,
+                    "lineNumber": 22,
+                    "name": "finished",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "transcript_translator.h",
+    "outputRevision": 69
+}

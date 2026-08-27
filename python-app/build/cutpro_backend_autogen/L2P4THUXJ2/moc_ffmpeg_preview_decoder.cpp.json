@@ -1,0 +1,48 @@
+{
+    "classes": [
+        {
+            "className": "FfmpegPreviewDecoder",
+            "final": true,
+            "lineNumber": 21,
+            "object": true,
+            "qualifiedClassName": "FfmpegPreviewDecoder",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "revision",
+                            "type": "quint64"
+                        }
+                    ],
+                    "index": 0,
+                    "lineNumber": 59,
+                    "name": "frameReady",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 1,
+                    "lineNumber": 60,
+                    "name": "stateChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 2,
+                    "lineNumber": 61,
+                    "name": "errorChanged",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "ffmpeg_preview_decoder.h",
+    "outputRevision": 69
+}

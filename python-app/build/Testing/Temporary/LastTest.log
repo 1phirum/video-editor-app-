@@ -1,0 +1,18 @@
+Start testing: Aug 25 11:08 SE Asia Standard Time
+----------------------------------------------------------
+1/1 Testing: cutpro_backend_tests
+1/1 Test: cutpro_backend_tests
+Command: "C:/premier-pro/python-app/build/bin/cutpro_backend_tests.exe"
+Directory: C:/premier-pro/python-app/build
+"cutpro_backend_tests" start time: Aug 25 11:08 SE Asia Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   6.02 sec
+----------------------------------------------------------
+Test Passed.
+"cutpro_backend_tests" end time: Aug 25 11:08 SE Asia Standard Time
+"cutpro_backend_tests" time elapsed: 00:00:06
+----------------------------------------------------------
+
+End testing: Aug 25 11:08 SE Asia Standard Time

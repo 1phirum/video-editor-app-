@@ -1,0 +1,48 @@
+{
+    "classes": [
+        {
+            "className": "NativeVideoPreviewDecoder",
+            "final": true,
+            "lineNumber": 34,
+            "object": true,
+            "qualifiedClassName": "NativeVideoPreviewDecoder",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "revision",
+                            "type": "quint64"
+                        }
+                    ],
+                    "index": 0,
+                    "lineNumber": 61,
+                    "name": "frameReady",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 1,
+                    "lineNumber": 62,
+                    "name": "stateChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 2,
+                    "lineNumber": 63,
+                    "name": "errorChanged",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "native_video_preview_decoder.h",
+    "outputRevision": 69
+}

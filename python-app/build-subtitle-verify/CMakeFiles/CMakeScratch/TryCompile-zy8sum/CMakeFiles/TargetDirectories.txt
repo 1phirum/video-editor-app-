@@ -1,0 +1,3 @@
+C:/premier-pro/python-app/build-subtitle-verify/CMakeFiles/CMakeScratch/TryCompile-zy8sum/CMakeFiles/cmTC_a2f89.dir
+C:/premier-pro/python-app/build-subtitle-verify/CMakeFiles/CMakeScratch/TryCompile-zy8sum/CMakeFiles/edit_cache.dir
+C:/premier-pro/python-app/build-subtitle-verify/CMakeFiles/CMakeScratch/TryCompile-zy8sum/CMakeFiles/rebuild_cache.dir

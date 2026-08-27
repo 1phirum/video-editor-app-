@@ -1,0 +1,45 @@
+{
+    "classes": [
+        {
+            "className": "TimelineClipModel",
+            "final": true,
+            "lineNumber": 19,
+            "methods": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "startMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "endMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 0,
+                    "lineNumber": 31,
+                    "name": "setViewport",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 1,
+                    "lineNumber": 32,
+                    "name": "clearViewport",
+                    "returnType": "void"
+                }
+            ],
+            "object": true,
+            "qualifiedClassName": "TimelineClipModel",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QAbstractListModel"
+                }
+            ]
+        }
+    ],
+    "inputFile": "timeline_clip_model.h",
+    "outputRevision": 69
+}

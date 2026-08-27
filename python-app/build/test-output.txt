@@ -1,0 +1,18 @@
+********* Start testing of BackendTests *********
+Config: Using QtTest library 6.11.0, Qt 6.11.0 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 13.1.0), windows 11
+PASS   : BackendTests::initTestCase()
+FAIL!  : BackendTests::projectTimelinePersistence() 'backend.setClipColorSetting( clipId, "masterCurvePoints", QVariantList{QVariantMap{{"x", 0.0}, {"y", 0.0}}, QVariantMap{{"x", 0.4}, {"y", 0.32}}, QVariantMap{{"x", 1.0}, {"y", 1.0}}})' returned FALSE. ()
+C:/premier-pro/python-app/tests/backend_tests.cpp(52) : failure location
+FAIL!  : BackendTests::ffmpegImportAndExport() 'backend.setClipColorSetting( colorClipId, "masterCurvePoints", QVariantList{QVariantMap{{"x", 0.0}, {"y", 0.0}}, QVariantMap{{"x", 0.5}, {"y", 0.58}}, QVariantMap{{"x", 1.0}, {"y", 1.0}}})' returned FALSE. ()
+C:/premier-pro/python-app/tests/backend_tests.cpp(284) : failure location
+PASS   : BackendTests::lumetriPipelineBuildsNativeFfmpegChain()
+PASS   : BackendTests::clipEffectsPipelineBuildsNativeFfmpegChain()
+PASS   : BackendTests::timelineEditingFeatures()
+SKIP   : BackendTests::suppliedMediaShortExport() CUTPRO_TEST_MEDIA is not set
+C:/premier-pro/python-app/tests/backend_tests.cpp(479) : failure location
+SKIP   : BackendTests::pythonWhisperTranscription() CUTPRO_WHISPER_TEST_MEDIA is not set
+C:/premier-pro/python-app/tests/backend_tests.cpp(506) : failure location
+PASS   : BackendTests::subtitleImportExport()
+PASS   : BackendTests::cleanupTestCase()
+Totals: 6 passed, 2 failed, 2 skipped, 0 blacklisted, 1501ms
+********* Finished testing of BackendTests *********

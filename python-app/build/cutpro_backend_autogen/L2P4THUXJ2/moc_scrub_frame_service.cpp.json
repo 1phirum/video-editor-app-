@@ -1,0 +1,48 @@
+{
+    "classes": [
+        {
+            "className": "ScrubFrameService",
+            "final": true,
+            "lineNumber": 33,
+            "object": true,
+            "qualifiedClassName": "ScrubFrameService",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "revision",
+                            "type": "quint64"
+                        }
+                    ],
+                    "index": 0,
+                    "lineNumber": 66,
+                    "name": "frameReady",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 1,
+                    "lineNumber": 67,
+                    "name": "busyChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 2,
+                    "lineNumber": 68,
+                    "name": "errorChanged",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "scrub_frame_service.h",
+    "outputRevision": 69
+}

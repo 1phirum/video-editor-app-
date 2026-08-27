@@ -1,0 +1,148 @@
+{
+    "classes": [
+        {
+            "className": "VideoPreviewHelper",
+            "final": true,
+            "lineNumber": 10,
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 0,
+                    "lineNumber": 12,
+                    "name": "activeClip",
+                    "notify": "activeStateChanged",
+                    "override": false,
+                    "read": "activeClip",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariant",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 1,
+                    "lineNumber": 13,
+                    "name": "activeMedia",
+                    "notify": "activeStateChanged",
+                    "override": false,
+                    "read": "activeMedia",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariant",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 2,
+                    "lineNumber": 14,
+                    "name": "activeAudioClip",
+                    "notify": "activeStateChanged",
+                    "override": false,
+                    "read": "activeAudioClip",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariant",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 3,
+                    "lineNumber": 15,
+                    "name": "activeAudioClips",
+                    "notify": "activeStateChanged",
+                    "override": false,
+                    "read": "activeAudioClips",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariantList",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 4,
+                    "lineNumber": 16,
+                    "name": "activeSubtitle",
+                    "notify": "activeStateChanged",
+                    "override": false,
+                    "read": "activeSubtitle",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariant",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 5,
+                    "lineNumber": 17,
+                    "name": "activeClipId",
+                    "notify": "activeStateChanged",
+                    "override": false,
+                    "read": "activeClipId",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "index": 6,
+                    "lineNumber": 18,
+                    "name": "uiTickInterval",
+                    "override": false,
+                    "read": "uiTickInterval",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "virtual": false
+                }
+            ],
+            "qualifiedClassName": "VideoPreviewHelper",
+            "signals": [
+                {
+                    "access": "public",
+                    "index": 0,
+                    "lineNumber": 45,
+                    "name": "activeStateChanged",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "video_preview_helper.h",
+    "outputRevision": 69
+}

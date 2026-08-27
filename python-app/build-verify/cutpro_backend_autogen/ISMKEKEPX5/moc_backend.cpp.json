@@ -1,0 +1,3191 @@
+{
+    "classes": [
+        {
+            "className": "Backend",
+            "lineNumber": 24,
+            "methods": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "x",
+                            "type": "double"
+                        },
+                        {
+                            "name": "y",
+                            "type": "double"
+                        },
+                        {
+                            "name": "width",
+                            "type": "double"
+                        },
+                        {
+                            "name": "height",
+                            "type": "double"
+                        }
+                    ],
+                    "index": 33,
+                    "lineNumber": 251,
+                    "name": "setCaptionBlurRegionNormalized",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "x",
+                            "type": "double"
+                        },
+                        {
+                            "name": "y",
+                            "type": "double"
+                        }
+                    ],
+                    "index": 34,
+                    "lineNumber": 255,
+                    "name": "setCaptionPositionNormalized",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "name",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "location",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "createSequence",
+                            "type": "bool"
+                        },
+                        {
+                            "name": "sequenceName",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 35,
+                    "lineNumber": 261,
+                    "name": "newProject",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "name",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "location",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "createSequence",
+                            "type": "bool"
+                        }
+                    ],
+                    "index": 36,
+                    "isCloned": true,
+                    "lineNumber": 261,
+                    "name": "newProject",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "name",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "location",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 37,
+                    "isCloned": true,
+                    "lineNumber": 261,
+                    "name": "newProject",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "name",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 38,
+                    "isCloned": true,
+                    "lineNumber": 261,
+                    "name": "newProject",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "index": 39,
+                    "isCloned": true,
+                    "lineNumber": 261,
+                    "name": "newProject",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "paths",
+                            "type": "QStringList"
+                        },
+                        {
+                            "name": "copyIntoProject",
+                            "type": "bool"
+                        }
+                    ],
+                    "index": 40,
+                    "lineNumber": 264,
+                    "name": "importMedia",
+                    "returnType": "int"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "paths",
+                            "type": "QStringList"
+                        }
+                    ],
+                    "index": 41,
+                    "isCloned": true,
+                    "lineNumber": 264,
+                    "name": "importMedia",
+                    "returnType": "int"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "paths",
+                            "type": "QStringList"
+                        },
+                        {
+                            "name": "copyIntoProject",
+                            "type": "bool"
+                        }
+                    ],
+                    "index": 42,
+                    "lineNumber": 266,
+                    "name": "importMediaAsync",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "paths",
+                            "type": "QStringList"
+                        }
+                    ],
+                    "index": 43,
+                    "isCloned": true,
+                    "lineNumber": 266,
+                    "name": "importMediaAsync",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "mediaId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 44,
+                    "lineNumber": 268,
+                    "name": "removeMedia",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "name",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 45,
+                    "lineNumber": 270,
+                    "name": "createSequence",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "index": 46,
+                    "isCloned": true,
+                    "lineNumber": 270,
+                    "name": "createSequence",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "mediaId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "startMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "track",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 47,
+                    "lineNumber": 271,
+                    "name": "addClip",
+                    "returnType": "QString"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "mediaId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "startMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 48,
+                    "isCloned": true,
+                    "lineNumber": 271,
+                    "name": "addClip",
+                    "returnType": "QString"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "mediaId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 49,
+                    "isCloned": true,
+                    "lineNumber": 271,
+                    "name": "addClip",
+                    "returnType": "QString"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "mediaId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "startMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "track",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 50,
+                    "lineNumber": 273,
+                    "name": "addMediaToTimeline",
+                    "returnType": "QStringList"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "mediaId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "startMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 51,
+                    "isCloned": true,
+                    "lineNumber": 273,
+                    "name": "addMediaToTimeline",
+                    "returnType": "QStringList"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "mediaId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 52,
+                    "isCloned": true,
+                    "lineNumber": 273,
+                    "name": "addMediaToTimeline",
+                    "returnType": "QStringList"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "startMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "track",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 53,
+                    "lineNumber": 276,
+                    "name": "moveClip",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "startMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 54,
+                    "isCloned": true,
+                    "lineNumber": 276,
+                    "name": "moveClip",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipIds",
+                            "type": "QStringList"
+                        },
+                        {
+                            "name": "deltaMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "trackDelta",
+                            "type": "int"
+                        }
+                    ],
+                    "index": 55,
+                    "lineNumber": 278,
+                    "name": "moveClips",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipIds",
+                            "type": "QStringList"
+                        },
+                        {
+                            "name": "deltaMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 56,
+                    "isCloned": true,
+                    "lineNumber": 278,
+                    "name": "moveClips",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "positionMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 57,
+                    "lineNumber": 280,
+                    "name": "splitClip",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "startMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 58,
+                    "lineNumber": 281,
+                    "name": "trimClipStart",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "endMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 59,
+                    "lineNumber": 282,
+                    "name": "trimClipEnd",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "positionMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 60,
+                    "lineNumber": 283,
+                    "name": "deleteClipLeft",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "positionMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 61,
+                    "lineNumber": 284,
+                    "name": "deleteClipRight",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 62,
+                    "lineNumber": 285,
+                    "name": "removeClip",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipIds",
+                            "type": "QStringList"
+                        }
+                    ],
+                    "index": 63,
+                    "lineNumber": 286,
+                    "name": "removeClips",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "kind",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 64,
+                    "lineNumber": 287,
+                    "name": "addTrack",
+                    "returnType": "QString"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "kind",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 65,
+                    "lineNumber": 288,
+                    "name": "removeLastTrack",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "track",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "muted",
+                            "type": "bool"
+                        }
+                    ],
+                    "index": 66,
+                    "lineNumber": 289,
+                    "name": "setTrackMuted",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "track",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "state",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "enabled",
+                            "type": "bool"
+                        }
+                    ],
+                    "index": 67,
+                    "lineNumber": 290,
+                    "name": "setTrackState",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "track",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 68,
+                    "isConst": true,
+                    "lineNumber": 292,
+                    "name": "trackState",
+                    "returnType": "QVariantMap"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "track",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 69,
+                    "isConst": true,
+                    "lineNumber": 293,
+                    "name": "trackLocked",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "track",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 70,
+                    "isConst": true,
+                    "lineNumber": 294,
+                    "name": "trackVisible",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "track",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 71,
+                    "isConst": true,
+                    "lineNumber": 295,
+                    "name": "trackSolo",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "track",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 72,
+                    "isConst": true,
+                    "lineNumber": 296,
+                    "name": "trackSyncLocked",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "track",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 73,
+                    "isConst": true,
+                    "lineNumber": 297,
+                    "name": "trackTargeted",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "requestedMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "excludedClipIds",
+                            "type": "QStringList"
+                        },
+                        {
+                            "name": "thresholdMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 74,
+                    "isConst": true,
+                    "lineNumber": 298,
+                    "name": "snapTime",
+                    "returnType": "qint64"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "requestedMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "excludedClipIds",
+                            "type": "QStringList"
+                        }
+                    ],
+                    "index": 75,
+                    "isCloned": true,
+                    "isConst": true,
+                    "lineNumber": 298,
+                    "name": "snapTime",
+                    "returnType": "qint64"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "requestedMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 76,
+                    "isCloned": true,
+                    "isConst": true,
+                    "lineNumber": 298,
+                    "name": "snapTime",
+                    "returnType": "qint64"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipIds",
+                            "type": "QStringList"
+                        }
+                    ],
+                    "index": 77,
+                    "lineNumber": 301,
+                    "name": "rippleDeleteClips",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "endMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 78,
+                    "lineNumber": 302,
+                    "name": "rippleTrimClipEnd",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "track",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "startMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "endMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 79,
+                    "lineNumber": 303,
+                    "name": "closeGap",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "positionMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "name",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "color",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 80,
+                    "lineNumber": 304,
+                    "name": "addMarker",
+                    "returnType": "QString"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "positionMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "name",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 81,
+                    "isCloned": true,
+                    "lineNumber": 304,
+                    "name": "addMarker",
+                    "returnType": "QString"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "positionMs",
+                            "type": "qint64"
+                        }
+                    ],
+                    "index": 82,
+                    "isCloned": true,
+                    "lineNumber": 304,
+                    "name": "addMarker",
+                    "returnType": "QString"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "markerId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "positionMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "name",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "color",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 83,
+                    "lineNumber": 307,
+                    "name": "updateMarker",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "markerId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 84,
+                    "lineNumber": 309,
+                    "name": "removeMarker",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "enabled",
+                            "type": "bool"
+                        }
+                    ],
+                    "index": 85,
+                    "lineNumber": 310,
+                    "name": "setSnappingEnabled",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "path",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 86,
+                    "lineNumber": 311,
+                    "name": "saveProject",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "index": 87,
+                    "isCloned": true,
+                    "lineNumber": 311,
+                    "name": "saveProject",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "path",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 88,
+                    "lineNumber": 312,
+                    "name": "loadProject",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "path",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 89,
+                    "lineNumber": 313,
+                    "name": "probeMedia",
+                    "returnType": "QVariantMap"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "outputPath",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "preset",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 90,
+                    "lineNumber": 314,
+                    "name": "startExport",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "outputPath",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 91,
+                    "isCloned": true,
+                    "lineNumber": 314,
+                    "name": "startExport",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "outputPath",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "settings",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "index": 92,
+                    "lineNumber": 316,
+                    "name": "startExportWithSettings",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "family",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 93,
+                    "lineNumber": 318,
+                    "name": "downloadCaptionFont",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "index": 94,
+                    "isConst": true,
+                    "lineNumber": 319,
+                    "name": "suggestedExportPath",
+                    "returnType": "QString"
+                },
+                {
+                    "access": "public",
+                    "index": 95,
+                    "lineNumber": 320,
+                    "name": "cancelExport",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "mediaId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "model",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "language",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 96,
+                    "lineNumber": 322,
+                    "name": "transcribeMedia",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "mediaId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "model",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 97,
+                    "isCloned": true,
+                    "lineNumber": 322,
+                    "name": "transcribeMedia",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "mediaId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 98,
+                    "isCloned": true,
+                    "lineNumber": 322,
+                    "name": "transcribeMedia",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "index": 99,
+                    "lineNumber": 325,
+                    "name": "cancelTranscription",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "path",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 100,
+                    "lineNumber": 326,
+                    "name": "importSubtitles",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "path",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 101,
+                    "lineNumber": 327,
+                    "name": "exportTranscriptSrt",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "index",
+                            "type": "int"
+                        },
+                        {
+                            "name": "text",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 102,
+                    "lineNumber": 328,
+                    "name": "updateTranscriptSegment",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "index": 103,
+                    "lineNumber": 329,
+                    "name": "addTranscriptToTimeline",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "index": 104,
+                    "lineNumber": 330,
+                    "name": "removeTranscriptFromTimeline",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "targetLanguage",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 105,
+                    "lineNumber": 331,
+                    "name": "translateTranscript",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "index": 106,
+                    "lineNumber": 332,
+                    "name": "cancelTranslation",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 107,
+                    "lineNumber": 333,
+                    "name": "undo",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 108,
+                    "lineNumber": 334,
+                    "name": "redo",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 109,
+                    "lineNumber": 335,
+                    "name": "clearError",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "value",
+                            "type": "QVariant"
+                        }
+                    ],
+                    "index": 110,
+                    "lineNumber": 336,
+                    "name": "setColorSetting",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "key",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "value",
+                            "type": "QVariant"
+                        }
+                    ],
+                    "index": 111,
+                    "lineNumber": 337,
+                    "name": "setClipColorSetting",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 112,
+                    "lineNumber": 340,
+                    "name": "resetClipColorSettings",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "key",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "value",
+                            "type": "QVariant"
+                        }
+                    ],
+                    "index": 113,
+                    "lineNumber": 341,
+                    "name": "setClipEffectSetting",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 114,
+                    "lineNumber": 344,
+                    "name": "resetClipEffectSettings",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "effectId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 115,
+                    "lineNumber": 345,
+                    "name": "addClipEffect",
+                    "returnType": "QString"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "instanceId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 116,
+                    "lineNumber": 347,
+                    "name": "removeClipEffect",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "instanceId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "offset",
+                            "type": "int"
+                        }
+                    ],
+                    "index": 117,
+                    "lineNumber": 349,
+                    "name": "moveClipEffect",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "instanceId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "enabled",
+                            "type": "bool"
+                        }
+                    ],
+                    "index": 118,
+                    "lineNumber": 351,
+                    "name": "setClipEffectEnabled",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "instanceId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "parameterId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "value",
+                            "type": "QVariant"
+                        }
+                    ],
+                    "index": 119,
+                    "lineNumber": 354,
+                    "name": "setClipEffectParameter",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "instanceId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 120,
+                    "lineNumber": 358,
+                    "name": "resetClipEffectInstance",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "instanceId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 121,
+                    "lineNumber": 360,
+                    "name": "beginCustomBlurMaskEdit",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "index": 122,
+                    "lineNumber": 362,
+                    "name": "endCustomBlurMaskEdit",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "instanceId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "x",
+                            "type": "double"
+                        },
+                        {
+                            "name": "y",
+                            "type": "double"
+                        },
+                        {
+                            "name": "width",
+                            "type": "double"
+                        },
+                        {
+                            "name": "height",
+                            "type": "double"
+                        }
+                    ],
+                    "index": 123,
+                    "lineNumber": 363,
+                    "name": "setCustomBlurMask",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 124,
+                    "lineNumber": 366,
+                    "name": "requestEffectControls",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 125,
+                    "lineNumber": 367,
+                    "name": "requestEffectsBrowser",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 126,
+                    "isCloned": true,
+                    "lineNumber": 367,
+                    "name": "requestEffectsBrowser",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "effectId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "animated",
+                            "type": "bool"
+                        }
+                    ],
+                    "index": 127,
+                    "lineNumber": 368,
+                    "name": "requestEffectPreview",
+                    "returnType": "QString"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "effectId",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 128,
+                    "isCloned": true,
+                    "lineNumber": 368,
+                    "name": "requestEffectPreview",
+                    "returnType": "QString"
+                },
+                {
+                    "access": "public",
+                    "index": 129,
+                    "isConst": true,
+                    "lineNumber": 371,
+                    "name": "defaultAppSettings",
+                    "returnType": "QVariantMap"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "settings",
+                            "type": "QVariantMap"
+                        }
+                    ],
+                    "index": 130,
+                    "lineNumber": 372,
+                    "name": "applyAppSettings",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "index": 131,
+                    "lineNumber": 373,
+                    "name": "resetAppSettings",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "index": 132,
+                    "lineNumber": 374,
+                    "name": "clearMediaCache",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "mediaId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "key",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "value",
+                            "type": "QVariant"
+                        }
+                    ],
+                    "index": 133,
+                    "lineNumber": 375,
+                    "name": "setMediaColorSetting",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "path",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "mediaKind",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "sourcePositionMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "durationMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "sourceWidth",
+                            "type": "int"
+                        },
+                        {
+                            "name": "sourceHeight",
+                            "type": "int"
+                        },
+                        {
+                            "name": "frameRate",
+                            "type": "double"
+                        },
+                        {
+                            "name": "audioEnabled",
+                            "type": "bool"
+                        },
+                        {
+                            "name": "volume",
+                            "type": "double"
+                        }
+                    ],
+                    "index": 134,
+                    "lineNumber": 378,
+                    "name": "startPreviewDecode",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "path",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "sourcePositionMs",
+                            "type": "qint64"
+                        },
+                        {
+                            "name": "sourceWidth",
+                            "type": "int"
+                        },
+                        {
+                            "name": "sourceHeight",
+                            "type": "int"
+                        }
+                    ],
+                    "index": 135,
+                    "lineNumber": 382,
+                    "name": "requestPreviewFrame",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "index": 136,
+                    "lineNumber": 385,
+                    "name": "stopPreviewDecode",
+                    "returnType": "void"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "index": 0,
+                    "lineNumber": 26,
+                    "name": "coreVersion",
+                    "override": false,
+                    "read": "coreVersion",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 1,
+                    "lineNumber": 27,
+                    "name": "projectId",
+                    "notify": "projectChanged",
+                    "override": false,
+                    "read": "projectId",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 2,
+                    "lineNumber": 28,
+                    "name": "projectName",
+                    "notify": "projectChanged",
+                    "override": false,
+                    "read": "projectName",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setProjectName"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 3,
+                    "lineNumber": 30,
+                    "name": "projectLocation",
+                    "notify": "projectChanged",
+                    "override": false,
+                    "read": "projectLocation",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 4,
+                    "lineNumber": 31,
+                    "name": "projectFile",
+                    "notify": "projectChanged",
+                    "override": false,
+                    "read": "projectFile",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 5,
+                    "lineNumber": 32,
+                    "name": "sequenceId",
+                    "notify": "sequenceChanged",
+                    "override": false,
+                    "read": "sequenceId",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 6,
+                    "lineNumber": 33,
+                    "name": "sequenceName",
+                    "notify": "sequenceChanged",
+                    "override": false,
+                    "read": "sequenceName",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setSequenceName"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 7,
+                    "lineNumber": 35,
+                    "name": "activeWorkspace",
+                    "notify": "activeWorkspaceChanged",
+                    "override": false,
+                    "read": "activeWorkspace",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setActiveWorkspace"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 8,
+                    "lineNumber": 37,
+                    "name": "layoutPreset",
+                    "notify": "layoutPresetChanged",
+                    "override": false,
+                    "read": "layoutPreset",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setLayoutPreset"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 9,
+                    "lineNumber": 39,
+                    "name": "captionFontFamily",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionFontFamily",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setCaptionFontFamily"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 10,
+                    "lineNumber": 41,
+                    "name": "downloadedCaptionFonts",
+                    "notify": "captionFontsChanged",
+                    "override": false,
+                    "read": "downloadedCaptionFonts",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QStringList",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 11,
+                    "lineNumber": 43,
+                    "name": "captionFontSize",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionFontSize",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setCaptionFontSize"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 12,
+                    "lineNumber": 45,
+                    "name": "captionTextColor",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionTextColor",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setCaptionTextColor"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 13,
+                    "lineNumber": 47,
+                    "name": "captionBold",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionBold",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setCaptionBold"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 14,
+                    "lineNumber": 49,
+                    "name": "captionItalic",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionItalic",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setCaptionItalic"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 15,
+                    "lineNumber": 51,
+                    "name": "captionBackgroundVisible",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionBackgroundVisible",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setCaptionBackgroundVisible"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 16,
+                    "lineNumber": 53,
+                    "name": "captionBackgroundColor",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionBackgroundColor",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setCaptionBackgroundColor"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 17,
+                    "lineNumber": 55,
+                    "name": "captionPosition",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionPosition",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setCaptionPosition"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 18,
+                    "lineNumber": 57,
+                    "name": "captionAlignment",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionAlignment",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setCaptionAlignment"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 19,
+                    "lineNumber": 59,
+                    "name": "captionPositionX",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionPositionX",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "double",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 20,
+                    "lineNumber": 61,
+                    "name": "captionPositionY",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionPositionY",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "double",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 21,
+                    "lineNumber": 63,
+                    "name": "captionBlurEnabled",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionBlurEnabled",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setCaptionBlurEnabled"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 22,
+                    "lineNumber": 65,
+                    "name": "captionBlurTrackingEnabled",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionBlurTrackingEnabled",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setCaptionBlurTrackingEnabled"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 23,
+                    "lineNumber": 67,
+                    "name": "captionBlurRegionX",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionBlurRegionX",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "double",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 24,
+                    "lineNumber": 69,
+                    "name": "captionBlurRegionY",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionBlurRegionY",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "double",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 25,
+                    "lineNumber": 71,
+                    "name": "captionBlurRegionWidth",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionBlurRegionWidth",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "double",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 26,
+                    "lineNumber": 73,
+                    "name": "captionBlurRegionHeight",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionBlurRegionHeight",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "double",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 27,
+                    "lineNumber": 75,
+                    "name": "captionBlurStrength",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionBlurStrength",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setCaptionBlurStrength"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 28,
+                    "lineNumber": 77,
+                    "name": "captionBlurPadding",
+                    "notify": "captionStyleChanged",
+                    "override": false,
+                    "read": "captionBlurPadding",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setCaptionBlurPadding"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 29,
+                    "lineNumber": 79,
+                    "name": "media",
+                    "notify": "mediaChanged",
+                    "override": false,
+                    "read": "media",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariantList",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 30,
+                    "lineNumber": 80,
+                    "name": "clips",
+                    "notify": "clipsChanged",
+                    "override": false,
+                    "read": "clips",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariantList",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 31,
+                    "lineNumber": 81,
+                    "name": "hasSubtitleClips",
+                    "notify": "clipsChanged",
+                    "override": false,
+                    "read": "hasSubtitleClips",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 32,
+                    "lineNumber": 82,
+                    "name": "videoTrackCount",
+                    "notify": "tracksChanged",
+                    "override": false,
+                    "read": "videoTrackCount",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 33,
+                    "lineNumber": 83,
+                    "name": "audioTrackCount",
+                    "notify": "tracksChanged",
+                    "override": false,
+                    "read": "audioTrackCount",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 34,
+                    "lineNumber": 84,
+                    "name": "mutedTracks",
+                    "notify": "tracksChanged",
+                    "override": false,
+                    "read": "mutedTracks",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QStringList",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 35,
+                    "lineNumber": 85,
+                    "name": "trackStates",
+                    "notify": "tracksChanged",
+                    "override": false,
+                    "read": "trackStates",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariantList",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 36,
+                    "lineNumber": 86,
+                    "name": "markers",
+                    "notify": "markersChanged",
+                    "override": false,
+                    "read": "markers",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariantList",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 37,
+                    "lineNumber": 87,
+                    "name": "snappingEnabled",
+                    "notify": "snappingChanged",
+                    "override": false,
+                    "read": "snappingEnabled",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setSnappingEnabled"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 38,
+                    "lineNumber": 89,
+                    "name": "mediaCount",
+                    "notify": "mediaChanged",
+                    "override": false,
+                    "read": "mediaCount",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 39,
+                    "lineNumber": 90,
+                    "name": "mediaImportInProgress",
+                    "notify": "mediaImportChanged",
+                    "override": false,
+                    "read": "mediaImportInProgress",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 40,
+                    "lineNumber": 91,
+                    "name": "mediaImportProgress",
+                    "notify": "mediaImportChanged",
+                    "override": false,
+                    "read": "mediaImportProgress",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 41,
+                    "lineNumber": 92,
+                    "name": "hasSequence",
+                    "notify": "sequenceChanged",
+                    "override": false,
+                    "read": "hasSequence",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 42,
+                    "lineNumber": 93,
+                    "name": "hasMedia",
+                    "notify": "mediaChanged",
+                    "override": false,
+                    "read": "hasMedia",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 43,
+                    "lineNumber": 94,
+                    "name": "canExport",
+                    "notify": "timelineChanged",
+                    "override": false,
+                    "read": "canExport",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 44,
+                    "lineNumber": 95,
+                    "name": "durationMs",
+                    "notify": "timelineChanged",
+                    "override": false,
+                    "read": "durationMs",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "qint64",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 45,
+                    "lineNumber": 96,
+                    "name": "playheadMs",
+                    "notify": "playheadChanged",
+                    "override": false,
+                    "read": "playheadMs",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "qint64",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setPlayheadMs"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 46,
+                    "lineNumber": 98,
+                    "name": "playing",
+                    "notify": "playingChanged",
+                    "override": false,
+                    "read": "playing",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setPlaying"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 47,
+                    "lineNumber": 99,
+                    "name": "dirty",
+                    "notify": "dirtyChanged",
+                    "override": false,
+                    "read": "dirty",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 48,
+                    "lineNumber": 100,
+                    "name": "canUndo",
+                    "notify": "historyChanged",
+                    "override": false,
+                    "read": "canUndo",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 49,
+                    "lineNumber": 101,
+                    "name": "canRedo",
+                    "notify": "historyChanged",
+                    "override": false,
+                    "read": "canRedo",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 50,
+                    "lineNumber": 102,
+                    "name": "exportInProgress",
+                    "notify": "exportStateChanged",
+                    "override": false,
+                    "read": "exportInProgress",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 51,
+                    "lineNumber": 104,
+                    "name": "exportProgress",
+                    "notify": "exportStateChanged",
+                    "override": false,
+                    "read": "exportProgress",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "double",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 52,
+                    "lineNumber": 106,
+                    "name": "exportStatus",
+                    "notify": "exportStateChanged",
+                    "override": false,
+                    "read": "exportStatus",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 53,
+                    "lineNumber": 107,
+                    "name": "transcript",
+                    "notify": "transcriptChanged",
+                    "override": false,
+                    "read": "transcript",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariantList",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 54,
+                    "lineNumber": 108,
+                    "name": "transcriptionInProgress",
+                    "notify": "transcriptChanged",
+                    "override": false,
+                    "read": "transcriptionInProgress",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 55,
+                    "lineNumber": 110,
+                    "name": "transcriptionStatus",
+                    "notify": "transcriptChanged",
+                    "override": false,
+                    "read": "transcriptionStatus",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 56,
+                    "lineNumber": 112,
+                    "name": "transcriptLanguage",
+                    "notify": "transcriptChanged",
+                    "override": false,
+                    "read": "transcriptLanguage",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 57,
+                    "lineNumber": 114,
+                    "name": "translationInProgress",
+                    "notify": "transcriptChanged",
+                    "override": false,
+                    "read": "translationInProgress",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 58,
+                    "lineNumber": 116,
+                    "name": "translationStatus",
+                    "notify": "transcriptChanged",
+                    "override": false,
+                    "read": "translationStatus",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 59,
+                    "lineNumber": 118,
+                    "name": "lastError",
+                    "notify": "errorChanged",
+                    "override": false,
+                    "read": "lastError",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 60,
+                    "lineNumber": 119,
+                    "name": "colorSettings",
+                    "notify": "colorSettingsChanged",
+                    "override": false,
+                    "read": "colorSettings",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariantMap",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 61,
+                    "lineNumber": 121,
+                    "name": "activeColorClip",
+                    "notify": "colorSettingsChanged",
+                    "override": false,
+                    "read": "activeColorClip",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariantMap",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 62,
+                    "lineNumber": 123,
+                    "name": "activeColorMedia",
+                    "notify": "colorSettingsChanged",
+                    "override": false,
+                    "read": "activeColorMedia",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariantMap",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 63,
+                    "lineNumber": 125,
+                    "name": "selectedClipId",
+                    "notify": "selectionChanged",
+                    "override": false,
+                    "read": "selectedClipId",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false,
+                    "write": "setSelectedClipId"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 64,
+                    "lineNumber": 127,
+                    "name": "selectedClip",
+                    "notify": "selectionChanged",
+                    "override": false,
+                    "read": "selectedClip",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariantMap",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "index": 65,
+                    "lineNumber": 128,
+                    "name": "effectDefinitions",
+                    "override": false,
+                    "read": "effectDefinitions",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariantList",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 66,
+                    "lineNumber": 129,
+                    "name": "customBlurEditClipId",
+                    "notify": "customBlurEditChanged",
+                    "override": false,
+                    "read": "customBlurEditClipId",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 67,
+                    "lineNumber": 131,
+                    "name": "customBlurEditInstanceId",
+                    "notify": "customBlurEditChanged",
+                    "override": false,
+                    "read": "customBlurEditInstanceId",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 68,
+                    "lineNumber": 133,
+                    "name": "appSettings",
+                    "notify": "appSettingsChanged",
+                    "override": false,
+                    "read": "appSettings",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariantMap",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "index": 69,
+                    "lineNumber": 134,
+                    "name": "mediaCachePath",
+                    "override": false,
+                    "read": "mediaCachePath",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 70,
+                    "lineNumber": 135,
+                    "name": "mediaCacheSize",
+                    "notify": "mediaCacheChanged",
+                    "override": false,
+                    "read": "mediaCacheSize",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 71,
+                    "lineNumber": 136,
+                    "name": "previewFrameUrl",
+                    "notify": "previewFrameChanged",
+                    "override": false,
+                    "read": "previewFrameUrl",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 72,
+                    "lineNumber": 138,
+                    "name": "previewDecoding",
+                    "notify": "previewStateChanged",
+                    "override": false,
+                    "read": "previewDecoding",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "virtual": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 73,
+                    "lineNumber": 140,
+                    "name": "previewError",
+                    "notify": "previewErrorChanged",
+                    "override": false,
+                    "read": "previewError",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "virtual": false
+                }
+            ],
+            "qualifiedClassName": "Backend",
+            "signals": [
+                {
+                    "access": "public",
+                    "index": 0,
+                    "lineNumber": 388,
+                    "name": "projectChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 1,
+                    "lineNumber": 389,
+                    "name": "sequenceChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 2,
+                    "lineNumber": 390,
+                    "name": "mediaChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 3,
+                    "lineNumber": 391,
+                    "name": "mediaImportChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 4,
+                    "lineNumber": 392,
+                    "name": "clipsChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 5,
+                    "lineNumber": 393,
+                    "name": "tracksChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 6,
+                    "lineNumber": 394,
+                    "name": "markersChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 7,
+                    "lineNumber": 395,
+                    "name": "snappingChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 8,
+                    "lineNumber": 396,
+                    "name": "timelineChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 9,
+                    "lineNumber": 397,
+                    "name": "playheadChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 10,
+                    "lineNumber": 398,
+                    "name": "playingChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 11,
+                    "lineNumber": 399,
+                    "name": "dirtyChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 12,
+                    "lineNumber": 400,
+                    "name": "historyChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 13,
+                    "lineNumber": 401,
+                    "name": "activeWorkspaceChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 14,
+                    "lineNumber": 402,
+                    "name": "layoutPresetChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 15,
+                    "lineNumber": 403,
+                    "name": "captionStyleChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 16,
+                    "lineNumber": 404,
+                    "name": "captionFontsChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 17,
+                    "lineNumber": 405,
+                    "name": "exportStateChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 18,
+                    "lineNumber": 406,
+                    "name": "errorChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "success",
+                            "type": "bool"
+                        },
+                        {
+                            "name": "outputPath",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 19,
+                    "lineNumber": 407,
+                    "name": "exportFinished",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 20,
+                    "lineNumber": 408,
+                    "name": "transcriptChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 21,
+                    "lineNumber": 409,
+                    "name": "colorSettingsChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 22,
+                    "lineNumber": 410,
+                    "name": "selectionChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 23,
+                    "lineNumber": 411,
+                    "name": "effectControlsRequested",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 24,
+                    "lineNumber": 412,
+                    "name": "customBlurEditChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 25,
+                    "lineNumber": 413,
+                    "name": "effectsBrowserRequested",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "clipId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "effectId",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "animated",
+                            "type": "bool"
+                        },
+                        {
+                            "name": "url",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 26,
+                    "lineNumber": 414,
+                    "name": "effectPreviewReady",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 27,
+                    "lineNumber": 416,
+                    "name": "appSettingsChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 28,
+                    "lineNumber": 417,
+                    "name": "mediaCacheChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 29,
+                    "lineNumber": 418,
+                    "name": "previewFrameChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 30,
+                    "lineNumber": 419,
+                    "name": "previewStateChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 31,
+                    "lineNumber": 420,
+                    "name": "previewErrorChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "path",
+                            "type": "QString"
+                        }
+                    ],
+                    "index": 32,
+                    "lineNumber": 421,
+                    "name": "autoSaveCompleted",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "backend.h",
+    "outputRevision": 69
+}
