@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"C:/premier-pro/python-app/build-verify/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

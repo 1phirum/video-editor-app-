@@ -1,9 +1,0 @@
-********* Start testing of BackendTests *********
-Config: Using QtTest library 6.11.0, Qt 6.11.0 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 13.1.0), windows 11
-PASS   : BackendTests::initTestCase()
-PASS   : BackendTests::subtitleImportSeparatesRollingYouTubeWindows()
-PASS   : BackendTests::subtitleDeoverlapSparesSimultaneousDialogueOnly()
-PASS   : BackendTests::subtitleTimelineClampsOverlappingTranscriptWindows()
-PASS   : BackendTests::cleanupTestCase()
-Totals: 5 passed, 0 failed, 0 skipped, 0 blacklisted, 231ms
-********* Finished testing of BackendTests *********
