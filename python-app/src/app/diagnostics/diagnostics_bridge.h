@@ -1,0 +1,64 @@
+#pragma once
+
+#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <QVariantMap>
+
+class QQmlApplicationEngine;
+
+// One QML-reachable handle on everything the diagnostics layer knows.
+//
+// The pieces underneath are deliberately independent - the watchdog measures
+// responsiveness, ItemTreeCensus counts the scene, ModelGuard caps and records
+// delegate counts, CrashReporterHost owns the out-of-process reporter - and
+// wiring each of them into QML separately would mean four singletons and four
+// registrations. This is the one seam the UI needs.
+//
+// It also carries the two calls that make the reporter testable:
+// forceHang() and forceCrash(). A crash reporter that has never been made to
+// fire is a crash reporter that does not work, and waiting for a real freeze to
+// find out is how this project lost several rounds already.
+class DiagnosticsBridge final : public QObject {
+  Q_OBJECT
+  // Everything at once, for a debug overlay. Refreshed on demand rather than
+  // on a timer: reading it walks nothing, but a property that notifies every
+  // two seconds would re-evaluate every binding that touches it.
+  Q_PROPERTY(QVariantMap statistics READ statistics NOTIFY statisticsChanged)
+
+public:
+  explicit DiagnosticsBridge(QObject *parent = nullptr);
+
+  // Starts the item census against `engine`'s root objects. Called from main().
+  void attach(QQmlApplicationEngine *engine, int censusIntervalMs);
+
+  QVariantMap statistics() const;
+
+  // Walks the scene now and returns the fresh numbers.
+  Q_INVOKABLE QVariantMap sampleCensus();
+  // The census as the crash report prints it.
+  Q_INVOKABLE QString censusText() const;
+  // The guarded-model table, worst first.
+  Q_INVOKABLE QString modelReport() const;
+  // Writes everything known right now to a file in the crash-report directory
+  // and returns its path. This is the "capture evidence while it is happening"
+  // button: no freeze, no debugger, no crash required.
+  Q_INVOKABLE QString writeSnapshot(const QString &note = QString());
+  Q_INVOKABLE QStringList reports(int limit = 20) const;
+  Q_INVOKABLE QString reportDirectory() const;
+
+  // --- reporter self-test ------------------------------------------------
+  // Blocks the GUI thread for `ms`. The reporter should notice at its hang
+  // threshold and leave a hang report plus a minidump naming this call.
+  Q_INVOKABLE void forceHang(int ms);
+  // Raises an access violation. The last-chance filter fills the channel, the
+  // reporter writes a crash dump, and the process dies. Never call this from
+  // anything a user can reach.
+  Q_INVOKABLE void forceCrash();
+
+Q_SIGNALS:
+  void statisticsChanged();
+
+private:
+  QQmlApplicationEngine *m_engine = nullptr;
+};
