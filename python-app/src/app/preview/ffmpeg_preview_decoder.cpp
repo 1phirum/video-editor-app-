@@ -76,6 +76,7 @@ FfmpegPreviewDecoder::FfmpegPreviewDecoder(QObject *parent)
             // attempt - closing it is what used to cost 845 ms to undo.
             m_audioDrainTimer.stop();
             m_audioBuffer.clear();
+            m_audioOut.reset();
             if (m_audioSink)
               m_audioSink->reset();
             m_audioDevice = nullptr;
@@ -134,6 +135,19 @@ QImage FfmpegPreviewDecoder::frame() const {
   return m_frame.copy();
 }
 
+qint64 FfmpegPreviewDecoder::presentedSourceMs() const {
+  // Whichever path produced the picture answers for it. The in-process decoder
+  // carries each frame's own pts, so it is authoritative when it has published
+  // anything; the pipe fallback has to count frames instead.
+  const qint64 native = m_nativeVideo.presentedSourceMs();
+  if (native >= 0)
+    return native;
+  if (m_streamFramesShown < 0)
+    return -1;
+  return m_streamStartSourceMs +
+         qint64(double(m_streamFramesShown) * m_streamFrameIntervalMs);
+}
+
 void FfmpegPreviewDecoder::setError(const QString &message) {
   const QString clean = message.trimmed();
   if (clean == m_error)
@@ -172,6 +186,7 @@ void FfmpegPreviewDecoder::stop() {
   // old code destroyed the sink here, which meant every Play, every step and
   // every scrub paid the AUDIOSES device open again on the GUI thread. That was
   // 845 ms per transport press on the machine where this was traced.
+  m_audioOut.reset();
   if (m_audioSink)
     m_audioSink->reset();
   m_audioDevice = nullptr;
@@ -245,6 +260,15 @@ bool FfmpegPreviewDecoder::startVideo(const QString &path,
 
   const double outputFrameRate =
       qBound(1.0, frameRate > 0 ? frameRate : 30.0, 60.0);
+  // Where this stream starts and how far apart its frames are, so
+  // presentedSourceMs() can name the frame on screen. Reset here rather than in
+  // stop(): pausing stops the session and then asks what was showing.
+  m_streamStartSourceMs = qMax<qint64>(0, sourcePositionMs);
+  m_streamFrameIntervalMs =
+      singleFrame ? 0.0
+                  : 1000.0 / qMax(1.0, qMin(outputFrameRate,
+                                            profile.maximumFrameRate));
+  m_streamFramesShown = -1;
   QStringList arguments{QStringLiteral("-hide_banner"),
                         QStringLiteral("-loglevel"),
                         QStringLiteral("error"),
@@ -313,6 +337,7 @@ bool FfmpegPreviewDecoder::resolveAudioOutput() {
   CUTPRO_GUI_SCOPE("FfmpegPreviewDecoder::resolveAudioOutput");
   m_audioOutputResolved = true;
   if (!m_mediaDevices) {
+    CUTPRO_GUI_SCOPE("QMediaDevices::QMediaDevices");
     m_mediaDevices = std::make_unique<QMediaDevices>();
     connect(m_mediaDevices.get(), &QMediaDevices::audioOutputsChanged, this,
             [this]() {
@@ -323,11 +348,20 @@ bool FfmpegPreviewDecoder::resolveAudioOutput() {
               m_audioOutputResolved = false;
               m_audioFormat = QAudioFormat();
               m_audioOutputDevice = QAudioDevice();
+              m_audioOut.reset();
               releaseAudioSink();
             });
   }
 
-  m_audioOutputDevice = QMediaDevices::defaultAudioOutput();
+  {
+    // Split out from the rest so the watchdog names which AUDIOSES round trip
+    // is the slow one. The 2017 ms stall this warm-up produced was reported as
+    // "warmAudioOutput" as a whole, which is three separate service calls -
+    // device enumeration, format negotiation and client initialisation - and
+    // they have different fixes.
+    CUTPRO_GUI_SCOPE("QMediaDevices::defaultAudioOutput");
+    m_audioOutputDevice = QMediaDevices::defaultAudioOutput();
+  }
   if (m_audioOutputDevice.isNull())
     return false;
 
@@ -335,22 +369,43 @@ bool FfmpegPreviewDecoder::resolveAudioOutput() {
   format.setSampleRate(48000);
   format.setChannelCount(2);
   format.setSampleFormat(QAudioFormat::Int16);
-  if (!m_audioOutputDevice.isFormatSupported(format))
-    format = m_audioOutputDevice.preferredFormat();
+  {
+    CUTPRO_GUI_SCOPE("QAudioDevice::isFormatSupported");
+    if (!m_audioOutputDevice.isFormatSupported(format))
+      format = m_audioOutputDevice.preferredFormat();
+  }
   // ffmpeg is asked for s16le below, so a device that will not take Int16 cannot
   // be fed without a conversion step this preview path does not have.
   if (format.sampleFormat() != QAudioFormat::Int16)
     return false;
   m_audioFormat = format;
+  // The threaded sink is told what to open before anyone asks it to open one, so
+  // that warm() and begin() are pure re-arms.
+  m_audioOut.configure(m_audioOutputDevice, m_audioFormat);
   return true;
 }
 
 void FfmpegPreviewDecoder::warmAudioOutput() {
-  if (m_audioSink || !resolveAudioOutput())
+  if (!resolveAudioOutput())
     return;
 
   CUTPRO_GUI_SCOPE("FfmpegPreviewDecoder::warmAudioOutput");
-  m_audioSink = std::make_unique<QAudioSink>(m_audioOutputDevice, m_audioFormat);
+  // Asked for, not waited for. The 2038 ms the tracer measured inside
+  // QAudioSink::start() now happens on the audio thread, where nothing is
+  // painting.
+  m_audioOut.warm();
+  if (!m_audioOut.failed())
+    return;
+
+  // Only reached if the worker could not drive a sink on its own thread. Then the
+  // cost is paid here, as it was before, rather than losing preview audio.
+  if (m_audioSink)
+    return;
+  {
+    CUTPRO_GUI_SCOPE("QAudioSink::QAudioSink");
+    m_audioSink =
+        std::make_unique<QAudioSink>(m_audioOutputDevice, m_audioFormat);
+  }
   // The widest buffer any source asks for. A sink only honours setBufferSize()
   // before start(), so a reused sink keeps whatever it was built with - and too
   // much margin only costs latency, while too little costs an underrun.
@@ -358,9 +413,12 @@ void FfmpegPreviewDecoder::warmAudioOutput() {
   // start() is what actually initialises the client on the endpoint, which is the
   // expensive half. Immediately reset so nothing is playing; the device stays
   // open and the next start() is a local re-arm rather than a service round trip.
-  if (!m_audioSink->start()) {
-    releaseAudioSink();
-    return;
+  {
+    CUTPRO_GUI_SCOPE("QAudioSink::start");
+    if (!m_audioSink->start()) {
+      releaseAudioSink();
+      return;
+    }
   }
   m_audioSink->reset();
   m_audioDevice = nullptr;
@@ -372,20 +430,27 @@ void FfmpegPreviewDecoder::startAudio(const QString &path,
   if (!resolveAudioOutput())
     return;
 
-  // A device change is the only thing that invalidates a sink; everything else
-  // reuses it, which is the whole point of the change.
-  if (m_audioSink && m_audioSink->format() != m_audioFormat)
-    releaseAudioSink();
-  if (!m_audioSink) {
-    m_audioSink = std::make_unique<QAudioSink>(m_audioOutputDevice, m_audioFormat);
-    m_audioSink->setBufferSize(m_audioFormat.bytesForDuration(kAudioBufferUs));
-  }
+  if (!m_audioOut.failed()) {
+    // Arms the threaded sink. Queued, so pressing Play returns to the event loop
+    // whether or not the endpoint is quick about it today.
+    m_audioOut.begin(volume);
+  } else {
+    // A device change is the only thing that invalidates a sink; everything else
+    // reuses it, which is the whole point of the change.
+    if (m_audioSink && m_audioSink->format() != m_audioFormat)
+      releaseAudioSink();
+    if (!m_audioSink) {
+      m_audioSink =
+          std::make_unique<QAudioSink>(m_audioOutputDevice, m_audioFormat);
+      m_audioSink->setBufferSize(m_audioFormat.bytesForDuration(kAudioBufferUs));
+    }
 
-  m_audioSink->setVolume(qBound(0.0, volume, 1.0));
-  m_audioDevice = m_audioSink->start();
-  if (!m_audioDevice) {
-    releaseAudioSink();
-    return;
+    m_audioSink->setVolume(qBound(0.0, volume, 1.0));
+    m_audioDevice = m_audioSink->start();
+    if (!m_audioDevice) {
+      releaseAudioSink();
+      return;
+    }
   }
 
   const PreviewDecodePolicy::Profile profile =
@@ -434,6 +499,7 @@ void FfmpegPreviewDecoder::consumeVideoOutput() {
       m_frame = frame.copy();
     }
     m_videoBuffer.remove(0, m_frameBytes);
+    ++m_streamFramesShown;
     changed = true;
   }
   if (changed)
@@ -441,6 +507,16 @@ void FfmpegPreviewDecoder::consumeVideoOutput() {
 }
 
 void FfmpegPreviewDecoder::consumeAudioOutput() {
+  if (!m_audioOut.failed()) {
+    // Backpressure by not reading: leaving bytes in the pipe stalls ffmpeg, which
+    // is the right answer when the endpoint is behind. Reading them into an
+    // unbounded queue would not be.
+    if (m_audioOut.queuedBytes() >= kMaxQueuedAudioBytes)
+      return;
+    m_audioOut.enqueue(m_audioProcess.readAllStandardOutput());
+    return;
+  }
+
   m_audioBuffer += m_audioProcess.readAllStandardOutput();
   if (!m_audioSink || !m_audioDevice || m_audioBuffer.isEmpty())
     return;

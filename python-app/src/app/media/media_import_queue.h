@@ -17,6 +17,8 @@
 #include <functional>
 #include <memory>
 
+#include "core/module_api.h"
+
 // Concurrent, cancellable media import: folder expansion, optional copy into the
 // project, and metadata probing.
 //
@@ -45,7 +47,7 @@
 //    rather than once per file.
 //
 // All signals are emitted on the thread that owns the queue.
-class MediaImportQueue final : public QObject {
+class CUTPRO_MEDIA_API MediaImportQueue final : public QObject {
   Q_OBJECT
 
 public:

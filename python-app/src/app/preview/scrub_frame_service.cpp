@@ -15,6 +15,13 @@ namespace {
 // keyframe spacing, so half of it is a fair "close enough" window for the
 // placeholder frame shown mid-drag.
 constexpr qint64 kDefaultToleranceMs = 1000;
+// How stale a stand-in frame is allowed to be. Half a GOP is the right window on
+// a normal source, but a long-GOP recording (10 s between keyframes is ordinary
+// for a screen capture) would make that half window five seconds: the monitor
+// would answer a whole scrub with one picture and look frozen. Past this bound
+// the cached neighbour is refused, the request goes to the worker, and the
+// worker answers with the frame that belongs to the position asked for.
+constexpr qint64 kMaximumToleranceMs = 500;
 } // namespace
 
 ScrubFrameService::ScrubFrameService(QObject *parent) : QObject(parent) {
@@ -60,8 +67,8 @@ qint64 ScrubFrameService::toleranceFor(const QString &sourceKey) const {
   QMutexLocker locker(&m_mutex);
   const auto found = m_gopBySource.constFind(sourceKey);
   if (found == m_gopBySource.constEnd())
-    return kDefaultToleranceMs;
-  return qMax<qint64>(1, *found / 2);
+    return qMin(kDefaultToleranceMs, kMaximumToleranceMs);
+  return qBound<qint64>(1, *found / 2, kMaximumToleranceMs);
 }
 
 void ScrubFrameService::rememberTolerance(const QString &sourceKey,

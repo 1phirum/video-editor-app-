@@ -1,8 +1,10 @@
 #include "app/preview/gui_thread_watchdog.h"
 
+#include "app/diagnostics/crash_channel.h"
 #include "app/preview/gui_stall_report.h"
 #include "app/preview/gui_stall_tracer.h"
 
+#include <QByteArray>
 #include <QCoreApplication>
 #include <QLoggingCategory>
 #include <QThread>
@@ -28,6 +30,26 @@ std::atomic<QThread *> g_guiThread{nullptr};
 std::thread g_monitorThread;
 
 } // namespace
+
+qint64 GuiThreadWatchdog::traceThresholdMs() {
+  // Read once. The monitor thread asks for it on every report, and a stall run
+  // is exactly when the process should not be doing environment lookups.
+  static const qint64 threshold = []() -> qint64 {
+    const QByteArray raw =
+        qgetenv("CUTPRO_STALL_TRACE_MS").trimmed();
+    if (raw.isEmpty())
+      return kTraceThresholdMs;
+    bool ok = false;
+    const qint64 value = raw.toLongLong(&ok);
+    if (!ok || value <= 0)
+      return kTraceThresholdMs;
+    // A stall below the report threshold never reaches report() at all, so
+    // asking to trace at 100 ms would silently do nothing; clamping makes the
+    // lowest useful value the lowest accepted one.
+    return qMax(value, kReportThresholdMs);
+  }();
+  return threshold;
+}
 
 GuiThreadWatchdog::Scope::Scope(const char *label) {
   if (!label || !GuiThreadWatchdog::onGuiThread())
@@ -93,8 +115,15 @@ void GuiThreadWatchdog::start() {
   beat->setTimerType(Qt::CoarseTimer);
   beat->setInterval(kHeartbeatIntervalMs);
   QObject::connect(beat, &QTimer::timeout, beat, [this]() {
-    m_heartbeat.fetch_add(1, std::memory_order_relaxed);
-    m_heartbeatAtMs.store(monotonicMs(), std::memory_order_release);
+    const quint64 tick =
+        m_heartbeat.fetch_add(1, std::memory_order_relaxed) + 1;
+    const qint64 now = monotonicMs();
+    m_heartbeatAtMs.store(now, std::memory_order_release);
+    // Published to the out-of-process reporter as well. It compares consecutive
+    // samples of this counter rather than measuring against its own clock, which
+    // is what lets it tell a real hang from a suspended machine or a debugger
+    // that paused the app.
+    diag::CrashChannel::noteHeartbeat(tick, now);
   });
   beat->start();
 
@@ -178,6 +207,18 @@ void GuiThreadWatchdog::report(qint64 ageMs, bool severe) {
     m_worstScope.store(scope.blocking, std::memory_order_relaxed);
   }
 
+  // Published before anything is logged. If this stall never ends - which is the
+  // case the reporter exists for - these are the fields its hang report carries,
+  // and they have to be in the shared block by the time the reporter looks. The
+  // calls are fixed-size copies into an already-mapped page, so doing them from
+  // the monitor thread costs nothing and cannot allocate.
+  diag::CrashChannel::setScopeChain(scope.chain);
+  diag::CrashChannel::setVerdict(verdict);
+  diag::CrashChannel::noteStall(
+      static_cast<unsigned int>(m_stalls.load(std::memory_order_relaxed)),
+      static_cast<unsigned int>(m_severeStalls.load(std::memory_order_relaxed)),
+      m_worstStallMs.load(std::memory_order_relaxed));
+
   if (severe)
     qCWarning(lcGuiWatchdog).nospace()
         << "GUI thread STILL blocked after " << ageMs << " ms, " << verdict
@@ -208,7 +249,7 @@ void GuiThreadWatchdog::report(qint64 ageMs, bool severe) {
            "stuck in one: the fix is to do it fewer times, not to move it off "
            "the thread.";
 
-  if (ageMs < kTraceThresholdMs)
+  if (ageMs < traceThresholdMs())
     return;
 
   const QStringList frames = GuiStallTracer::captureGuiBacktrace();
@@ -253,6 +294,10 @@ QVariantMap GuiThreadWatchdog::statistics() const {
   stats[QStringLiteral("guiStallTraces")] =
       static_cast<qulonglong>(m_traceCaptures.load(std::memory_order_relaxed));
   stats[QStringLiteral("guiStallTracerReady")] = GuiStallTracer::available();
+  // Which stalls in this run were eligible for a backtrace. Without it, a log
+  // full of unattributed 400 ms hitches reads as a tracer failure rather than as
+  // the threshold being above them.
+  stats[QStringLiteral("guiStallTraceThresholdMs")] = traceThresholdMs();
   // The chain and the frames of the worst stall, so the debug overlay shows what
   // the log would have said without needing the log.
   {

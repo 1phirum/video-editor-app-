@@ -17,7 +17,10 @@ Menu {
     readonly property var effects: clipData && clipData.effects ? clipData.effects : ({})
     readonly property bool hasEditableClip: Boolean(clipData && clipData.id)
                                             && clipData.kind !== "subtitle"
+    // An effect-track bar has no picture of its own, so the intrinsic
+    // transform commands have nothing to act on.
     readonly property bool hasVideo: clipData && clipData.kind !== "audio"
+                                     && clipData.kind !== "effect"
     // Video clips carry their audio in the linked source media. Keep the
     // command visible for those clips even when metadata probing was delayed.
     readonly property bool hasAudio: clipData.kind === "video"

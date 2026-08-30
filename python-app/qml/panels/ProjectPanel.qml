@@ -4,6 +4,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Window
 import CutPro 1.0
 import "../theme"
 import "../components/common"
@@ -75,6 +76,12 @@ Rectangle {
     }
 
     function selectOrAdd(item, addToTimeline, modifiers, index) {
+        // Nothing that arrives while the context menu is up may rewrite the
+        // selection that menu is about to act on. On Windows the right-button
+        // release can still be delivered to the item after the popup opened,
+        // which would otherwise wipe a rubber-band selection down to one item.
+        if (mediaContextMenu.visible)
+            return
         root.forceActiveFocus()
         modifiers = modifiers || 0
         var ctrl = (modifiers & Qt.ControlModifier) !== 0
@@ -110,16 +117,21 @@ Rectangle {
     }
 
     function selectedIdsForAction() {
-        return selectedMediaIds.length ? selectedMediaIds.slice() :
-               (contextMediaId !== "" ? [contextMediaId] : [])
+        var ids = selectedMediaIds.length ? selectedMediaIds.slice()
+                  : (contextMediaId !== "" ? [contextMediaId] : [])
+        // The right-clicked item must always be part of its own context action:
+        // never let a stale selection leave the clicked clip behind while wiping
+        // its neighbours.
+        if (contextMediaId !== "" && ids.indexOf(contextMediaId) < 0)
+            ids.push(contextMediaId)
+        return ids
     }
 
     function requestDeleteSelected() {
         var ids = selectedIdsForAction()
         if (ids.length === 0)
             return
-        deleteConfirmDialog.mediaIds = ids
-        deleteConfirmDialog.open()
+        deleteConfirmDialog.openFor(ids)
     }
 
     function deleteSelected(ids) {
@@ -230,29 +242,162 @@ Rectangle {
         }
     }
 
-    Dialog {
+    // Window-native confirmation, centered on the application window. The stock
+    // MessageDialog fallback draws "Yes"/"Cancel" as bare text with no shape, so
+    // the same top-level modal window is kept and dressed with the app's own
+    // pill buttons: an outlined Cancel and a filled destructive Delete.
+    NativeModalWindow {
         id: deleteConfirmDialog
         property var mediaIds: []
-        modal: true
-        width: 380
-        title: mediaIds.length > 1 ? "Delete selected media?" : "Delete media?"
-        standardButtons: Dialog.Yes | Dialog.Cancel
-        anchors.centerIn: parent
-        onAccepted: root.deleteSelected(mediaIds.slice())
+        readonly property bool many: mediaIds.length > 1
 
-        background: Rectangle {
-            color: Theme.bgSidebar
-            border.color: Theme.border
-            radius: Theme.radiusMd
+        ownerWindow: root.Window.window
+        dialogTitle: many ? "Delete selected media?" : "Delete media?"
+        dialogWidth: 428
+        dialogHeight: 214
+        color: Theme.bgSidebar
+
+        function openFor(ids) {
+            mediaIds = ids
+            openNative()
+            confirmContent.forceActiveFocus()
         }
-        contentItem: Label {
-            text: deleteConfirmDialog.mediaIds.length > 1
-                  ? "This removes " + deleteConfirmDialog.mediaIds.length
-                    + " project items and all of their timeline clips. Source files stay on disk."
-                  : "This removes the project item and all of its timeline clips. The source file stays on disk."
-            color: Theme.textPrimary
-            font.pixelSize: Theme.fsSm
-            wrapMode: Text.WordWrap
+        function confirm() {
+            var ids = mediaIds.slice()
+            close()
+            root.deleteSelected(ids)
+        }
+        // Enter confirms, unless the user has tabbed onto Cancel.
+        function activateFocused() {
+            if (deleteCancelButton.activeFocus)
+                close()
+            else
+                confirm()
+        }
+
+        Item {
+            id: confirmContent
+            anchors.fill: parent
+            focus: true
+            Keys.onEscapePressed: deleteConfirmDialog.close()
+            Keys.onReturnPressed: deleteConfirmDialog.activateFocused()
+            Keys.onEnterPressed: deleteConfirmDialog.activateFocused()
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 18
+                spacing: 12
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 12
+
+                    Rectangle {
+                        Layout.alignment: Qt.AlignTop
+                        width: 38
+                        height: 38
+                        radius: 19
+                        color: Qt.rgba(0.973, 0.443, 0.443, 0.16)
+                        border.width: 1
+                        border.color: Qt.rgba(0.973, 0.443, 0.443, 0.45)
+                        Image {
+                            anchors.centerIn: parent
+                            source: "../../assets/icons/trash-2.svg"
+                            sourceSize.width: 19
+                            sourceSize.height: 19
+                        }
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 5
+                        Text {
+                            Layout.fillWidth: true
+                            text: deleteConfirmDialog.many
+                                  ? "Delete these " + deleteConfirmDialog.mediaIds.length
+                                    + " project items?"
+                                  : "Delete this project item?"
+                            color: Theme.textPrimary
+                            font.pixelSize: Theme.fsLg
+                            font.bold: true
+                            wrapMode: Text.WordWrap
+                        }
+                        Text {
+                            Layout.fillWidth: true
+                            text: deleteConfirmDialog.many
+                                  ? "This removes all of their timeline clips. The source files stay on disk."
+                                  : "This removes all of its timeline clips. The source file stays on disk."
+                            color: Theme.textSecondary
+                            font.pixelSize: Theme.fsSm
+                            lineHeight: 1.25
+                            wrapMode: Text.WordWrap
+                        }
+                    }
+                }
+                Item { Layout.fillHeight: true; Layout.minimumHeight: 4 }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 10
+                    Item { Layout.fillWidth: true }
+
+                    Button {
+                        id: deleteCancelButton
+                        text: "Cancel"
+                        implicitWidth: 96
+                        implicitHeight: 34
+                        onClicked: deleteConfirmDialog.close()
+                        HoverHandler {
+                            id: deleteCancelHover
+                            cursorShape: Qt.PointingHandCursor
+                        }
+                        contentItem: Text {
+                            text: deleteCancelButton.text
+                            color: Theme.textPrimary
+                            font.pixelSize: Theme.fsMd
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        background: Rectangle {
+                            radius: height / 2
+                            color: deleteCancelButton.down
+                                   ? Theme.hover
+                                   : deleteCancelHover.hovered ? Qt.lighter(Theme.bgPrimary, 1.35)
+                                                               : Theme.bgPrimary
+                            border.width: 1
+                            border.color: deleteCancelButton.activeFocus ? Theme.accent
+                                                                         : Theme.textMuted
+                        }
+                    }
+                    Button {
+                        id: deleteConfirmButton
+                        text: deleteConfirmDialog.many ? "Delete all" : "Delete"
+                        implicitWidth: 116
+                        implicitHeight: 34
+                        onClicked: deleteConfirmDialog.confirm()
+                        HoverHandler {
+                            id: deleteConfirmHover
+                            cursorShape: Qt.PointingHandCursor
+                        }
+                        contentItem: Text {
+                            text: deleteConfirmButton.text
+                            color: "#1c1c1c"
+                            font.pixelSize: Theme.fsMd
+                            font.bold: true
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        background: Rectangle {
+                            radius: height / 2
+                            color: deleteConfirmButton.down
+                                   ? Qt.darker(Theme.danger, 1.25)
+                                   : deleteConfirmHover.hovered ? Qt.lighter(Theme.danger, 1.1)
+                                                                : Theme.danger
+                            border.width: deleteConfirmButton.activeFocus ? 2 : 0
+                            border.color: Theme.textPrimary
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -466,6 +611,7 @@ Rectangle {
                 visible: !root.effectsMode && root.sortedMedia.length > 0 && !root.gridView
                 clip: true
                 model: root.sortedMedia
+                onCountChanged: ModelGuard.note("project.media", count)
                 spacing: 1
 
                 Rectangle {

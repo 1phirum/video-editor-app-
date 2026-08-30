@@ -28,6 +28,11 @@ Item {
         root.hasClip ? String(root.clipData.id) : ""
     readonly property bool isSubtitle:
         root.hasClip && root.clipData.kind === "subtitle"
+    // An effect-track bar. It carries an effect stack like a clip does, but none
+    // of the intrinsic clip controls - Motion, Opacity, Crop, Time Remapping -
+    // have any picture of their own to act on.
+    readonly property bool isEffectItem:
+        root.hasClip && root.clipData.kind === "effect"
     readonly property bool hasVisual: root.hasClip && !root.isSubtitle
                                       && root.clipData.kind !== "audio"
     readonly property int channelCount:
@@ -42,6 +47,105 @@ Item {
         root.hasClip ? Number(root.clipData.startMs || 0) : 0
     readonly property real clipSpanMs: root.hasClip
         ? Math.max(1, Number(root.clipData.durationMs || 1)) : 1
+
+    // ---- Visible window --------------------------------------------------
+    // Premiere scopes this timeline to the whole clip, which reads well because
+    // a Premiere clip is usually seconds long. The sources this project is cut
+    // from are not: a 25 h 48 m clip across the ~690 px of lane this panel has
+    // is 134 seconds per pixel, so two keyframes a minute apart land on the same
+    // pixel, a one-pixel drag moves a keyframe by two minutes, and the ruler
+    // labels collapse into a solid bar. So the lanes show a window into the
+    // clip rather than the clip, and the window is what both children are given.
+    // The clip's own extent goes down separately, so edits still clamp to the
+    // clip and only the view moves.
+    readonly property real minViewSpanMs: 2000
+    // Ten minutes is roughly where a keyframe is still a pixel or two wide at
+    // this panel's width, so it is the widest window worth opening on.
+    readonly property real fitSpanMs: 600000
+    property real viewStartMs: 0
+    property real viewSpanMs: 1000
+    readonly property real viewEndMs: root.viewStartMs + root.viewSpanMs
+    readonly property bool windowed: root.viewSpanMs < root.clipSpanMs - 1
+
+    // One frame of this clip's own media, so the ruler's sub-second ticks land
+    // on real frames instead of on a hardcoded 25 fps.
+    readonly property real frameMs: {
+        var rate = Number(root.mediaData ? (root.mediaData.frameRate || 0) : 0)
+        return rate > 0.01 ? 1000 / rate : 40
+    }
+
+    // Whole clip when the whole clip is legible, otherwise fitSpanMs around the
+    // playhead - which is where the user is working, and is already inside the
+    // clip whenever this panel has a selection.
+    function fitToClip() {
+        root.viewSpanMs = Math.max(root.minViewSpanMs,
+                                   Math.min(root.clipSpanMs, root.fitSpanMs))
+        root.viewStartMs = root.clipStartMs
+        root.centerOn(Number(Backend.playheadMs))
+    }
+
+    function showWholeClip() {
+        root.viewSpanMs = Math.max(root.minViewSpanMs, root.clipSpanMs)
+        root.viewStartMs = root.clipStartMs
+        root.clampView()
+    }
+
+    function clampView() {
+        var span = Math.max(root.minViewSpanMs,
+                            Math.min(root.viewSpanMs, root.clipSpanMs))
+        root.viewSpanMs = span
+        root.viewStartMs = Math.max(
+                    root.clipStartMs,
+                    Math.min(root.clipStartMs + root.clipSpanMs - span,
+                             root.viewStartMs))
+    }
+
+    function centerOn(ms) {
+        root.viewStartMs = ms - root.viewSpanMs / 2
+        root.clampView()
+    }
+
+    // Anchored zoom: the time under the pointer stays under the pointer, which
+    // is what makes a wheel-zoom feel like a lens rather than a jump.
+    function zoomBy(factor, anchorMs) {
+        var span = Math.max(root.minViewSpanMs,
+                            Math.min(root.clipSpanMs, root.viewSpanMs * factor))
+        var ratio = (anchorMs - root.viewStartMs) / Math.max(1, root.viewSpanMs)
+        root.viewSpanMs = span
+        root.viewStartMs = anchorMs - ratio * span
+        root.clampView()
+    }
+
+    function panBy(deltaMs) {
+        root.viewStartMs += deltaMs
+        root.clampView()
+    }
+
+    // Button zoom anchors on the playhead when it is on screen, because that is
+    // the frame the user is looking at; otherwise on the middle of the window.
+    function zoomAtPlayhead(factor) {
+        var ms = Number(Backend.playheadMs)
+        root.zoomBy(factor, ms >= root.viewStartMs && ms <= root.viewEndMs
+                    ? ms : root.viewStartMs + root.viewSpanMs / 2)
+    }
+
+    onClipIdChanged: root.fitToClip()
+    // A trim on the selected clip can leave the window hanging past the new end.
+    onClipSpanMsChanged: root.clampView()
+
+    // Follows the playhead only once it leaves the window, and then pages by
+    // recentring: a window that recentres on every tick turns playback into a
+    // sliding ruler nothing can be aimed at.
+    Connections {
+        target: Backend
+        function onPlayheadChanged() {
+            if (!root.hasClip)
+                return
+            var ms = Number(Backend.playheadMs)
+            if (ms < root.viewStartMs || ms > root.viewEndMs)
+                root.centerOn(ms)
+        }
+    }
 
     // Split between the parameter tree and the keyframe lanes.
     property real dividerX: 336
@@ -111,11 +215,24 @@ Item {
 
     function timecode(milliseconds) {
         var ms = Math.max(0, Number(milliseconds))
-        var frames = Math.floor((ms % 1000) / 40)
+        var frames = Math.floor((ms % 1000) / Math.max(1, root.frameMs))
         var total = Math.floor(ms / 1000)
         function pad(value) { return value < 10 ? "0" + value : String(value) }
         return pad(Math.floor(total / 3600)) + ":" + pad(Math.floor(total / 60) % 60)
                + ":" + pad(total % 60) + ":" + pad(frames)
+    }
+
+    // Span readout for the footer. A bare timecode cannot say whether the lanes
+    // are showing ten minutes or a whole day, and that is the one thing the user
+    // needs to know before dragging a keyframe.
+    function durationLabel(milliseconds) {
+        var total = Math.round(Math.max(0, Number(milliseconds)) / 1000)
+        if (total < 60)
+            return total + "s"
+        if (total < 3600)
+            return Math.floor(total / 60) + "m " + (total % 60) + "s"
+        return Math.floor(total / 3600) + "h "
+                + Math.floor((total % 3600) / 60) + "m"
     }
 
     // ---- Row constructors -----------------------------------------------
@@ -130,7 +247,7 @@ Item {
     }
     function paramRow(id, label, def, from, to, decimals, unit) {
         return { kind: "param", key: "p::" + id, id: id, instanceId: "",
-                 label: label, def: def, from: from, to: to,
+                 channel: id, label: label, def: def, from: from, to: to,
                  decimals: decimals, unit: unit, kf: true, expandable: true }
     }
     function boolRow(id, label, def) {
@@ -157,7 +274,8 @@ Item {
     // feeds the same draft.
     function sliderRowFor(row) {
         return { kind: "slider", key: row.key, id: row.id,
-                 instanceId: row.instanceId || "", label: row.label,
+                 instanceId: row.instanceId || "",
+                 channel: row.channel || row.id, label: row.label,
                  def: row.def, from: row.from, to: row.to,
                  decimals: row.decimals, kf: row.kf === true,
                  disabled: row.disabled === true, resettable: false }
@@ -189,12 +307,17 @@ Item {
         }
         return { kind: "param", key: key, id: String(parameter.id),
                  instanceId: String(instance.id), label: label,
+                 // Animation channel. The instance id is in the name because two
+                 // Custom Blurs on one clip, or a Gaussian Blur beside one, both
+                 // call their parameter "amount".
+                 channel: Backend.keyframeEngine.instanceChannel(
+                              String(instance.id), String(parameter.id)),
                  def: Number(parameter.default || 0),
                  from: Number(parameter.minimum || 0),
                  to: Number(parameter.maximum === undefined ? 100 : parameter.maximum),
                  decimals: Number(parameter.decimals || 0),
                  unit: String(parameter.unit || ""),
-                 kf: false, expandable: true, disabled: off }
+                 kf: true, expandable: true, disabled: off }
     }
 
     function blendModeOptions() {
@@ -262,7 +385,10 @@ Item {
     // The first build stays synchronous: this panel is incubated asynchronously
     // by its Loader, so it is already off the critical path, and doing it here
     // avoids showing an empty grid for a frame on open.
-    Component.onCompleted: root.rebuildRows()
+    Component.onCompleted: {
+        root.fitToClip()
+        root.rebuildRows()
+    }
 
     function rebuildRows() {
         var list = []
@@ -319,44 +445,46 @@ Item {
             var videoBand = root.bandRow("video", "Video")
             list.push(videoBand)
             if (root.isExpanded(videoBand.key, true)) {
-                pushSection(root.groupRow("motion", "Motion", true), [
-                    root.paramRow("positionX", "Position X", 0, -100, 100, 1, ""),
-                    root.paramRow("positionY", "Position Y", 0, -100, 100, 1, ""),
-                    root.paramRow("scale", "Scale", 100, 10, 400, 1, "%"),
-                    root.withDisabled(root.paramRow("scaleWidth", "Scale Width",
-                                                    100, 10, 600, 1, "%"), uniform),
-                    root.withDisabled(root.paramRow("scaleHeight", "Scale Height",
-                                                    100, 10, 600, 1, "%"), uniform),
-                    root.boolRow("uniformScale", "Uniform Scale", true),
-                    root.paramRow("rotation", "Rotation", 0, -180, 180, 1, "°"),
-                    root.paramRow("anchorPointX", "Anchor Point X", 0.5, 0, 1, 2, ""),
-                    root.paramRow("anchorPointY", "Anchor Point Y", 0.5, 0, 1, 2, ""),
-                    root.paramRow("antiFlicker", "Anti-flicker Filter", 0, 0, 1, 2, ""),
-                    root.boolRow("horizontalFlip", "Flip Horizontal", false),
-                    root.boolRow("verticalFlip", "Flip Vertical", false)
-                ])
-                pushSection(root.groupRow("opacity", "Opacity", true), [
-                    root.paramRow("opacity", "Opacity", 100, 0, 100, 1, "%"),
-                    root.masksRow("maskType", "Mask", "none"),
-                    root.paramRow("maskFeather", "Mask Feather", 0, 0, 250, 0, "px"),
-                    root.paramRow("maskOpacity", "Mask Opacity", 100, 0, 100, 1, "%"),
-                    root.paramRow("maskExpansion", "Mask Expansion", 0, -250, 250, 0, "px"),
-                    root.boolRow("maskInverted", "Inverted", false),
-                    root.selectRow("blendMode", "Blend Mode", "normal",
-                                   root.blendModeOptions())
-                ])
-                pushSection(root.groupRow("crop", "Crop", false), [
-                    root.paramRow("cropLeft", "Left", 0, 0, 49, 1, "%"),
-                    root.paramRow("cropRight", "Right", 0, 0, 49, 1, "%"),
-                    root.paramRow("cropTop", "Top", 0, 0, 49, 1, "%"),
-                    root.paramRow("cropBottom", "Bottom", 0, 0, 49, 1, "%")
-                ])
-                pushSection(root.groupRow("blur", "Gaussian Blur", false), [
-                    root.paramRow("blur", "Blurriness", 0, 0, 100, 1, "")
-                ])
-                pushSection(root.groupRow("time", "Time Remapping", false), [
-                    root.paramRow("speed", "Speed", 100, 1, 10000, 1, "%")
-                ])
+                if (!root.isEffectItem) {
+                    pushSection(root.groupRow("motion", "Motion", true), [
+                        root.paramRow("positionX", "Position X", 0, -100, 100, 1, ""),
+                        root.paramRow("positionY", "Position Y", 0, -100, 100, 1, ""),
+                        root.paramRow("scale", "Scale", 100, 10, 400, 1, "%"),
+                        root.withDisabled(root.paramRow("scaleWidth", "Scale Width",
+                                                        100, 10, 600, 1, "%"), uniform),
+                        root.withDisabled(root.paramRow("scaleHeight", "Scale Height",
+                                                        100, 10, 600, 1, "%"), uniform),
+                        root.boolRow("uniformScale", "Uniform Scale", true),
+                        root.paramRow("rotation", "Rotation", 0, -180, 180, 1, "°"),
+                        root.paramRow("anchorPointX", "Anchor Point X", 0.5, 0, 1, 2, ""),
+                        root.paramRow("anchorPointY", "Anchor Point Y", 0.5, 0, 1, 2, ""),
+                        root.paramRow("antiFlicker", "Anti-flicker Filter", 0, 0, 1, 2, ""),
+                        root.boolRow("horizontalFlip", "Flip Horizontal", false),
+                        root.boolRow("verticalFlip", "Flip Vertical", false)
+                    ])
+                    pushSection(root.groupRow("opacity", "Opacity", true), [
+                        root.paramRow("opacity", "Opacity", 100, 0, 100, 1, "%"),
+                        root.masksRow("maskType", "Mask", "none"),
+                        root.paramRow("maskFeather", "Mask Feather", 0, 0, 250, 0, "px"),
+                        root.paramRow("maskOpacity", "Mask Opacity", 100, 0, 100, 1, "%"),
+                        root.paramRow("maskExpansion", "Mask Expansion", 0, -250, 250, 0, "px"),
+                        root.boolRow("maskInverted", "Inverted", false),
+                        root.selectRow("blendMode", "Blend Mode", "normal",
+                                       root.blendModeOptions())
+                    ])
+                    pushSection(root.groupRow("crop", "Crop", false), [
+                        root.paramRow("cropLeft", "Left", 0, 0, 49, 1, "%"),
+                        root.paramRow("cropRight", "Right", 0, 0, 49, 1, "%"),
+                        root.paramRow("cropTop", "Top", 0, 0, 49, 1, "%"),
+                        root.paramRow("cropBottom", "Bottom", 0, 0, 49, 1, "%")
+                    ])
+                    pushSection(root.groupRow("blur", "Gaussian Blur", false), [
+                        root.paramRow("blur", "Blurriness", 0, 0, 100, 1, "")
+                    ])
+                    pushSection(root.groupRow("time", "Time Remapping", false), [
+                        root.paramRow("speed", "Speed", 100, 1, 10000, 1, "%")
+                    ])
+                }
                 pushInstances("video")
             }
         }
@@ -393,6 +521,13 @@ Item {
             }
         }
 
+        // Both halves of the story, recorded at the moment the rebuild ends:
+        // the input (how many effect instances the backend says this clip has)
+        // and the output (how many rows they produced). A row count that has
+        // run away with a sane stack is a bug in the builder above; both large
+        // together is a backend that is appending instances it should not.
+        ModelGuard.note("effectControls.stack", stack.length)
+        ModelGuard.note("effectControls.built", list.length)
         root.rows = list
     }
 
@@ -487,8 +622,13 @@ Item {
                 x: root.dividerX + 1
                 width: Math.max(0, parent.width - root.dividerX - 1)
                 height: parent.height
-                startMs: root.clipStartMs
-                spanMs: root.clipSpanMs
+                startMs: root.viewStartMs
+                spanMs: root.viewSpanMs
+                clipStartMs: root.clipStartMs
+                clipSpanMs: root.clipSpanMs
+                frameMs: root.frameMs
+                onZoomRequested: (factor, anchorMs) => root.zoomBy(factor, anchorMs)
+                onPanRequested: (deltaMs) => root.panBy(deltaMs)
             }
             Rectangle {
                 x: root.dividerX
@@ -547,6 +687,16 @@ Item {
 
                     Repeater {
                         model: root.rows
+                        // The prime suspect, and the reason this recording
+                        // exists. gdb caught the freeze inside
+                        // QQuickRepeater::setModel -> clear() ->
+                        // QQmlDelegateModel::cancel(), reached from a
+                        // selectionDetailChanged cascade, and this is a
+                        // Repeater whose model is rebound by exactly that
+                        // cascade. If the count here is four figures when the
+                        // window freezes, the argument is over.
+                        onCountChanged: ModelGuard.note("effectControls.rows",
+                                                       count)
                         delegate: EffectTreeRow {
                             required property var modelData
                             width: treeColumn.width
@@ -578,8 +728,13 @@ Item {
                     rows: root.rows
                     clipId: root.clipId
                     clipLabel: root.clipLabel
-                    startMs: root.clipStartMs
-                    spanMs: root.clipSpanMs
+                    startMs: root.viewStartMs
+                    spanMs: root.viewSpanMs
+                    clipStartMs: root.clipStartMs
+                    clipSpanMs: root.clipSpanMs
+                    onZoomRequested: (factor, anchorMs) => root.zoomBy(factor,
+                                                                       anchorMs)
+                    onPanRequested: (deltaMs) => root.panBy(deltaMs)
                 }
             }
 
@@ -598,7 +753,7 @@ Item {
                 width: 7
                 height: parent.height
                 hoverEnabled: true
-                cursorShape: Qt.SplitHCursor
+                AppCursor.name: "SplitterHorizontal"
                 property real pressX: 0
                 onPressed: (mouse) => {
                     dividerHandle.pressX =
@@ -662,14 +817,72 @@ Item {
                 font.pixelSize: Theme.fsXs
             }
 
-            Text {
+            // Zoom controls. Without them a windowed timeline is a trap: the
+            // lanes would show ten minutes of a twenty-six hour clip with no
+            // visible way to reach the rest of it.
+            Row {
                 anchors.right: parent.right
                 anchors.rightMargin: 10
                 anchors.verticalCenter: parent.verticalCenter
-                text: root.timecode(root.clipSpanMs)
-                color: Theme.textMuted
-                font.family: Theme.monoFont
-                font.pixelSize: Theme.fsXs
+                height: 18
+                spacing: 6
+
+                Text {
+                    height: 18
+                    verticalAlignment: Text.AlignVCenter
+                    text: root.windowed
+                          ? root.durationLabel(root.viewSpanMs) + " view"
+                          : "whole clip"
+                    color: Theme.textMuted
+                    font.pixelSize: Theme.fsXs
+                }
+
+                LumetriActionButton {
+                    implicitWidth: 24
+                    height: 18
+                    text: "−"
+                    enabled: root.hasClip && root.windowed
+                    onClicked: root.zoomAtPlayhead(1.6)
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Zoom out (Ctrl+wheel over the lanes)"
+                }
+                LumetriActionButton {
+                    implicitWidth: 24
+                    height: 18
+                    text: "+"
+                    enabled: root.hasClip
+                             && root.viewSpanMs > root.minViewSpanMs
+                    onClicked: root.zoomAtPlayhead(0.625)
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Zoom in (Ctrl+wheel over the lanes)"
+                }
+                LumetriActionButton {
+                    implicitWidth: 34
+                    height: 18
+                    text: "Fit"
+                    enabled: root.hasClip
+                    onClicked: root.fitToClip()
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Window around the playhead"
+                }
+                LumetriActionButton {
+                    implicitWidth: 34
+                    height: 18
+                    text: "All"
+                    enabled: root.hasClip && root.windowed
+                    onClicked: root.showWholeClip()
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Show the whole clip"
+                }
+
+                Text {
+                    height: 18
+                    verticalAlignment: Text.AlignVCenter
+                    text: root.timecode(root.clipSpanMs)
+                    color: Theme.textMuted
+                    font.family: Theme.monoFont
+                    font.pixelSize: Theme.fsXs
+                }
             }
         }
     }

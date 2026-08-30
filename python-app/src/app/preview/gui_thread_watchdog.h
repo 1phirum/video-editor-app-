@@ -102,6 +102,12 @@ public:
   // so the first repeat of any real stall carries a backtrace; below it, the
   // marked scopes are enough and the report stays free of side effects.
   static constexpr qint64 kTraceThresholdMs = 600;
+  // The threshold actually in force. CUTPRO_STALL_TRACE_MS lowers it for a
+  // diagnostic session: a run of 400 ms hitches never reaches the default, so
+  // the log names no scope for exactly the stalls a user describes as "slow but
+  // not frozen". Clamped to the report threshold below, since a stall that is
+  // never reported cannot be traced either.
+  static qint64 traceThresholdMs();
 
 private:
   GuiThreadWatchdog() = default;

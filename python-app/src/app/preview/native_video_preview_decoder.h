@@ -11,6 +11,7 @@
 #include <thread>
 
 #include "app/preview/frame_buffer_pool.h"
+#include "core/module_api.h"
 
 // Only pointers to these libav types are stored, so the FFmpeg headers stay
 // private to the implementation and out of every consumer of this header.
@@ -31,7 +32,7 @@ struct AVBufferRef;
 //  - Every published frame carries the generation it was decoded for. A frame
 //    from a superseded request is discarded rather than shown, so the monitor
 //    always ends on the newest seek instead of whichever decode finished last.
-class NativeVideoPreviewDecoder final : public QObject {
+class CUTPRO_PREVIEW_API NativeVideoPreviewDecoder final : public QObject {
   Q_OBJECT
 
 public:
@@ -52,6 +53,22 @@ public:
   // performance tests and the debug overlay.
   quint64 droppedFrames() const {
     return m_droppedFrames.load(std::memory_order_relaxed);
+  }
+  // Source position of the frame currently on screen, or -1 before this session
+  // has published one.
+  //
+  // The monitor's playhead used to be an open-loop wall clock started the moment
+  // Play was pressed, while the picture only starts once this thread has opened
+  // the container, seeked and decoded a frame. Everything derived from the
+  // playhead - the time display, the subtitle overlay, the still rendered on
+  // pause - therefore ran ahead of the image by that startup cost, which is why
+  // pausing appeared to jump the picture forward.
+  //
+  // Written by the decode thread on every publish, read by the GUI thread on
+  // every UI tick, so it is an atomic rather than mutex-guarded: one qint64, no
+  // invariant to protect, and the reader always wants the newest value.
+  qint64 presentedSourceMs() const {
+    return m_presentedSourceMs.load(std::memory_order_acquire);
   }
   qint64 frameMemoryBytes() const {
     return m_pool ? m_pool->allocatedBytes() : 0;
@@ -76,7 +93,7 @@ private:
   };
 
   void decode(Request request);
-  void publishFrame(QImage image, quint64 generation);
+  void publishFrame(QImage image, quint64 generation, qint64 sourceMs);
   void setError(const QString &message);
   void joinDecodeThread();
   // Creates the hardware decode device on first use and reuses it for every
@@ -105,4 +122,5 @@ private:
   std::atomic<quint64> m_generation{0};
   std::atomic<quint64> m_droppedFrames{0};
   std::atomic<quint64> m_revision{0};
+  std::atomic<qint64> m_presentedSourceMs{-1};
 };

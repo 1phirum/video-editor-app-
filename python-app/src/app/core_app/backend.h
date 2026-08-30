@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QImage>
 #include <QHash>
+#include <QJsonObject>
 #include <QNetworkAccessManager>
 #include <QProcess>
 #include <QFutureWatcher>
@@ -31,9 +32,11 @@
 #include <QVariantMap>
 #include <QVector>
 
+#include "core/module_api.h"
+
 // Native Qt application service exposed to QML. Project data uses Qt value
 // types so it remains observable and can be serialized without another bridge.
-class Backend : public QObject {
+class CUTPRO_BACKEND_API Backend : public QObject {
   Q_OBJECT
   Q_PROPERTY(QString coreVersion READ coreVersion CONSTANT)
   Q_PROPERTY(QString projectId READ projectId NOTIFY projectChanged)
@@ -92,6 +95,10 @@ class Backend : public QObject {
   Q_PROPERTY(QVariantList clips READ clips NOTIFY clipsChanged)
   Q_PROPERTY(TimelineClipModel *timelineClipModel READ timelineClipModel CONSTANT)
   Q_PROPERTY(bool hasSubtitleClips READ hasSubtitleClips NOTIFY clipsChanged)
+  // Effect-track items only, so the monitor and the timeline can walk a handful
+  // of entries per playhead move instead of the whole clip list.
+  Q_PROPERTY(QVariantList timelineEffects READ timelineEffects NOTIFY
+                 clipsChanged)
   Q_PROPERTY(int videoTrackCount READ videoTrackCount NOTIFY tracksChanged)
   Q_PROPERTY(int audioTrackCount READ audioTrackCount NOTIFY tracksChanged)
   Q_PROPERTY(QStringList mutedTracks READ mutedTracks NOTIFY tracksChanged)
@@ -99,6 +106,19 @@ class Backend : public QObject {
   Q_PROPERTY(QVariantList markers READ markers NOTIFY markersChanged)
   Q_PROPERTY(bool snappingEnabled READ snappingEnabled WRITE setSnappingEnabled
                  NOTIFY snappingChanged)
+  // True while an effect is being dragged out of the Effects panel. The effect
+  // lane only exists on the timeline while it holds bars or while there is
+  // something to drop on it, and the panel doing the dragging is not the panel
+  // that has to show the lane - so the flag lives here, where both can see it.
+  Q_PROPERTY(bool effectDragActive READ effectDragActive WRITE
+                 setEffectDragActive NOTIFY effectDragActiveChanged)
+  // True while the program monitor is showing the picture over the whole screen.
+  // The monitor is the panel that re-hosts its own stage, but the window is what
+  // has to go fullscreen and Escape is handled once for the whole window - so
+  // like effectDragActive this lives where both ends can see it, which is also
+  // what keeps the button and the key from disagreeing about the state.
+  Q_PROPERTY(bool videoFullScreen READ videoFullScreen WRITE setVideoFullScreen
+                 NOTIFY videoFullScreenChanged)
   Q_PROPERTY(int mediaCount READ mediaCount NOTIFY mediaChanged)
   Q_PROPERTY(bool mediaImportInProgress READ mediaImportInProgress NOTIFY mediaImportChanged)
   Q_PROPERTY(int mediaImportProgress READ mediaImportProgress NOTIFY mediaImportChanged)
@@ -180,6 +200,12 @@ class Backend : public QObject {
   // "Not Responding" while a long source is decoded behind it.
   Q_PROPERTY(bool timelineInteractionActive READ timelineInteractionActive NOTIFY
                  timelineInteractionChanged)
+  // Bumped every time the prefetcher lands another thumbnail or waveform window.
+  // The timeline's filmstrips and waveforms re-check what they hold whenever this
+  // changes, which is how a clip's strip visibly grows in after a drop instead of
+  // appearing whole or not at all. Monotonic; the value itself means nothing.
+  Q_PROPERTY(int timelinePreviewRevision READ timelinePreviewRevision NOTIFY
+                 timelinePreviewRevisionChanged)
 
 public:
   explicit Backend(QObject *parent = nullptr);
@@ -227,12 +253,17 @@ public:
   QVariantList clips() const { return m_clips; }
   TimelineClipModel *timelineClipModel() { return &m_timelineClipModel; }
   bool hasSubtitleClips() const;
+  QVariantList timelineEffects() const;
   int videoTrackCount() const { return m_videoTrackCount; }
   int audioTrackCount() const { return m_audioTrackCount; }
   QStringList mutedTracks() const { return m_mutedTracks; }
   QVariantList trackStates() const;
   QVariantList markers() const { return m_markers; }
   bool snappingEnabled() const { return m_snappingEnabled; }
+  bool effectDragActive() const { return m_effectDragActive; }
+  void setEffectDragActive(bool active);
+  bool videoFullScreen() const { return m_videoFullScreen; }
+  void setVideoFullScreen(bool active);
   int mediaCount() const { return m_media.size(); }
   bool mediaImportInProgress() const { return m_mediaImportQueue.active(); }
   int mediaImportProgress() const { return m_mediaImportQueue.percent(); }
@@ -375,8 +406,14 @@ public:
   Q_INVOKABLE bool deleteClipRight(const QString &clipId, qint64 positionMs);
   Q_INVOKABLE bool removeClip(const QString &clipId);
   Q_INVOKABLE bool removeClips(const QStringList &clipIds);
-  Q_INVOKABLE QString addTrack(const QString &kind);
+  Q_INVOKABLE QString addTrack(const QString &kind, bool sticky = true);
   Q_INVOKABLE bool removeLastTrack(const QString &kind);
+  // Placement rules for the drop handlers, answered against the live track
+  // counts. QML owns the geometry (which row the pointer is over); this owns
+  // what may go there, so the rule cannot drift between the two drag paths.
+  Q_INVOKABLE QString trackForRow(int row) const;
+  Q_INVOKABLE QString compatibleTrackFor(const QString &kind,
+                                         const QString &requestedTrack) const;
   Q_INVOKABLE bool setTrackMuted(const QString &track, bool muted);
   Q_INVOKABLE bool setTrackState(const QString &track, const QString &state,
                                  bool enabled);
@@ -388,6 +425,14 @@ public:
   Q_INVOKABLE bool trackTargeted(const QString &track) const;
   Q_INVOKABLE qint64 snapTime(
       qint64 requestedMs, const QStringList &excludedClipIds = QStringList(),
+      qint64 thresholdMs = 120) const;
+  // Whole-clip snapping for a live drag: both edges compete, and the caller
+  // gets back what was hit ("snapped", "startMs", "guideMs", "edge", "target")
+  // rather than a bare time, because a guide line cannot be drawn from a time
+  // that does not say whether it moved or which edge it belongs to.
+  Q_INVOKABLE QVariantMap snapClipDrag(
+      qint64 startMs, qint64 clipDurationMs,
+      const QStringList &excludedClipIds = QStringList(),
       qint64 thresholdMs = 120) const;
   Q_INVOKABLE bool rippleDeleteClips(const QStringList &clipIds);
   Q_INVOKABLE bool rippleTrimClipEnd(const QString &clipId, qint64 endMs);
@@ -445,6 +490,12 @@ public:
                                              const QString &gender);
   Q_INVOKABLE QString addClipEffect(const QString &clipId,
                                     const QString &effectId);
+  // An effect as its own timeline item on the F1 lane: the span of the item is
+  // the stretch of the sequence the effect applies to, so trimming the bar is
+  // how the user decides when it is on. Returns the new clip's id.
+  Q_INVOKABLE QString addTimelineEffect(const QString &effectId,
+                                        qint64 startMs = -1,
+                                        qint64 durationMs = 0);
   Q_INVOKABLE bool removeClipEffect(const QString &clipId,
                                     const QString &instanceId);
   Q_INVOKABLE bool moveClipEffect(const QString &clipId,
@@ -480,9 +531,13 @@ public:
       const QString &path, const QString &mediaKind, qint64 sourcePositionMs,
       qint64 durationMs, int sourceWidth, int sourceHeight, double frameRate,
       bool audioEnabled, double volume, const QString &audioPath = QString());
+  // exact = false asks for the cheap frame: the seek lands on the keyframe at or
+  // before the position, which is what a moving playhead can afford. Pass true
+  // once the playhead settles to decode forward to the requested frame itself.
   Q_INVOKABLE bool requestPreviewFrame(const QString &path,
                                        qint64 sourcePositionMs,
-                                       int sourceWidth, int sourceHeight);
+                                       int sourceWidth, int sourceHeight,
+                                       bool exact = false);
   // Opens the container for a source before it is scrubbed, so the first frame
   // costs a seek instead of a header parse on a multi-gigabyte file.
   Q_INVOKABLE void prewarmPreviewSource(const QString &path, int sourceWidth = 0,
@@ -493,6 +548,22 @@ public:
   // the debug overlay.
   Q_INVOKABLE QVariantMap previewDecodeStatistics() const;
   Q_INVOKABLE void stopPreviewDecode();
+  // Source position of the frame the monitor is actually showing during
+  // playback, or -1 before the first one arrives. The monitor's playhead follows
+  // this instead of a wall clock started when Play was pressed: the decoder
+  // needs to open the container, seek and decode before any picture exists, and
+  // counting that time as elapsed playback put the playhead - and with it the
+  // time display, the subtitle overlay and the still drawn on pause - ahead of
+  // the image.
+  Q_INVOKABLE qint64 previewPresentedSourceMs() const;
+
+  // Report the timeline position of the picture on screen, so the playback trace
+  // can print the playhead-versus-image gap as a number. The mapping from a
+  // source position to a timeline position needs the active clip's startMs and
+  // sourceInMs, which only the monitor knows, so the monitor pushes it here
+  // rather than the trace pulling it. A no-op unless CUTPRO_PLAYBACK_TRACE is
+  // set.
+  Q_INVOKABLE void tracePlaybackDrift(qint64 presentedTimelineMs) const;
   // Labels the current event-loop turn so a stall report names the QML handler
   // that caused it instead of saying "no marked scope". Call it as the first
   // statement of a handler that builds something; it clears itself when the turn
@@ -513,6 +584,37 @@ public:
   // False in builds without direct FFmpeg linkage, where the timeline keeps
   // stretching the whole-file waveform sheet.
   Q_INVOKABLE bool waveformWindowsAvailable() const;
+  // Declare what a clip layer wants decoded, instead of asking the image
+  // providers for it directly.
+  //
+  // `requesterId` is one opaque key per clip layer; a second call with the same
+  // key replaces the first, so a pan or a zoom abandons the positions that
+  // scrolled off screen rather than queueing behind them. `bucketsMs` are the
+  // exact values the QML builds its tile URLs from, in the order they should be
+  // decoded - left to right across the visible slice.
+  //
+  // A single background thread serves every wish, round-robin between clips, one
+  // decode at a time. Nothing here blocks: the call is a hash insert.
+  Q_INVOKABLE void requestTimelineTiles(const QString &requesterId,
+                                        const QString &token,
+                                        const QVariantList &bucketsMs);
+  Q_INVOKABLE void requestWaveformWindows(const QString &requesterId,
+                                          const QString &token,
+                                          const QVariantList &startsMs,
+                                          qint64 spanMs, int columns);
+  // Called when a clip layer goes away, so its wish does not hold a slice of the
+  // worker's attention for a delegate that no longer exists.
+  Q_INVOKABLE void cancelTimelinePreviewRequest(const QString &requesterId);
+  // Whether that exact position is in memory *now*. The timeline only points an
+  // Image at a tile or a window this returns true for, which is what guarantees
+  // no provider thread ever has to decode one: a request that would have to open
+  // a file is never made. Memory-only and mutex-cheap, because it is asked per
+  // visible slot on every revision.
+  Q_INVOKABLE bool timelineTileReady(const QString &token,
+                                     qint64 bucketMs) const;
+  Q_INVOKABLE bool waveformWindowReady(const QString &token, qint64 startMs,
+                                       qint64 spanMs, int columns) const;
+  int timelinePreviewRevision() const;
   // Size the monitor draws preview frames at, in QML logical units. The decoder
   // decodes at the source's own resolution up to this size, so the picture is
   // never upscaled from a smaller decode - the reason a preview looked softer
@@ -541,6 +643,8 @@ signals:
   void tracksChanged();
   void markersChanged();
   void snappingChanged();
+  void effectDragActiveChanged();
+  void videoFullScreenChanged();
   void timelineChanged();
   void playheadChanged();
   void playingChanged();
@@ -580,6 +684,7 @@ signals:
   void previewStateChanged();
   void previewErrorChanged();
   void timelineInteractionChanged();
+  void timelinePreviewRevisionChanged();
   void autoSaveCompleted(const QString &path);
 
 private:
@@ -591,9 +696,25 @@ private:
   int mediaIndex(const QString &id) const;
   int clipIndex(const QString &id) const;
   QStringList expandedLinkedClipIds(const QStringList &clipIds) const;
-  QByteArray serializeState() const;
+  // The whole project as one object. Kept separate from serializeState() so the
+  // SQLite mirror can take it directly: that path used to serialise to JSON text
+  // and immediately parse the text back into a QVariantMap, three full passes
+  // over every clip to produce something the object already was.
+  QJsonObject stateObject() const;
+  // Compact by default. The indented writer emits a newline and an indent per
+  // value, and a subtitle track puts tens of thousands of values in here; only
+  // the file the user may open in an editor is worth that cost.
+  QByteArray serializeState(bool pretty = false) const;
   bool restoreState(const QByteArray &json, bool fromHistory = false);
   void rememberState();
+  // Undo depth is bounded by bytes as well as by count: one snapshot of a
+  // 2581-clip subtitle track is megabytes, and a hundred of those is a few
+  // hundred megabytes held for a depth nobody reaches.
+  static constexpr int kMaxUndoStates = 100;
+  static constexpr qint64 kMaxUndoBytes = 96 * 1024 * 1024;
+  // How often the action log may carry a full state snapshot. Nothing reads that
+  // column, so this is a floor on how much a row costs, not a recovery window.
+  static constexpr qint64 kActionSnapshotIntervalMs = 30000;
   void markDirty(bool dirty = true);
   void setError(const QString &message);
   void emitAllStateChanged();
@@ -610,7 +731,13 @@ private:
   QString startTranscriptionJobDir(const QString &mediaId);
   void clearTranscriptionJobDir();
   void ensureTrackExists(const QString &track);
-  void pruneEmptyTracks();
+  // `releaseUserTracks` drops the hand-added track floors before recomputing, so
+  // the stack collapses to the tracks that actually hold clips. Pass it from any
+  // edit that vacates a track - a delete or a move - because that is the moment
+  // the user expects an emptied lane to disappear. Additive edits and project
+  // loads keep the floors, which is what makes V+ hold a lane long enough to be
+  // useful and lets a saved sequence reopen with its empty tracks intact.
+  void pruneEmptyTracks(bool releaseUserTracks = false);
   void beginTimedSpeechImport(const QVariantList &outputs);
   void importNextTimedSpeechOutput();
   void configureAutoSave();
@@ -622,10 +749,18 @@ private:
   // True when the background preview job still has a poster, filmstrip or
   // waveform left to produce for this media entry.
   static bool needsDeferredPreview(const QVariantMap &item);
+  // Starts that job for a source already in the bin, if it is still missing
+  // anything. Called when a clip is placed, which is where the artefacts are
+  // actually drawn.
+  void ensureMediaPreviews(const QString &mediaId);
   // Ceiling on queued background thumbnail jobs for large media.
   static constexpr int kMaxPendingLargePreviews = 16;
   void finishDeferredMediaPreview();
-  void recordAction(const QString &type, const QVariantMap &payload = {});
+  // The snapshot is passed in rather than serialised here: callers that already
+  // built one for the undo stack must not pay for a second copy.
+  void recordAction(const QString &type, const QVariantMap &payload = {},
+                    const QByteArray &snapshot = QByteArray());
+  qint64 m_lastActionSnapshotMs = 0;
 
   QString m_projectId;
   QString m_projectName = QStringLiteral("Untitled");
@@ -664,10 +799,21 @@ private:
   TimelineClipModel m_timelineClipModel;
   int m_videoTrackCount = 1;
   int m_audioTrackCount = 1;
+  // Tracks the user asked for by hand (V+ / A-), as opposed to tracks that
+  // exist because a clip is sitting on them. pruneEmptyTracks() recomputes the
+  // counts from clip occupancy, which used to delete an empty track the moment
+  // any other edit ran - so a lane added to drop a clip onto was gone before
+  // the drop, and the drop then landed on the only remaining track.
+  int m_minVideoTracks = 1;
+  int m_minAudioTracks = 0;
   QStringList m_mutedTracks;
   QVariantMap m_trackStates;
   QVariantList m_markers;
   bool m_snappingEnabled = true;
+  // Purely view flags: not part of the project, so they never mark it dirty and
+  // never enter the undo history.
+  bool m_effectDragActive = false;
+  bool m_videoFullScreen = false;
   qint64 m_playheadMs = 0;
   bool m_playing = false;
   bool m_dirty = false;

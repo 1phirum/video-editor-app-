@@ -88,6 +88,20 @@ QImage TimelineThumbnailService::cachedTile(const QString &path,
     return {};
   return TimelineTileCache::instance().tile(fingerprintFor(path), bucketMs);
 }
+
+bool TimelineThumbnailService::hasTile(const QString &path,
+                                      qint64 positionMs) {
+  if (path.isEmpty())
+    return false;
+  // A cold source has no index yet, so nothing can be claimed as held: the first
+  // tile the prefetcher decodes is what makes this answerable at all.
+  const qint64 bucketMs = snapped(path, positionMs);
+  if (bucketMs < 0)
+    return false;
+  return !TimelineTileCache::instance()
+              .memoryTile(fingerprintFor(path), bucketMs)
+              .isNull();
+}
 TimelineThumbnailService::Tile
 TimelineThumbnailService::tile(const QString &path, qint64 positionMs,
                               const std::atomic_bool *cancel) {

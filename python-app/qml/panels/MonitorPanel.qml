@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
+import QtQuick.Window
 import QtMultimedia
 import CutPro 1.0
 import "../theme"
@@ -48,8 +49,16 @@ Rectangle {
                     || activeMedia.kind === "audio"))
     readonly property url playerSourceUrl:
         useProcessPreview ? "" : sourceUrl
+    // Previous value of activeSourceKey, kept only so the log can print what
+    // actually changed when a playback session is torn down.
+    property string lastSourceKey: ""
     property double processPlaybackWallMs: 0
     property double processPlaybackTimelineMs: 0
+    // Source position of the last frame the decoder reported as being on screen.
+    // The playhead is re-anchored to it whenever it changes; the wall clock only
+    // fills the gap between two frames. -1 means nothing has been shown yet for
+    // the current session.
+    property double presentedSourceMs: -1
     property bool captionSelected: false
     property var trackStateList: Backend.trackStates
     property bool scrubbingPlayhead: false
@@ -58,8 +67,54 @@ Rectangle {
     property string replacementAudioKey: ""
     readonly property var activeLumetri: activeClip && activeClip.lumetri ? activeClip.lumetri : ({})
     readonly property var activeEffects: activeClip && activeClip.effects ? activeClip.effects : ({})
+
+    // Everything the decoder actually cares about: which file, which slice of
+    // it, and which audio stream. VideoPreviewHelper::resolve() compares whole
+    // clip maps, so activeClip "changes" whenever any field in it changes -
+    // including the effects blob. Keying the decoder teardown on the whole map
+    // meant every checkbox and every slider tick in Effect Controls was treated
+    // as "the monitor moved to a different clip": stopPreviewDecode() destroys
+    // the WASAPI sink synchronously on the GUI thread, which the watchdog
+    // measured at 404-1749 ms per call, and the prewarm behind it re-opened a
+    // 26-hour container. An effects edit changes the picture, not the source.
+    readonly property string activeSourceKey:
+        root.activeClip && root.activeMedia
+        ? [String(root.activeClip.id),
+           String(root.activeMedia.path),
+           String(root.activeMedia.kind),
+           String(root.activeClip.sourceInMs || 0),
+           String(root.activeClip.startMs || 0),
+           String(root.activeClip.durationMs || 0),
+           root.audioSourcePath()].join("|")
+        : ""
     readonly property var activeEffectStack: activeClip && activeClip.effectStack
                                              ? activeClip.effectStack : []
+    // What the monitor should be showing right now: the clip's own enabled
+    // effects, then the effect-track bars covering the playhead. Each entry keeps
+    // the id of the item that owns it, because keyframe channels are stored per
+    // item and a bar's channels are not the clip's.
+    readonly property var previewStackEntries: {
+        var entries = []
+        var ownerId = root.activeClip ? String(root.activeClip.id || "") : ""
+        var stack = root.activeEffectStack
+        for (var i = 0; i < stack.length; ++i) {
+            if (stack[i] && stack[i].enabled !== false)
+                entries.push({"ownerId": ownerId, "instance": stack[i]})
+        }
+        var playhead = Math.max(0, Number(Backend.playheadMs))
+        var bars = root.timelineEffectEntries
+        for (var b = 0; b < bars.length; ++b) {
+            var bar = bars[b]
+            if (playhead < bar.startMs || playhead >= bar.endMs)
+                continue
+            entries.push({"ownerId": bar.clipId, "instance": bar.instance})
+        }
+        return entries
+    }
+    // keyframesFor() is a plain call, not a tracked property, so the animated
+    // motion bindings need something to depend on to refresh when the curve
+    // itself changes. Bumped by the Connections below on keyframesChanged.
+    property int kfRevision: 0
 
     function clipById(clipId) {
         if (!clipId)
@@ -73,14 +128,71 @@ Rectangle {
 
     function monitorClipAt(position) {
         // During mask editing, preview the selected clip even if another
-        // visual track is above it at the current playhead position.
+        // visual track is above it at the current playhead position. An
+        // effect-track bar is never the preview: it has no picture of its own,
+        // so what it blurs is whatever clip is under the playhead.
         if (Backend.customBlurEditClipId !== "") {
             var editingClip = clipById(Backend.customBlurEditClipId)
             if (editingClip && editingClip.kind !== "audio"
-                    && editingClip.kind !== "subtitle")
+                    && editingClip.kind !== "subtitle"
+                    && editingClip.kind !== "effect")
                 return editingClip
         }
         return clipAt(position)
+    }
+
+    // Every enabled effect living on the effect track, with the bar that carries
+    // it and the stretch that bar covers. Bars are not media, so this list only
+    // changes when the timeline does - the playhead is read where each entry is
+    // used rather than here, because rebuilding a Repeater model whose items each
+    // own a texture would recreate those textures on every frame of playback.
+    readonly property var timelineEffectEntries: {
+        var entries = []
+        var bars = Backend.timelineEffects || []
+        for (var barIndex = 0; barIndex < bars.length; ++barIndex) {
+            var bar = bars[barIndex]
+            if (!bar || bar.enabled === false || !root.trackVisible(bar.track))
+                continue
+            var startMs = Number(bar.startMs || 0)
+            var endMs = startMs + Number(bar.durationMs || 0)
+            if (endMs <= startMs)
+                continue
+            var stack = bar.effectStack || []
+            for (var i = 0; i < stack.length; ++i) {
+                var instance = stack[i]
+                if (!instance || instance.enabled === false)
+                    continue
+                entries.push({"clipId": String(bar.id || ""),
+                              "startMs": startMs,
+                              "endMs": endMs,
+                              "instance": instance})
+            }
+        }
+        return entries
+    }
+
+    // The Custom Blur subset, which is the one the monitor draws as its own
+    // region rather than folding into the picture's MultiEffect.
+    readonly property var effectTrackBlurs: {
+        var result = []
+        var entries = root.timelineEffectEntries
+        for (var i = 0; i < entries.length; ++i) {
+            if (entries[i].instance.definitionId === "custom_blur")
+                result.push(entries[i])
+        }
+        return result
+    }
+
+    // The effect lane's own eye toggle. Backend keeps track visibility as a list
+    // of state records, so a hidden F1 stops previewing the same way it stops
+    // exporting.
+    function trackVisible(track) {
+        var states = Backend.trackStates || []
+        for (var i = 0; i < states.length; ++i) {
+            if (states[i].id === track)
+                return states[i].visible !== false
+        }
+        return true
     }
 
     function colorValue(key, fallback) {
@@ -98,6 +210,20 @@ Rectangle {
     function effectValue(key, fallback) {
         var value = activeEffects[key]
         return value === undefined || value === null ? fallback : Number(value)
+    }
+    // Same as effectValue, but follows keyframes. When the active clip has a
+    // keyframed channel for `key`, the value is interpolated at the current
+    // playhead so the program monitor actually animates as it plays or scrubs;
+    // otherwise this is exactly effectValue. Depends on playheadMs and on
+    // kfRevision (bumped when a keyframe is added/moved/deleted) so the monitor
+    // transform re-evaluates in both cases.
+    function animatedValue(key, fallback) {
+        var base = effectValue(key, fallback)
+        if (root.kfRevision < 0 || !root.activeClip || !root.activeClip.id)
+            return base
+        return Backend.keyframeEngine.valueAt(
+                    String(root.activeClip.id), key,
+                    Math.max(0, Number(Backend.playheadMs)), base)
     }
     function audioClipFor(clip) {
         if (!clip)
@@ -168,22 +294,46 @@ Rectangle {
                                    0, 0, 30, true,
                                    root.replacementAudioVolume())
     }
+    // Same idea as animatedValue(), for a parameter of one effect instance. The
+    // channel name comes from the engine so the panel, the monitor and the export
+    // builder all agree on it.
+    function instanceValue(instance, parameterId, fallback) {
+        return root.ownerInstanceValue(
+                    root.activeClip ? String(root.activeClip.id || "") : "",
+                    instance, parameterId, fallback)
+    }
+    // Keyframe channels are stored per (clip, instance), so an instance carried by
+    // an effect-track bar has to be read against the bar's id rather than against
+    // whatever clip the monitor happens to be previewing.
+    function ownerInstanceValue(ownerId, instance, parameterId, fallback) {
+        var parameters = instance && instance.parameters ? instance.parameters : ({})
+        var base = parameters[parameterId] === undefined
+                ? fallback : Number(parameters[parameterId])
+        if (root.kfRevision < 0 || !instance || !instance.id || !ownerId)
+            return base
+        return Backend.keyframeEngine.instanceValueAt(
+                    String(ownerId), String(instance.id),
+                    parameterId, Math.max(0, Number(Backend.playheadMs)), base)
+    }
     function stackHas(effectId) {
-        for (var i = 0; i < activeEffectStack.length; ++i) {
-            var instance = activeEffectStack[i]
-            if (instance.enabled !== false && instance.definitionId === effectId)
+        var entries = root.previewStackEntries
+        for (var i = 0; i < entries.length; ++i) {
+            if (entries[i].instance.definitionId === effectId)
                 return true
         }
         return false
     }
     function stackValue(effectId, parameterId, fallback) {
         var result = fallback
-        for (var i = 0; i < activeEffectStack.length; ++i) {
-            var instance = activeEffectStack[i]
-            if (instance.enabled !== false && instance.definitionId === effectId
-                    && instance.parameters
+        var entries = root.previewStackEntries
+        for (var i = 0; i < entries.length; ++i) {
+            var entry = entries[i]
+            var instance = entry.instance
+            if (instance.definitionId === effectId && instance.parameters
                     && instance.parameters[parameterId] !== undefined)
-                result = Number(instance.parameters[parameterId])
+                result = root.ownerInstanceValue(
+                            entry.ownerId, instance, parameterId,
+                            Number(instance.parameters[parameterId]))
         }
         return result
     }
@@ -198,8 +348,7 @@ Rectangle {
         }
     }
     function customBlurAmount(instance) {
-        var parameters = instance && instance.parameters ? instance.parameters : ({})
-        return parameters.amount === undefined ? 12 : Number(parameters.amount)
+        return root.instanceValue(instance, "amount", 12)
     }
     function editingCustomBlurInstance() {
         if (Backend.customBlurEditClipId === ""
@@ -224,8 +373,14 @@ Rectangle {
         return null
     }
     function stackPreviewEffectActive() {
+        // Only the effects MultiEffect can actually express are listed. The rest
+        // of the registry is applied on export, where FFmpeg runs the real
+        // filter chain.
         return stackHas("brightness_contrast") || stackHas("monochrome")
                 || stackHas("gaussian_blur") || stackHas("box_blur")
+                || stackHas("exposure") || stackHas("hue_saturation")
+                || stackHas("vibrance") || stackHas("directional_blur")
+                || stackHas("smart_blur")
     }
 
     function previewColorEffectActive() {
@@ -407,25 +562,86 @@ Rectangle {
                         + Number(activeClip.sourceInMs || 0))
     }
 
-    function requestProcessFrame() {
+    function requestProcessFrame(exact) {
         if (!root.useProcessPreview || !root.processPreviewArmed
                 || !root.activeMedia || root.playing)
             return
         Backend.requestPreviewFrame(String(root.activeMedia.path),
                                     root.activeSourcePosition(),
                                     Number(root.activeMedia.width || 0),
-                                    Number(root.activeMedia.height || 0))
+                                    Number(root.activeMedia.height || 0),
+                                    exact === true)
+    }
+
+    // Live scrubbing. A playhead drag delivers playheadChanged every 8-16 ms,
+    // which is faster than any debounce interval worth using - and a QML Timer
+    // restart pushes its deadline forward, so a debounce fed at that rate never
+    // fires at all. The monitor therefore stayed on the frame the drag started
+    // from and only caught up once the pointer stopped moving.
+    //
+    // A throttle instead: one request on the leading edge, then at most one every
+    // scrubIntervalMs for as long as the playhead keeps moving, so the picture
+    // follows the drag. Those in-drag requests are the cheap kind (the seek lands
+    // on the keyframe at or before the position); the precise frame costs a
+    // forward decode, so it is asked for once, when the motion settles.
+    readonly property int scrubIntervalMs: 40
+    readonly property int scrubSettleMs: 90
+    property double lastScrubRequestMs: 0
+    property bool scrubRequestQueued: false
+
+    function scheduleProcessFrame() {
+        if (!root.useProcessPreview || !root.processPreviewArmed
+                || !root.activeMedia || root.playing)
+            return
+        // Restarted on every move: this one is meant to fire after the motion,
+        // not during it.
+        scrubSettle.restart()
+        var now = Date.now()
+        var since = now - root.lastScrubRequestMs
+        if (since >= root.scrubIntervalMs || since < 0) {
+            scrubThrottle.stop()
+            root.scrubRequestQueued = false
+            root.lastScrubRequestMs = now
+            root.requestProcessFrame(false)
+            return
+        }
+        // Inside the cadence window: remember that a newer position is waiting
+        // and let the timer serve it when the window closes. start() rather than
+        // restart(), and only while nothing is queued, so a stream of moves
+        // cannot keep pushing the deadline the way the old debounce did.
+        if (!root.scrubRequestQueued) {
+            root.scrubRequestQueued = true
+            scrubThrottle.interval = Math.max(1, root.scrubIntervalMs - since)
+            scrubThrottle.start()
+        }
+    }
+
+    // For everything that is not a drag: a new clip, a paused seek, an effects
+    // edit. There is no cadence to respect, so ask immediately.
+    function requestFrameNow(exact) {
+        scrubThrottle.stop()
+        scrubSettle.stop()
+        root.scrubRequestQueued = false
+        root.lastScrubRequestMs = Date.now()
+        root.requestProcessFrame(exact === true)
     }
 
     function startProcessPlayback() {
         if (!root.useProcessPreview || !root.activeMedia || !root.activeClip)
             return false
+        // One line per playback session. A session means opening the container
+        // and seeking, so anything that starts more than one per Play is a bug
+        // worth seeing named.
+        console.info("monitor: playback session at playhead",
+                     Math.round(Backend.playheadMs), "clip",
+                     String(root.activeClip.id))
         root.processPreviewArmed = true
         var elapsed = Math.max(0, Backend.playheadMs
                                   - Number(root.activeClip.startMs))
         var remaining = Math.max(1, Number(root.activeClip.durationMs) - elapsed)
         root.processPlaybackWallMs = Date.now()
         root.processPlaybackTimelineMs = Backend.playheadMs
+        root.presentedSourceMs = -1
         return Backend.startPreviewDecode(
                     String(root.activeMedia.path),
                     String(root.activeMedia.kind),
@@ -442,7 +658,7 @@ Rectangle {
         if (!activeClip || !activeMedia || activeMedia.kind === "image")
             return
         if (root.useProcessPreview) {
-            processFrameDebounce.restart()
+            root.scheduleProcessFrame()
             return
         }
         if (playerSourceUrl.toString() === "")
@@ -613,13 +829,31 @@ Rectangle {
     }
 
     Timer {
-        id: processFrameDebounce
-        // Coalescing now happens in the C++ scrub service (newest request wins,
-        // superseded decodes abort), so the UI no longer needs a long debounce
-        // to protect the decoder. A short one keeps the still tracking the drag.
-        interval: 24
+        id: scrubThrottle
+        // The cadence gate. Interval is set by scheduleProcessFrame() to whatever
+        // is left of the current window, so the queued position is served the
+        // moment the window closes rather than a full interval later.
+        interval: root.scrubIntervalMs
         repeat: false
-        onTriggered: root.requestProcessFrame()
+        onTriggered: {
+            root.scrubRequestQueued = false
+            root.lastScrubRequestMs = Date.now()
+            root.requestProcessFrame(false)
+        }
+    }
+
+    Timer {
+        id: scrubSettle
+        // The playhead has stopped. Ask for the frame that actually belongs to
+        // this position: the coarse requests during the drag can only show the
+        // keyframe at or before it.
+        interval: root.scrubSettleMs
+        repeat: false
+        onTriggered: {
+            scrubThrottle.stop()
+            root.scrubRequestQueued = false
+            root.requestProcessFrame(true)
+        }
     }
 
     Connections {
@@ -636,6 +870,16 @@ Rectangle {
         function onAppSettingsChanged() {
             if (root.playing)
                 root.startReplacementAudio()
+        }
+    }
+
+    // Refresh the animated motion transform when a keyframe is added, moved or
+    // deleted while the playhead is stationary.
+    Connections {
+        target: Backend.keyframeEngine
+        function onKeyframesChanged(clipId) {
+            if (root.activeClip && String(clipId) === String(root.activeClip.id))
+                root.kfRevision += 1
         }
     }
 
@@ -658,11 +902,53 @@ Rectangle {
                 Backend.playheadMs = Math.min(Backend.durationMs,
                                                Backend.playheadMs + interval)
             } else if (root.useProcessPreview) {
+                // The playhead follows the picture, not the button press.
+                //
+                // This used to be a pure wall clock: processPlaybackWallMs was
+                // stamped in startProcessPlayback(), before the decoder had
+                // opened the container, seeked and decoded anything. All of that
+                // time counted as elapsed playback, so the playhead - and the
+                // timecode, the subtitle overlay and the still rendered on pause
+                // - sat that far ahead of the frame on screen, which is why
+                // pausing looked like the image jumped forward.
+                //
+                // previewPresentedSourceMs() is the pts of the frame the decoder
+                // actually published. Each new one re-anchors the clock; between
+                // frames the wall clock still interpolates, so the timecode moves
+                // smoothly at the 50 ms UI tick instead of stepping at the source
+                // frame rate.
+                const shown = Backend.previewPresentedSourceMs()
+                if (shown >= 0 && shown !== root.presentedSourceMs) {
+                    root.presentedSourceMs = shown
+                    root.processPlaybackTimelineMs =
+                            Number(root.activeClip.startMs)
+                            + Math.max(0, shown - Number(
+                                           root.activeClip.sourceInMs || 0))
+                    root.processPlaybackWallMs = Date.now()
+                } else if (shown < 0
+                           && Date.now() - root.processPlaybackWallMs < 600) {
+                    // Nothing on screen yet. Holding the playhead still is the
+                    // honest answer while the first frame is being decoded -
+                    // advancing it and snapping back on arrival would show the
+                    // timecode running and then jumping backwards. The 600 ms
+                    // bound is what keeps an audio-only clip, which publishes no
+                    // video frame at all, from freezing the playhead forever.
+                    return
+                }
                 Backend.playheadMs = Math.min(
                             Backend.durationMs,
                             root.processPlaybackTimelineMs
                             + Math.max(0, Date.now()
                                        - root.processPlaybackWallMs))
+                // Only the monitor can convert the decoder's source pts into a
+                // timeline position, so it is the monitor that hands the trace
+                // the pair to compare. A no-op without CUTPRO_PLAYBACK_TRACE.
+                if (root.presentedSourceMs >= 0)
+                    Backend.tracePlaybackDrift(
+                                Number(root.activeClip.startMs)
+                                + Math.max(0, root.presentedSourceMs
+                                           - Number(root.activeClip.sourceInMs
+                                                    || 0)))
             } else {
                 Backend.playheadMs = root.activeClip.startMs
                         + Math.max(0, player.position
@@ -674,6 +960,8 @@ Rectangle {
     }
 
     onPlayingChanged: {
+        console.info("monitor: playing ->", playing, "at",
+                     Math.round(Backend.playheadMs))
         if (playing) {
             if (root.useProcessPreview) {
                 player.stop()
@@ -685,13 +973,63 @@ Rectangle {
         } else {
             player.pause()
             root.replacementAudioKey = ""
+            // Snap the playhead back onto the frame that was on screen, and only
+            // ever backwards.
+            //
+            // Measured, with CUTPRO_PLAYBACK_TRACE on: the click writes
+            // playing = false at, say, playhead 6458 ms, and by the time this
+            // handler reads the decoder - 36 ms later, because the write goes
+            // through the metaobject system and the decode thread is not stopped
+            // yet - the decoder has published the *next* frame at 6541 ms. That
+            // frame was never the picture the user clicked on. Taking it moved the
+            // playhead 42-83 ms forward on every pause, and requestFrameNow()
+            // then rendered that later frame, which is exactly the "the image goes
+            // ahead when I pause" report.
+            //
+            // The playhead during playback is the last published frame plus
+            // interpolation, so it is never behind the picture. A presented
+            // position that is *ahead* of it therefore always means a frame that
+            // arrived after the click, and must be ignored; one that is behind it
+            // is the frame boundary to land on.
+            const shown = root.useProcessPreview
+                        ? Backend.previewPresentedSourceMs() : -1
+            if (shown >= 0 && root.activeClip) {
+                const shownTimelineMs = Number(root.activeClip.startMs)
+                        + Math.max(0, shown - Number(
+                                       root.activeClip.sourceInMs || 0))
+                if (shownTimelineMs < Backend.playheadMs)
+                    Backend.playheadMs = shownTimelineMs
+            }
             Backend.stopPreviewDecode()
             if (root.useProcessPreview)
-                processFrameDebounce.restart()
+                root.requestFrameNow(true)
         }
     }
 
+    // An effects edit re-renders the still and nothing more. requestProcessFrame()
+    // is already guarded (armed, paused, has media) and the C++ scrub service
+    // keeps the container warm, so this costs one decode of one frame instead of
+    // an audio-device teardown and a re-open.
     onActiveClipChanged: {
+        if (!root.useProcessPreview || root.playing)
+            return
+        // scrubSettle is running only while the playhead is actually moving. Mid
+        // drag this is a clip boundary being crossed, so stay on the cheap
+        // cadence; otherwise it is an edit to the clip under a stationary
+        // playhead, and re-rendering it at a keyframe instead of the frame the
+        // user is looking at would read as the picture jumping backwards.
+        if (scrubSettle.running)
+            root.scheduleProcessFrame()
+        else
+            root.requestFrameNow(true)
+    }
+
+    onActiveSourceKeyChanged: {
+        // The key is what decides whether the decoder has to be torn down, so
+        // when it changes mid-playback the log has to say which field moved.
+        console.info("monitor: source key", root.lastSourceKey, "->",
+                     root.activeSourceKey)
+        root.lastSourceKey = root.activeSourceKey
         player.stop()
         Backend.stopPreviewDecode()
         root.processPreviewArmed = false
@@ -711,11 +1049,20 @@ Rectangle {
                                          Number(root.activeMedia.width || 0),
                                          Number(root.activeMedia.height || 0))
             root.processPreviewArmed = true
-            processFrameDebounce.restart()
+            // Coarse frame now, precise frame once the playhead settles - which
+            // is immediately when the clip was just selected, and after the drag
+            // when the playhead crossed into this source mid-scrub.
+            root.scheduleProcessFrame()
         }
     }
 
-    Component.onDestruction: Backend.stopPreviewDecode()
+    Component.onDestruction: {
+        Backend.stopPreviewDecode()
+        // The stage is re-hosted in the window's overlay while full screen, which
+        // outlives this panel: leaving the flag set would keep a black layer over
+        // a panel that no longer has a picture to put in it.
+        Backend.videoFullScreen = false
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -726,6 +1073,19 @@ Rectangle {
             tabs: ["Source: (no clips)", "Program: " + Backend.sequenceName]
             currentIndex: 1
             overflowIcon: "menu"
+        }
+
+        // Where the stage sits while it is docked in this panel. A layout, like the
+        // full-screen slot, so the stage keeps sizing itself the same way in both
+        // and moving it needs no geometry changes. A placeholder rather than
+        // re-parenting straight back into the column, because re-parenting appends
+        // to the children and a column lays out in that order - the stage would
+        // come back below the transport bar. This never moves, so order is kept.
+        ColumnLayout {
+            id: monitorStage
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: 0
         }
 
         // Grey monitor panel — fills the entire available space,
@@ -791,15 +1151,15 @@ Rectangle {
                     // content scales within it.
                     Item {
                         id: videoContainer
-                        property real scaleFactor: root.effectValue("scale", 100) / 100
+                        property real scaleFactor: root.animatedValue("scale", 100) / 100
                         width: parent.width * scaleFactor
                         height: parent.height * scaleFactor
                         x: (parent.width - width) / 2
-                           + root.effectValue("positionX", 0) / 100 * parent.width
+                           + root.animatedValue("positionX", 0) / 100 * parent.width
                         y: (parent.height - height) / 2
-                           + root.effectValue("positionY", 0) / 100 * parent.height
-                        rotation: root.effectValue("rotation", 0)
-                        opacity: root.effectValue("opacity", 100) / 100
+                           + root.animatedValue("positionY", 0) / 100 * parent.height
+                        rotation: root.animatedValue("rotation", 0)
+                        opacity: root.animatedValue("opacity", 100) / 100
                         transformOrigin: Item.Center
                         transform: Scale {
                             origin.x: videoContainer.width / 2
@@ -858,9 +1218,13 @@ Rectangle {
                     blurEnabled: root.effectValue("blur", 0) > 0.001
                                  || root.stackHas("gaussian_blur")
                                  || root.stackHas("box_blur")
+                                 || root.stackHas("directional_blur")
+                                 || root.stackHas("smart_blur")
                     blur: Math.max(root.effectValue("blur", 0) / 100,
                                    root.stackValue("gaussian_blur", "amount", 0) / 30,
-                                   root.stackValue("box_blur", "radius", 0) / 30)
+                                   root.stackValue("box_blur", "radius", 0) / 30,
+                                   root.stackValue("directional_blur", "radius", 0) / 40,
+                                   root.stackValue("smart_blur", "radius", 0) / 5)
                     visible: root.activeMedia
                              && (root.activeMedia.kind === "video"
                                  || root.activeMedia.kind === "image")
@@ -872,7 +1236,10 @@ Rectangle {
                                 + root.sectionColorValue("basicEnabled", "blacks", 0) * 0.0008
                                 + root.sectionColorValue("creativeEnabled", "fade", 0) * 0.001
                                 + root.stackValue("brightness_contrast",
-                                                  "brightness", 0) / 100))
+                                                  "brightness", 0) / 100
+                                + root.stackValue("exposure", "exposure", 0) * 0.25
+                                + root.stackValue("hue_saturation",
+                                                  "brightness", 0) * 0.25))
                     contrast: Math.max(-1, Math.min(1,
                               root.sectionColorValue("basicEnabled", "contrast", 0) / 100
                               - root.sectionColorValue("creativeEnabled", "fade", 0) / 180
@@ -884,7 +1251,10 @@ Rectangle {
                                   + root.sectionColorValue("creativeEnabled", "vibrance", 0) / 200
                                   + (root.sectionColorValue("creativeEnabled", "creativeSaturation", 100) - 100) / 100
                                   + (root.stackValue("brightness_contrast",
-                                                     "saturation", 100) - 100) / 100))
+                                                     "saturation", 100) - 100) / 100
+                                  + (root.stackValue("hue_saturation",
+                                                     "saturation", 100) - 100) / 100
+                                  + root.stackValue("vibrance", "intensity", 0) / 200))
                     colorization: Math.min(0.18, Math.abs(root.sectionColorValue("basicEnabled", "temperature", 0)) / 550)
                     colorizationColor: root.sectionColorValue("basicEnabled", "temperature", 0) >= 0 ? "#ffad72" : "#7bbcff"
                 }
@@ -918,6 +1288,10 @@ Rectangle {
 
             Repeater {
                 model: root.activeEffectStack
+                // One live blur region per effect instance, and each one owns a
+                // texture: this is the most expensive per-item model in the
+                // program monitor, so its count is worth more than most.
+                onCountChanged: ModelGuard.note("monitor.effectStack", count)
                 delegate: CustomBlurRegion {
                     required property var modelData
                     anchors.fill: viewer
@@ -932,6 +1306,31 @@ Rectangle {
                     maskWidth: mask.width
                     maskHeight: mask.height
                     blurAmount: root.customBlurAmount(modelData)
+                }
+            }
+
+            // The same regions, but coming from the effect track instead of from
+            // the clip's own stack. The bar's extent is what decides when the blur
+            // is on, which is exactly the rule the export applies.
+            Repeater {
+                model: root.effectTrackBlurs
+                onCountChanged: ModelGuard.note("monitor.effectTrackBlurs", count)
+                delegate: CustomBlurRegion {
+                    required property var modelData
+                    anchors.fill: viewer
+                    z: 2
+                    sourceItem: rawColorSource
+                    active: root.activeMedia !== null
+                            && Backend.playheadMs >= modelData.startMs
+                            && Backend.playheadMs < modelData.endMs
+                    readonly property var mask: root.customBlurMask(modelData.instance)
+                    maskX: mask.x
+                    maskY: mask.y
+                    maskWidth: mask.width
+                    maskHeight: mask.height
+                    blurAmount: root.ownerInstanceValue(modelData.clipId,
+                                                        modelData.instance,
+                                                        "amount", 12)
                 }
             }
 
@@ -1030,8 +1429,8 @@ Rectangle {
                         acceptedButtons: Qt.LeftButton
                         preventStealing: true
                         hoverEnabled: true
-                        cursorShape: containsMouse || pressed
-                                     ? Qt.SizeAllCursor : Qt.ArrowCursor
+                        AppCursor.name: containsMouse || pressed
+                                        ? "CrossArrow" : ""
 
                         onPressed: mouse => {
                             root.captionSelected = true
@@ -1100,24 +1499,106 @@ Rectangle {
                                               x, y, width, height)
             }
 
+            // Region and strength in one bar, on top of the picture: placing the
+            // box and choosing how hard to blur it are one task, so the slider
+            // lives here instead of only in the Effect Controls tree.
             Rectangle {
+                id: blurBar
                 anchors.top: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.topMargin: 12
                 z: 9
                 visible: customBlurEditor.active
-                width: editHint.implicitWidth + 28
-                height: 30
+                width: barRow.implicitWidth + 24
+                height: 34
                 radius: Theme.radiusSm
                 color: Qt.rgba(0.05, 0.06, 0.08, 0.90)
                 border.width: 1
                 border.color: Theme.accent
-                Text {
-                    id: editHint
+
+                readonly property real amount:
+                    root.ownerInstanceValue(Backend.customBlurEditClipId,
+                                            customBlurEditor.instance, "amount", 12)
+
+                Row {
+                    id: barRow
                     anchors.centerIn: parent
-                    text: "Draw a box, or drag its edges to resize"
-                    color: Theme.textPrimary
-                    font.pixelSize: Theme.fsXs
+                    spacing: 10
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "Drag the box to move, its edges to resize"
+                        color: Theme.textMuted
+                        font.pixelSize: Theme.fsXs
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "Blurriness"
+                        color: Theme.textPrimary
+                        font.pixelSize: Theme.fsXs
+                    }
+                    Slider {
+                        id: blurStrength
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 120
+                        height: 16
+                        from: 0
+                        to: 30
+                        live: true
+                        Binding {
+                            target: blurStrength
+                            property: "value"
+                            value: blurBar.amount
+                            when: !blurStrength.pressed
+                            restoreMode: Binding.RestoreBinding
+                        }
+                        onMoved: Backend.setClipEffectParameter(
+                                     Backend.customBlurEditClipId,
+                                     Backend.customBlurEditInstanceId,
+                                     "amount", blurStrength.value)
+                        background: Rectangle {
+                            y: blurStrength.availableHeight / 2 - 1
+                            width: blurStrength.availableWidth
+                            height: 3
+                            radius: 1
+                            color: Theme.ecTrack
+                            Rectangle {
+                                width: blurStrength.visualPosition * parent.width
+                                height: parent.height
+                                radius: 1
+                                color: Theme.accent
+                            }
+                        }
+                        handle: Rectangle {
+                            x: blurStrength.visualPosition
+                               * (blurStrength.availableWidth - width)
+                            y: blurStrength.availableHeight / 2 - height / 2
+                            width: 11
+                            height: 11
+                            radius: 6
+                            color: blurStrength.pressed ? "#ffffff" : "#dcdcdc"
+                            border.width: 1
+                            border.color: Theme.border
+                        }
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 26
+                        text: blurBar.amount.toFixed(1)
+                        color: Theme.textPrimary
+                        font.pixelSize: Theme.fsXs
+                    }
+                    IconButton {
+                        anchors.verticalCenter: parent.verticalCenter
+                        boxSize: 22
+                        glyphSize: 13
+                        hoverEnabled: true
+                        adobeStyle: true
+                        iconName: "check"
+                        onClicked: Backend.endCustomBlurMaskEdit()
+                        ToolTip.visible: hovered
+                        ToolTip.text: "Finish editing the blur region"
+                    }
                 }
             }
 
@@ -1192,8 +1673,8 @@ Rectangle {
                     acceptedButtons: Qt.LeftButton
                     preventStealing: true
                     hoverEnabled: true
-                    cursorShape: pressed || containsMouse
-                                 ? Qt.SizeAllCursor : Qt.ArrowCursor
+                    AppCursor.name: pressed || containsMouse
+                                    ? "CrossArrow" : ""
                     drag.target: manualBlurBox
                     drag.axis: Drag.XAndYAxis
                     drag.minimumX: 0
@@ -1234,7 +1715,7 @@ Rectangle {
                         acceptedButtons: Qt.LeftButton
                         preventStealing: true
                         hoverEnabled: true
-                        cursorShape: Qt.SizeFDiagCursor
+                        AppCursor.name: "ScaleTLBR"
                         property real startWidth: 0
                         property real startHeight: 0
 
@@ -1274,21 +1755,10 @@ Rectangle {
             }
         }
 
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.leftMargin: 12
-            Layout.rightMargin: 12
-            Layout.topMargin: 8
-
-            Text { text: root.timecode(Backend.playheadMs); color: Theme.accent; font.pixelSize: Theme.fsMd; font.family: Theme.monoFont }
-            Item { Layout.fillWidth: true }
-            Text { text: root.timecode(Backend.durationMs); color: Theme.textSecondary; font.pixelSize: Theme.fsMd; font.family: Theme.monoFont }
-        }
-
         Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 12
-            Layout.topMargin: 6
+            Layout.topMargin: 8
 
             Rectangle {
                 id: scrubber
@@ -1345,7 +1815,37 @@ Rectangle {
             Layout.preferredHeight: Theme.transportHeight
             color: "transparent"
 
+            // Playhead on the left, duration on the right, buttons still centred
+            // under the picture. Anchored to the edges rather than laid out in one
+            // row with the buttons, because a row would let the width of a
+            // timecode decide where the play button sits.
+            Text {
+                anchors.left: parent.left
+                anchors.leftMargin: 12
+                anchors.verticalCenter: parent.verticalCenter
+                // Hidden instead of overlapping when the panel is too narrow to
+                // hold both timecodes beside the buttons. Both read the same
+                // format, so one width answers for the pair.
+                visible: parent.width - transportButtons.width >= width * 2 + 48
+                text: root.timecode(Backend.playheadMs)
+                color: Theme.accent
+                font.pixelSize: Theme.fsMd
+                font.family: Theme.monoFont
+            }
+
+            Text {
+                anchors.right: parent.right
+                anchors.rightMargin: 12
+                anchors.verticalCenter: parent.verticalCenter
+                visible: parent.width - transportButtons.width >= width * 2 + 48
+                text: root.timecode(Backend.durationMs)
+                color: Theme.textSecondary
+                font.pixelSize: Theme.fsMd
+                font.family: Theme.monoFont
+            }
+
             RowLayout {
+                id: transportButtons
                 anchors.centerIn: parent
                 spacing: 4
 
@@ -1372,11 +1872,118 @@ Rectangle {
                 }
                 IconButton { iconName: "skip-forward"; boxSize: 28; glyphSize: 16; restColor: Theme.textPrimary; onClicked: Backend.playheadMs = Math.min(Backend.durationMs, Backend.playheadMs + 1000) }
                 IconButton { iconName: "chevrons-right"; boxSize: 28; glyphSize: 16; restColor: Theme.textPrimary; onClicked: Backend.playheadMs = Backend.durationMs }
-                IconButton { iconName: "scissors"; boxSize: 28; glyphSize: 15; restColor: Theme.textPrimary; Layout.leftMargin: 4 }
-                Rectangle { Layout.leftMargin: 4; Layout.rightMargin: 4; Layout.alignment: Qt.AlignVCenter; width: 1; height: 16; color: Theme.border }
-                IconButton { iconName: "settings"; boxSize: 28; glyphSize: 15 }
-                IconButton { iconName: "maximize-2"; boxSize: 28; glyphSize: 15 }
+                IconButton {
+                    iconName: "maximize-2"
+                    boxSize: 28
+                    glyphSize: 15
+                    Layout.leftMargin: 4
+                    active: Backend.videoFullScreen
+                    ToolTip.visible: hovered
+                    ToolTip.text: Backend.videoFullScreen
+                                  ? "Leave full screen (Esc)" : "Play full screen"
+                    onClicked: Backend.videoFullScreen = !Backend.videoFullScreen
+                }
             }
         }
     }
+
+    // Full-screen playback. The stage is moved here rather than copied: the
+    // MediaPlayer feeds one VideoOutput, so a second one could not show the same
+    // picture, and moving the item it lives in keeps playback running instead of
+    // re-opening the source. Everything that draws over the picture - the blur
+    // regions, the mask editor, the caption boxes - is a sibling of the frame
+    // inside this stage, so it travels with it and keeps anchoring to it.
+    //
+    // The slot is a ColumnLayout because the stage sizes itself with
+    // Layout.fillWidth/fillHeight. Handing it another layout means neither end
+    // needs to know where it currently lives.
+    Item {
+        id: cinemaHost
+        // The window's overlay layer, so the picture covers every panel. Bound
+        // through Window.window because that is the property that reports when
+        // this panel has a window at all: the panel is built by a Loader, so the
+        // first evaluation can run before it is in the scene, and an item left
+        // without a parent would never be shown again. Until then it stays where
+        // it was declared, which is invisible anyway.
+        parent: root.Window.window ? root.Overlay.overlay : root
+        // Explicit geometry rather than anchors: the overlay is not known until
+        // this panel has a window, and anchoring to a null parent is a warning.
+        x: 0
+        y: 0
+        width: parent ? parent.width : 0
+        height: parent ? parent.height : 0
+        visible: Backend.videoFullScreen
+        z: 40
+
+        Rectangle {
+            anchors.fill: parent
+            color: "#000000"
+        }
+
+        // The stage only takes left clicks, so this is what stops a right or
+        // middle click from reaching the panels the picture is covering.
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.AllButtons
+        }
+
+        ColumnLayout {
+            id: cinemaSlot
+            anchors.fill: parent
+            spacing: 0
+        }
+
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 48
+            text: "Esc to exit  ·  Space to play"
+            color: Qt.rgba(1, 1, 1, 0.72)
+            font.pixelSize: Theme.fsMd
+            opacity: cinemaHintTimer.running ? 1 : 0
+            visible: opacity > 0.01
+            Behavior on opacity { NumberAnimation { duration: 400 } }
+        }
+
+        Timer {
+            id: cinemaHintTimer
+            interval: 2600
+        }
+    }
+
+    // Escape is handled once for the whole window (main.qml), so it is not
+    // repeated here - two shortcuts on one key is an ambiguous overload and
+    // neither fires reliably. Space has no owner in this window, and full screen
+    // is the one place the transport bar is not reachable.
+    Shortcut {
+        sequence: "Space"
+        enabled: Backend.videoFullScreen
+        onActivated: {
+            if (root.playing)
+                Backend.playing = false
+            else
+                root.startPlayback()
+        }
+    }
+
+    // Which container currently holds the monitor stage. A bound property rather
+    // than a Connections handler, so the stage cannot be left behind in the
+    // overlay by a flag change this panel did not see.
+    readonly property Item videoFullScreenHost:
+        Backend.videoFullScreen ? cinemaSlot : monitorStage
+
+    function applyVideoFullScreenHost() {
+        if (!monitorPanel || !root.videoFullScreenHost
+                || monitorPanel.parent === root.videoFullScreenHost)
+            return
+        monitorPanel.parent = root.videoFullScreenHost
+        if (root.videoFullScreenHost === cinemaSlot)
+            cinemaHintTimer.restart()
+    }
+
+    // The stage is declared in the column and moved into the placeholder here, so
+    // the docked case does not depend on the order the bindings happen to run in.
+    Component.onCompleted: root.applyVideoFullScreenHost()
+
+    onVideoFullScreenHostChanged: root.applyVideoFullScreenHost()
 }

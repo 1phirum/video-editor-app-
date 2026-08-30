@@ -1,5 +1,6 @@
 //qmllint disable
 import QtQuick
+import CutPro 1.0
 import "../../theme"
 import "../common"
 import "../effects"
@@ -103,7 +104,7 @@ Item {
         id: mouse
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton
-        cursorShape: Qt.CrossCursor
+        AppCursor.name: "Precise"
         property int selected: -1
 
         function nearest(px, py) {

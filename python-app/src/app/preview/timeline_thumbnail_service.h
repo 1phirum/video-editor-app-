@@ -51,6 +51,14 @@ public:
   // already known. Never opens a file, so it is safe on the GUI thread.
   QImage cachedTile(const QString &path, qint64 positionMs);
 
+  // Memory only, and no LRU touch: the predicate the timeline asks per visible
+  // slot on every prefetch revision, so it has to be cheaper than cachedTile()
+  // - which promotes disk hits and therefore reads and decodes a JPEG. A tile
+  // that is only on disk reads as absent here and is picked up by the
+  // prefetcher, whose tile() call promotes it. That is one file read on a
+  // background thread instead of one on the GUI thread per slot.
+  bool hasTile(const QString &path, qint64 positionMs);
+
   // Full path. Opens the source if needed, snaps the position to its keyframe
   // bucket, and decodes only when neither cache has that bucket.
   Tile tile(const QString &path, qint64 positionMs,

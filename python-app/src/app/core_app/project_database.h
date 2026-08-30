@@ -5,6 +5,8 @@
 #include <QVariantList>
 #include <QVariantMap>
 
+#include "core/module_api.h"
+
 // SQLite-backed persistence for all project data.
 // Replaces the single flat JSON file with a proper relational store so each
 // entity (media, clip, marker, transcript segment, settings …) can be queried,
@@ -13,7 +15,7 @@
 // Schema version history
 //   1 – initial (projects, sequences, media, clips, markers,
 //               transcript_segments, track_states, muted_tracks, settings)
-class ProjectDatabase : public QObject {
+class CUTPRO_BACKEND_API ProjectDatabase : public QObject {
   Q_OBJECT
 public:
   explicit ProjectDatabase(QObject *parent = nullptr);

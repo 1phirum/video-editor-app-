@@ -106,6 +106,38 @@ QString EffectPreviewGenerator::filterFor(const QString &effectId) {
     p["saturation"] = 115;
   } else if (effectId == "lens_correction") {
     p["k1"] = 28;
+  } else if (effectId == "hue_saturation") {
+    p["hue"] = 60;
+    p["saturation"] = 160;
+  } else if (effectId == "exposure") {
+    p["exposure"] = 0.7;
+  } else if (effectId == "levels") {
+    p["inputBlack"] = 12;
+    p["inputWhite"] = 82;
+  } else if (effectId == "gamma") {
+    p["gamma"] = 1.8;
+  } else if (effectId == "color_balance") {
+    p["shadowsBlue"] = 35;
+    p["highlightsRed"] = 30;
+  } else if (effectId == "vibrance") {
+    p["intensity"] = 70;
+  } else if (effectId == "chromatic_aberration") {
+    p["horizontal"] = 10;
+  } else if (effectId == "unsharp_mask") {
+    p["amount"] = 3;
+  } else if (effectId == "smart_blur") {
+    p["radius"] = 4;
+    p["strength"] = 1;
+  } else if (effectId == "video_denoise") {
+    p["luma"] = 16;
+    p["chroma"] = 14;
+  } else if (effectId == "deband") {
+    p["threshold"] = 24;
+  } else if (effectId == "luma_key") {
+    p["threshold"] = 45;
+    p["tolerance"] = 35;
+  } else if (effectId == "chroma_key") {
+    p["similarity"] = 40;
   }
   instance["parameters"] = p;
   return VideoEffectPipeline::filters({instance});

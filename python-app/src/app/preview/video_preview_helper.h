@@ -4,10 +4,12 @@
 #include <QVariantList>
 #include <QVariantMap>
 
+#include "core/module_api.h"
+
 // Resolves the active program-monitor clip in C++ and caches it until the next
 // timeline boundary. This avoids scanning every clip and subtitle from QML on
 // every playback tick.
-class VideoPreviewHelper final : public QObject {
+class CUTPRO_PREVIEW_API VideoPreviewHelper final : public QObject {
   Q_OBJECT
   Q_PROPERTY(QVariant activeClip READ activeClip NOTIFY activeStateChanged)
   Q_PROPERTY(QVariant activeMedia READ activeMedia NOTIFY activeStateChanged)

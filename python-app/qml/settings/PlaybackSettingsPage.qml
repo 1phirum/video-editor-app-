@@ -12,13 +12,9 @@ SettingsPage {
 
     SettingsSection {
         title: "Playback"
-        SettingsRow {
-            label: "Pause when app loses focus"
-            CaptionSwitch {
-                checked: root.settings.pauseOnFocusLoss !== false
-                onToggled: root.settingChanged("pauseOnFocusLoss", checked)
-            }
-        }
+        // Playback no longer stops when the window loses focus: clicking another
+        // app while a sequence plays is not a request to pause, so there is no
+        // "pause on focus loss" switch to offer any more.
         SettingsRow {
             label: "Loop sequence"
             CaptionSwitch {

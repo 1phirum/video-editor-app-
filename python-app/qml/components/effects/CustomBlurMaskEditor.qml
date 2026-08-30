@@ -1,4 +1,5 @@
 import QtQuick
+import CutPro 1.0
 import "../../theme"
 import "../common"
 import "../export"
@@ -117,17 +118,17 @@ Item {
         }
 
         function cursorFor(mode) {
-            if (mode === "move") return Qt.SizeAllCursor
-            if (mode === "left" || mode === "right") return Qt.SizeHorCursor
-            if (mode === "top" || mode === "bottom") return Qt.SizeVerCursor
+            if (mode === "move") return "CrossArrow"
+            if (mode === "left" || mode === "right") return "ScaleHorizontal"
+            if (mode === "top" || mode === "bottom") return "ScaleVertical"
             if (mode === "topLeft" || mode === "bottomRight")
-                return Qt.SizeFDiagCursor
+                return "ScaleTLBR"
             if (mode === "topRight" || mode === "bottomLeft")
-                return Qt.SizeBDiagCursor
-            return Qt.CrossCursor
+                return "ScaleTRBL"
+            return "Precise"
         }
 
-        cursorShape: cursorFor(pressed ? editMode : hitMode(mouseX, mouseY))
+        AppCursor.name: cursorFor(pressed ? editMode : hitMode(mouseX, mouseY))
 
         onPressed: mouse => {
             root.syncFromMask()

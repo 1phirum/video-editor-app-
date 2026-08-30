@@ -6,9 +6,11 @@
 #include <QString>
 #include <QObject>
 
+#include "core/module_api.h"
+
 // Generates effect-browser previews from the currently selected timeline clip.
 // Work is serialized so hover events never start competing FFmpeg processes.
-class EffectPreviewGenerator final : public QObject {
+class CUTPRO_PREVIEW_API EffectPreviewGenerator final : public QObject {
   Q_OBJECT
 
 public:

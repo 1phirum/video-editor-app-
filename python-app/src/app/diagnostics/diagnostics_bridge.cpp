@@ -14,6 +14,7 @@
 #include "app/diagnostics/crash_reporter_host.h"
 #include "app/diagnostics/item_tree_census.h"
 #include "app/diagnostics/model_guard.h"
+#include "app/diagnostics/playback_trace.h"
 #include "app/preview/gui_thread_watchdog.h"
 
 namespace {
@@ -80,6 +81,16 @@ QStringList DiagnosticsBridge::reports(int limit) const {
   return CrashReporterHost::existingReports(limit);
 }
 
+QString DiagnosticsBridge::playbackTrace(int maxEntries) const {
+  const QStringList lines = PlaybackTrace::instance().history(maxEntries);
+  if (lines.isEmpty())
+    return PlaybackTrace::enabled()
+               ? QStringLiteral("no playback events yet")
+               : QStringLiteral(
+                     "playback trace off (set CUTPRO_PLAYBACK_TRACE=1)");
+  return lines.join(QLatin1Char('\n'));
+}
+
 QString DiagnosticsBridge::writeSnapshot(const QString &note) {
   const QString directory = CrashReporterHost::reportDirectory();
   QDir().mkpath(directory);
@@ -110,6 +121,7 @@ QString DiagnosticsBridge::writeSnapshot(const QString &note) {
   stream << "\n--- item tree census ---\n" << census.text() << '\n';
   stream << "\n--- guarded models ---\n"
          << ModelGuard::instance().report() << '\n';
+  stream << "\n--- playback trace ---\n" << playbackTrace(256) << '\n';
   stream << "\n--- crash channel ---\n";
   for (const QString &line : diag::CrashChannel::describe())
     stream << line << '\n';

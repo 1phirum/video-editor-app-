@@ -1,6 +1,7 @@
 #include "app/export/sequence_export_builder.h"
 #include "app/effects/clip_effects_pipeline.h"
 #include "app/effects/audio_effect_pipeline.h"
+#include "app/export/timeline_effect_window.h"
 #include "app/lumetri/custom_blur_pipeline.h"
 #include "app/lumetri/lumetri_pipeline.h"
 #include "app/subtitles/subtitle_io.h"
@@ -70,6 +71,7 @@ QStringList SequenceExportBuilder::build(
 
   QVariantList ordered;
   QVariantList subtitleSegments;
+  QVariantList timelineEffects;
   for (const auto &value : clips)
     if (value.toMap().value("enabled", true).toBool() &&
         trackEnabled(value.toMap().value("track").toString())) {
@@ -82,6 +84,12 @@ QStringList SequenceExportBuilder::build(
               QVariantMap{{"start", startMs / 1000.0},
                           {"end", (startMs + duration) / 1000.0},
                           {"text", clip.value("text").toString()}});
+      } else if (clip.value("kind") == "effect") {
+        // An effect-track item is not something to decode - it has no media
+        // behind it. It applies to whatever picture its bar covers, so it is
+        // held aside here and folded into each overlapping video clip below.
+        if (clip.value("durationMs").toLongLong() > 0)
+          timelineEffects.append(clip);
       } else {
         ordered.append(value);
       }
@@ -248,6 +256,37 @@ QStringList SequenceExportBuilder::build(
       const QString colorChain =
           colorFilters.isEmpty() ? QString() : QString(",%1").arg(colorFilters);
       const QVariantMap effects = clip.value("effects").toMap();
+      // The clip's animation channels ride along on the clip map (Backend attaches
+      // them before it calls this), so a keyframed Blurriness renders the same
+      // curve the program monitor shows instead of one baked-in value.
+      QVariantList customBlurMasks = CustomBlurPipeline::enabledMasks(
+          clip.value("effectStack").toList(),
+          clip.value("keyframes").toMap());
+      // Then the effect track. Each bar contributes only over the stretch where
+      // it and this clip overlap, so the extent of the bar is what decides when
+      // its effects are on - outside it the picture comes through untouched.
+      // Timeline ms throughout: the trim/setpts below has already put this clip on
+      // sequence time, which is the clock both gates use.
+      QStringList timelineEffectChains;
+      for (const auto &effectValue : timelineEffects) {
+        const QVariantMap effectItem = effectValue.toMap();
+        const qint64 effectStart = effectItem.value("startMs").toLongLong();
+        const qint64 effectEnd =
+            effectStart + effectItem.value("durationMs").toLongLong();
+        const qint64 windowStart = qMax(effectStart, start);
+        const qint64 windowEnd = qMin(effectEnd, start + duration);
+        if (windowEnd <= windowStart + 1)
+          continue;
+        const QVariantList effectItemStack =
+            effectItem.value("effectStack").toList();
+        customBlurMasks += CustomBlurPipeline::windowedMasks(
+            effectItemStack, effectItem.value("keyframes").toMap(), windowStart,
+            windowEnd);
+        const QString windowedChain = TimelineEffectWindow::gatedFilters(
+            effectItemStack, windowStart, windowEnd);
+        if (!windowedChain.isEmpty())
+          timelineEffectChains << windowedChain;
+      }
       QStringList effectParts;
       const QString intrinsicFilters =
           ClipEffectsPipeline::videoFilters(effects);
@@ -257,12 +296,13 @@ QStringList SequenceExportBuilder::build(
         effectParts << intrinsicFilters;
       if (!stackFilters.isEmpty())
         effectParts << stackFilters;
+      // Last, because the lane sits over the clip: what a bar acts on is the
+      // picture the clip's own effects have already produced.
+      effectParts += timelineEffectChains;
       const QString effectFilters = effectParts.join(',');
       const QString effectChain = effectFilters.isEmpty()
                                       ? QString()
                                       : QString(",%1").arg(effectFilters);
-      const QVariantList customBlurMasks =
-          CustomBlurPipeline::enabledMasks(clip.value("effectStack").toList());
       const QString initialPrepared =
           customBlurMasks.isEmpty() ? prepared
                                     : QStringLiteral("vpreblur%1").arg(videoIndex);
@@ -284,11 +324,50 @@ QStringList SequenceExportBuilder::build(
       const QString preparedOutput = CustomBlurPipeline::appendFilters(
           &filters, initialPrepared, QStringLiteral("vblur%1").arg(videoIndex),
           customBlurMasks);
-      filters << QString("[%1][%2]overlay=x='%3':y='%4':eof_action=pass:"
-                         "shortest=0[%5]")
-                     .arg(videoOutput, preparedOutput,
-                          ClipEffectsPipeline::overlayX(effects),
-                          ClipEffectsPipeline::overlayY(effects), composed);
+      const QString blendSpec = ClipEffectsPipeline::blendMode(effects);
+      if (blendSpec.isEmpty()) {
+        filters << QString("[%1][%2]overlay=x='%3':y='%4':eof_action=pass:"
+                           "shortest=0[%5]")
+                       .arg(videoOutput, preparedOutput,
+                            ClipEffectsPipeline::overlayX(effects),
+                            ClipEffectsPipeline::overlayY(effects), composed);
+      } else {
+        // Blend modes composite the clip against everything already drawn
+        // beneath it. FFmpeg's `blend` filter has no positioning and rewrites
+        // the whole frame, so: (1) drop the clip onto a full-frame transparent
+        // canvas at its overlay position, (2) blend that against the accumulator,
+        // then (3) re-apply the clip's own alpha so only its pixels are affected
+        // and transparent regions keep the layers below untouched.
+        const QString bg = QStringLiteral("vbg%1").arg(videoIndex);
+        const QString topFull = QStringLiteral("vtopfull%1").arg(videoIndex);
+        const QString baseA = QStringLiteral("vbaseA%1").arg(videoIndex);
+        const QString baseB = QStringLiteral("vbaseB%1").arg(videoIndex);
+        const QString topRgb = QStringLiteral("vtoprgb%1").arg(videoIndex);
+        const QString topAlphaSrc = QStringLiteral("vtopas%1").arg(videoIndex);
+        const QString topMask = QStringLiteral("vmask%1").arg(videoIndex);
+        const QString blended = QStringLiteral("vblended%1").arg(videoIndex);
+        const QString blendMasked =
+            QStringLiteral("vbmasked%1").arg(videoIndex);
+        filters << QString("color=c=black@0:s=%1x%2:r=%3[%4]")
+                       .arg(width)
+                       .arg(height)
+                       .arg(frameRate, 0, 'f', 3)
+                       .arg(bg);
+        filters << QString("[%1][%2]overlay=x='%3':y='%4':eof_action=pass[%5]")
+                       .arg(bg, preparedOutput,
+                            ClipEffectsPipeline::overlayX(effects),
+                            ClipEffectsPipeline::overlayY(effects), topFull);
+        filters << QString("[%1]split=2[%2][%3]").arg(videoOutput, baseA, baseB);
+        filters << QString("[%1]split=2[%2][%3]")
+                       .arg(topFull, topRgb, topAlphaSrc);
+        filters << QString("[%1]alphaextract[%2]").arg(topAlphaSrc, topMask);
+        filters << QString("[%1][%2]blend=%3:shortest=1[%4]")
+                       .arg(topRgb, baseA, blendSpec, blended);
+        filters << QString("[%1][%2]alphamerge[%3]")
+                       .arg(blended, topMask, blendMasked);
+        filters << QString("[%1][%2]overlay=eof_action=pass:shortest=0[%3]")
+                       .arg(baseB, blendMasked, composed);
+      }
       videoOutput = composed;
       ++videoIndex;
     }

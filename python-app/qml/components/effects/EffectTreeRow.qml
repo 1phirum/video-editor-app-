@@ -56,10 +56,11 @@ Rectangle {
                ? (root.rowData.def === undefined ? "" : root.rowData.def)
                : root.currentValue)
 
-    // Instance parameters are not wired to the keyframe engine (its channels are
-    // keyed by clip + built-in property), so they show no stopwatch.
+    // The animation channel this row drives. Instance parameters carry a channel
+    // that names their instance, built-in properties are their own key.
+    readonly property string channel:
+        String(root.rowData.channel || root.rowData.id || "")
     readonly property bool keyframable: root.rowData.kf === true
-                                        && root.instanceId === ""
     property bool keyframed: false
 
     readonly property bool modified:
@@ -97,7 +98,7 @@ Rectangle {
     function commitNumber(value) {
         root.commitValue(value)
         if (root.keyframed)
-            Backend.keyframeEngine.addKeyframe(root.clipId, root.paramId,
+            Backend.keyframeEngine.addKeyframe(root.clipId, root.channel,
                                                Math.max(0, Number(Backend.playheadMs)),
                                                value)
     }
@@ -121,16 +122,16 @@ Rectangle {
 
     // Premiere's stopwatch drops the whole animation channel when switched off.
     function toggleKeyframing() {
-        if (root.clipId === "" || root.paramId === "")
+        if (root.clipId === "" || root.channel === "")
             return
         if (root.keyframed) {
             var frames = Backend.keyframeEngine.keyframesFor(root.clipId,
-                                                             root.paramId)
+                                                             root.channel)
             for (var i = frames.length - 1; i >= 0; --i)
-                Backend.keyframeEngine.removeKeyframe(root.clipId, root.paramId,
+                Backend.keyframeEngine.removeKeyframe(root.clipId, root.channel,
                                                       Number(frames[i].timeMs))
         } else {
-            Backend.keyframeEngine.addKeyframe(root.clipId, root.paramId,
+            Backend.keyframeEngine.addKeyframe(root.clipId, root.channel,
                                                Math.max(0, Number(Backend.playheadMs)),
                                                root.numberValue)
         }
@@ -140,12 +141,12 @@ Rectangle {
     function refreshKeyframed() {
         root.keyframed = root.keyframable && root.clipId !== ""
                          && Backend.keyframeEngine.isKeyframed(root.clipId,
-                                                               root.paramId)
+                                                               root.channel)
     }
 
     Component.onCompleted: root.refreshKeyframed()
     onClipIdChanged: root.refreshKeyframed()
-    onParamIdChanged: root.refreshKeyframed()
+    onChannelChanged: root.refreshKeyframed()
 
     Connections {
         target: Backend.keyframeEngine
@@ -367,6 +368,10 @@ Rectangle {
                 id: combo
                 anchors.fill: parent
                 model: root.rowData.options || []
+                // Generated per row (the blend-mode list is 27 entries), so
+                // worth a number even though the popup instantiates nothing
+                // until it opens.
+                onCountChanged: ModelGuard.note("effectRow.options", count)
                 textRole: "label"
                 valueRole: "value"
                 currentIndex: combo.indexOfValue(root.stringValue)
@@ -498,7 +503,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         visible: root.kind === "param" && root.keyframed
         clipId: root.clipId
-        effectKey: root.paramId
+        effectKey: root.channel
         currentValue: root.numberValue
     }
 

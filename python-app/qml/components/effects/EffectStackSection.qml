@@ -130,6 +130,10 @@ Rectangle {
 
         Repeater {
             model: root.definitionData.parameters || []
+            // Registry-fixed: a definition declares its parameters once at
+            // startup, so this should never move. Recorded because "should
+            // never move" is the class of assumption that hid the last freeze.
+            onCountChanged: ModelGuard.note("effectStack.parameters", count)
             delegate: EffectParameterControl {
                 required property var modelData
                 parameterData: modelData

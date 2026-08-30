@@ -2,6 +2,7 @@
 
 #include <QtGlobal>
 #include <algorithm>
+#include <functional>
 
 namespace {
 qint64 clipStart(const QVariantMap &clip) {
@@ -13,38 +14,97 @@ qint64 clipEnd(const QVariantMap &clip) {
 bool excluded(const QSet<QString> &ids, const QVariantMap &clip) {
   return ids.contains(clip.value("id").toString());
 }
+
+// Every time a moving edge may lock onto, named. Kept in one place so the drag
+// guide and the trim path can never end up snapping to different target sets:
+// an editor that snaps a trim to a marker but ignores it on a move is worse
+// than one that ignores markers everywhere.
+void forEachSnapTarget(
+    const QVariantList &clips, const QVariantList &markers,
+    const QSet<QString> &excludedIds, qint64 playheadMs,
+    qint64 sequenceDurationMs,
+    const std::function<void(qint64, const QString &)> &visit) {
+  visit(0, QStringLiteral("sequenceStart"));
+  visit(sequenceDurationMs, QStringLiteral("sequenceEnd"));
+  visit(playheadMs, QStringLiteral("playhead"));
+  for (const auto &value : markers)
+    visit(value.toMap().value("positionMs").toLongLong(),
+          QStringLiteral("marker"));
+  for (const auto &value : clips) {
+    const auto clip = value.toMap();
+    if (excluded(excludedIds, clip))
+      continue;
+    visit(clipStart(clip), QStringLiteral("clip"));
+    visit(clipEnd(clip), QStringLiteral("clip"));
+  }
+}
 } // namespace
+
+TimelineEditor::SnapResult TimelineEditor::snapEdge(
+    qint64 requestedMs, const QVariantList &clips, const QVariantList &markers,
+    const QStringList &excludedClipIds, qint64 playheadMs, qint64 thresholdMs,
+    qint64 sequenceDurationMs) {
+  const QSet<QString> excludedIds(excludedClipIds.begin(),
+                                  excludedClipIds.end());
+  const qint64 limit = qMax<qint64>(0, sequenceDurationMs);
+  SnapResult result;
+  result.guideMs = qMax<qint64>(0, requestedMs);
+  result.edge = QStringLiteral("start");
+  qint64 nearest = thresholdMs + 1;
+  forEachSnapTarget(clips, markers, excludedIds, playheadMs, limit,
+                    [&](qint64 candidate, const QString &kind) {
+                      candidate = qBound<qint64>(0, candidate, limit);
+                      const qint64 d = qAbs(candidate - requestedMs);
+                      // Strictly nearer, so a tie goes to the earlier target in
+                      // visit order and the winner cannot flicker between two
+                      // equidistant joins while the pointer sits still.
+                      if (d > thresholdMs || d >= nearest)
+                        return;
+                      nearest = d;
+                      result.snapped = true;
+                      result.deltaMs = candidate - requestedMs;
+                      result.guideMs = candidate;
+                      result.distanceMs = d;
+                      result.target = kind;
+                    });
+  return result;
+}
+
+TimelineEditor::SnapResult TimelineEditor::snapClip(
+    qint64 startMs, qint64 clipDurationMs, const QVariantList &clips,
+    const QVariantList &markers, const QStringList &excludedClipIds,
+    qint64 playheadMs, qint64 thresholdMs, qint64 sequenceDurationMs) {
+  const qint64 span = qMax<qint64>(0, clipDurationMs);
+  const SnapResult head =
+      snapEdge(startMs, clips, markers, excludedClipIds, playheadMs,
+               thresholdMs, sequenceDurationMs);
+  SnapResult tail =
+      snapEdge(startMs + span, clips, markers, excludedClipIds, playheadMs,
+               thresholdMs, sequenceDurationMs);
+  tail.edge = QStringLiteral("end");
+  // A tail snap that would push the head behind zero is not reachable: the
+  // start clamp would eat part of the move and leave the guide standing at a
+  // join the edge never actually met.
+  if (tail.snapped && startMs + tail.deltaMs < 0)
+    tail = SnapResult{};
+  if (!tail.snapped)
+    return head;
+  if (!head.snapped)
+    return tail;
+  // The head wins a tie. Butting a clip against the one on its left is the more
+  // common intent, and it is the edge the pointer usually leads with.
+  return tail.distanceMs < head.distanceMs ? tail : head;
+}
 
 qint64 TimelineEditor::snapTime(qint64 requestedMs, const QVariantList &clips,
                                 const QVariantList &markers,
                                 const QStringList &excludedClipIds,
                                 qint64 playheadMs, qint64 thresholdMs,
                                 qint64 durationMs) {
-  const QSet<QString> excludedIds(excludedClipIds.begin(),
-                                  excludedClipIds.end());
-  qint64 best = qMax<qint64>(0, requestedMs);
-  qint64 distance = thresholdMs + 1;
-  const auto consider = [&](qint64 candidate) {
-    candidate = qBound<qint64>(0, candidate, qMax<qint64>(0, durationMs));
-    const qint64 d = qAbs(candidate - requestedMs);
-    if (d < distance) {
-      distance = d;
-      best = candidate;
-    }
-  };
-  consider(0);
-  consider(durationMs);
-  consider(playheadMs);
-  for (const auto &value : markers)
-    consider(value.toMap().value("positionMs").toLongLong());
-  for (const auto &value : clips) {
-    const auto clip = value.toMap();
-    if (excluded(excludedIds, clip))
-      continue;
-    consider(clipStart(clip));
-    consider(clipEnd(clip));
-  }
-  return distance <= thresholdMs ? best : qMax<qint64>(0, requestedMs);
+  const SnapResult result = snapEdge(requestedMs, clips, markers,
+                                     excludedClipIds, playheadMs, thresholdMs,
+                                     durationMs);
+  return result.snapped ? result.guideMs : qMax<qint64>(0, requestedMs);
 }
 
 bool TimelineEditor::rippleDelete(QVariantList &clips,

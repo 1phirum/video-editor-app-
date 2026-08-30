@@ -220,11 +220,20 @@ Item {
             dragTargetDummy.y = 0
         }
         onDoubleClicked: mouse => {
+            if (mouse.button !== Qt.LeftButton)
+                return
             if (!root.movedDuringPress)
                 root.doubleClicked(mouse.modifiers)
             root.movedDuringPress = false
         }
         onClicked: mouse => {
+            // The right button did all of its work in onPressed (it opened the
+            // context menu). MouseArea still emits clicked() for it on release,
+            // and letting that through would re-run the plain-click selection
+            // and collapse a rubber-band / multi selection down to the single
+            // item under the cursor, right after the menu opened on it.
+            if (mouse.button !== Qt.LeftButton)
+                return
             if (!root.movedDuringPress)
                 root.clicked(mouse.modifiers)
             root.movedDuringPress = false

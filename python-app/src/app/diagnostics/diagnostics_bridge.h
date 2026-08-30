@@ -5,6 +5,8 @@
 #include <QStringList>
 #include <QVariantMap>
 
+#include "core/module_api.h"
+
 class QQmlApplicationEngine;
 
 // One QML-reachable handle on everything the diagnostics layer knows.
@@ -19,7 +21,7 @@ class QQmlApplicationEngine;
 // forceHang() and forceCrash(). A crash reporter that has never been made to
 // fire is a crash reporter that does not work, and waiting for a real freeze to
 // find out is how this project lost several rounds already.
-class DiagnosticsBridge final : public QObject {
+class CUTPRO_SCENE_API DiagnosticsBridge final : public QObject {
   Q_OBJECT
   // Everything at once, for a debug overlay. Refreshed on demand rather than
   // on a timer: reading it walks nothing, but a property that notifies every
@@ -40,6 +42,10 @@ public:
   Q_INVOKABLE QString censusText() const;
   // The guarded-model table, worst first.
   Q_INVOKABLE QString modelReport() const;
+  // The ordered playback event stream: every play/pause, every decode session,
+  // every playhead jump and every playhead-versus-picture gap, each with the QML
+  // caller that caused it. Empty unless CUTPRO_PLAYBACK_TRACE is set.
+  Q_INVOKABLE QString playbackTrace(int maxEntries = 128) const;
   // Writes everything known right now to a file in the crash-report directory
   // and returns its path. This is the "capture evidence while it is happening"
   // button: no freeze, no debugger, no crash required.

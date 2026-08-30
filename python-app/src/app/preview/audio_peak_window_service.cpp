@@ -161,6 +161,18 @@ AudioPeakWindowService::cachedWindow(const QString &path, qint64 startMs,
   return result;
 }
 
+bool AudioPeakWindowService::hasWindow(const QString &path, qint64 startMs,
+                                       qint64 spanMs, int columns) {
+  if (path.isEmpty() || spanMs <= 0)
+    return false;
+  const int bounded = qBound(32, columns, 2048);
+  // fingerprintFor() takes the mutex itself, so the key is built before locking.
+  const QString key =
+      cacheKey(fingerprintFor(path), qMax<qint64>(0, startMs), spanMs, bounded);
+  QMutexLocker locker(&m_mutex);
+  return m_windows.contains(key);
+}
+
 void AudioPeakWindowService::forget(const QString &path) {
   if (path.isEmpty())
     return;

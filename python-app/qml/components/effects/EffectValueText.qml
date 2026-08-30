@@ -1,6 +1,7 @@
 // qmllint disable
 import QtQuick
 import QtQuick.Controls
+import CutPro 1.0
 import "../../theme"
 import "../common"
 import "../export"
@@ -85,7 +86,7 @@ Item {
         anchors.fill: parent
         enabled: root.enabled && !root.editing
         hoverEnabled: true
-        cursorShape: root.enabled ? Qt.SizeHorCursor : Qt.ArrowCursor
+        AppCursor.name: root.enabled ? "HandPointSlider" : ""
         property real pressX: 0
         property real startValue: 0
         property bool scrubbed: false

@@ -1,5 +1,6 @@
 // qmllint disable
 import QtQuick
+import CutPro 1.0
 import "../common"
 import "../export"
 import "../lumetri"
@@ -18,6 +19,16 @@ Item {
     property bool movedDuringPress: false
     property real pressX: 0
     property real pressY: 0
+
+    // The timeline opens its effect lane while this is set. An audio effect has
+    // nothing to do there, so dragging one leaves the lane closed rather than
+    // offering a row that would refuse the drop.
+    function announceDrag(active) {
+        Backend.effectDragActive = active && root.dragMediaType !== "audio"
+                                  && root.dragEffectId !== ""
+    }
+
+    Component.onDestruction: Backend.effectDragActive = false
 
     signal clicked()
     signal doubleClicked()
@@ -60,6 +71,8 @@ Item {
             dragProxy.y = deltaY
             if (!root.internalDragging
                     && Math.abs(deltaX) + Math.abs(deltaY) >= 4) {
+                // Before Drag.active, so the lane is already there to be entered.
+                root.announceDrag(true)
                 root.internalDragging = true
                 root.movedDuringPress = true
             }
@@ -78,6 +91,10 @@ Item {
             root.internalDragging = false
             dragProxy.x = 0
             dragProxy.y = 0
+            // Deferred, because the drop defers the bar it creates: clearing now
+            // would close the lane for one frame before the bar arrives to keep
+            // it open.
+            Qt.callLater(root.announceDrag, false)
         }
         onCanceled: {
             if (root.internalDragging)
@@ -85,6 +102,7 @@ Item {
             root.internalDragging = false
             dragProxy.x = 0
             dragProxy.y = 0
+            root.announceDrag(false)
         }
     }
 }

@@ -5,6 +5,8 @@
 #include <QString>
 #include <QVariantMap>
 
+#include "core/module_api.h"
+
 // A cap on any count QML is about to turn into that many objects, and a record
 // of every time the cap was needed.
 //
@@ -40,7 +42,7 @@
 //
 // Registered from main() with qmlRegisterSingletonInstance, like Backend, so it
 // is reachable as `ModelGuard.bound(...)` after `import CutPro 1.0`.
-class ModelGuard final : public QObject {
+class CUTPRO_DIAGNOSTICS_API ModelGuard final : public QObject {
   Q_OBJECT
 
 public:

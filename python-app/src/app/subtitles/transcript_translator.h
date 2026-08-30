@@ -6,7 +6,9 @@
 #include <QVariantList>
 #include <QVariantMap>
 
-class TranscriptTranslator : public QObject {
+#include "core/module_api.h"
+
+class CUTPRO_SUBTITLES_API TranscriptTranslator : public QObject {
   Q_OBJECT
 
 public:

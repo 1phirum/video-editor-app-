@@ -1,5 +1,6 @@
 #include "app/effects/clip_effects_pipeline.h"
 
+#include <QHash>
 #include <QStringList>
 #include <QtGlobal>
 #include <cmath>
@@ -77,6 +78,44 @@ QString ClipEffectsPipeline::overlayY(const QVariantMap &effects) {
   const double y =
       qBound(-100.0, value(effects, "positionY", 0.0), 100.0) / 100.0;
   return QStringLiteral("(main_h-overlay_h)/2+main_h*%1").arg(y, 0, 'f', 5);
+}
+
+QString ClipEffectsPipeline::blendMode(const QVariantMap &effects) {
+  const QString mode = effects.value("blendMode", "normal").toString();
+  // FFmpeg's `blend` filter supplies most Photoshop-style modes by name. A few
+  // app modes have no per-pixel expression FFmpeg can evaluate in a
+  // format-independent way, so they degrade to the closest valid mode (noted
+  // per line) or to a plain source-over composite (empty string):
+  //   - linearBurn would need A+B-max, which depends on bit depth; approximated
+  //     by multiply (both darken toward black);
+  //   - darkerColor/lighterColor are luminance decisions; approximated by the
+  //     per-channel darken/lighten;
+  //   - dissolve and the four HSL modes (hue/saturation/color/luminosity) have
+  //     no blend expression at all and fall back to normal.
+  static const QHash<QString, QString> named{
+      {"darken", QStringLiteral("all_mode=darken")},
+      {"multiply", QStringLiteral("all_mode=multiply")},
+      {"colorBurn", QStringLiteral("all_mode=burn")},
+      {"linearBurn", QStringLiteral("all_mode=multiply")},   // approx
+      {"darkerColor", QStringLiteral("all_mode=darken")},    // approx
+      {"lighten", QStringLiteral("all_mode=lighten")},
+      {"screen", QStringLiteral("all_mode=screen")},
+      {"colorDodge", QStringLiteral("all_mode=dodge")},
+      {"linearDodge", QStringLiteral("all_mode=addition")},
+      {"lighterColor", QStringLiteral("all_mode=lighten")},  // approx
+      {"overlay", QStringLiteral("all_mode=overlay")},
+      {"softLight", QStringLiteral("all_mode=softlight")},
+      {"hardLight", QStringLiteral("all_mode=hardlight")},
+      {"vividLight", QStringLiteral("all_mode=vividlight")},
+      {"linearLight", QStringLiteral("all_mode=linearlight")},
+      {"pinLight", QStringLiteral("all_mode=pinlight")},
+      {"hardMix", QStringLiteral("all_mode=hardmix")},
+      {"difference", QStringLiteral("all_mode=difference")},
+      {"exclusion", QStringLiteral("all_mode=exclusion")},
+      {"subtract", QStringLiteral("all_mode=subtract")},
+      {"divide", QStringLiteral("all_mode=divide")},
+  };
+  return named.value(mode);  // empty for normal/dissolve/hue/saturation/color/luminosity
 }
 
 QString ClipEffectsPipeline::audioFilters(const QVariantMap &effects,

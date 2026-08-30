@@ -12,11 +12,18 @@
 #include <QtQml>
 
 #include "app/core_app/backend.h"
+#include "app/diagnostics/crash_channel.h"
+#include "app/diagnostics/crash_reporter_host.h"
+#include "app/diagnostics/diagnostics_bridge.h"
+#include "app/diagnostics/item_tree_census.h"
+#include "app/diagnostics/playback_trace.h"
+#include "app/diagnostics/model_guard.h"
 #include "app/preview/gui_dispatch.h"
 #include "app/preview/gui_thread_watchdog.h"
 #include "app/preview/startup_warmup.h"
 #include "app/preview/timeline_thumbnail_provider.h"
 #include "app/preview/waveform_window_provider.h"
+#include "app/ui/app_cursor.h"
 #include "core/version.h"
 
 namespace {
@@ -66,6 +73,13 @@ int main(int argc, char* argv[]) {
     GuiDispatch::install();
     GuiThreadWatchdog::instance().start();
 
+    // Before anything can stall, and before the window exists: the reporter has
+    // to already be watching when the first freeze happens, not started in
+    // response to one. This creates the shared block, installs the last-chance
+    // exception filter and spawns cutpro_crash_report.exe. It never fails fatally
+    // - a missing reporter logs one line and the editor runs as before.
+    CrashReporterHost::start();
+
     // Started here and not later: everything between this line and engine.load()
     // is the head start it gets. The 2049 ms severe stall the tracer caught at
     // startup was the GUI thread loading the image-format plugins from inside a
@@ -85,12 +99,36 @@ int main(int argc, char* argv[]) {
     Backend backend;
     qmlRegisterSingletonInstance("CutPro", 1, 0, "Backend", &backend);
 
+    // Caps any Repeater/ListView model width that is computed rather than
+    // counted, and logs the key that asked for too much. A freeze already traced
+    // to QQuickRepeater::clear() force-completing pending incubations is a model
+    // that grew past what the window can draw; this makes the app say which
+    // expression did it instead of surviving on a guess.
+    ModelGuard &modelGuard = ModelGuard::instance();
+    qmlRegisterSingletonInstance("CutPro", 1, 0, "ModelGuard", &modelGuard);
+
+    // Census + guard + watchdog + crash reports behind one QML handle, plus the
+    // two self-test calls that prove the reporter fires.
+    DiagnosticsBridge diagnostics;
+    qmlRegisterSingletonInstance("CutPro", 1, 0, "Diagnostics", &diagnostics);
+
+    // Attached-only type: `AppCursor.name: "Razor"` on any Item swaps in one of
+    // the bitmap cursors under assets/cursors.
+    qmlRegisterUncreatableType<AppCursor>(
+        "CutPro", 1, 0, "AppCursor",
+        QStringLiteral("AppCursor is only available as an attached property."));
+
     qInfo().noquote()
         << "Cut Pro: native C++/Qt backend, coreVersion ="
         << QString::fromLatin1(core::kVersion) << "| built =" << __DATE__
         << __TIME__ << "| executable =" << QCoreApplication::applicationFilePath();
 
     QQmlApplicationEngine engine;
+    // Before anything can be loaded, so the very first playback-property write
+    // already carries its QML caller. Attribution is the whole point of the
+    // trace: Backend::playing has writers in three panels and the metaobject
+    // write erases the caller from any C++ backtrace.
+    PlaybackTrace::instance().attachEngine(&engine);
     engine.addImageProvider(QStringLiteral("ffmpeg-preview"),
                             new FfmpegPreviewImageProvider(&backend));
     // On-demand timeline thumbnails. Asynchronous, so a clip made of hundreds of
@@ -117,15 +155,28 @@ int main(int argc, char* argv[]) {
     }
     if (engine.rootObjects().isEmpty())
         return -1;
+    // Started once there is a tree to walk. Every sample is published into the
+    // crash channel, so a hang report carries the item histogram as of a second
+    // or two before the freeze - which is the only time it can be taken, since
+    // the walk runs on the thread that gets wedged.
+    diagnostics.attach(&engine, ItemTreeCensus::kDefaultIntervalMs);
     // From here a stall is a visibly frozen window rather than a slow launch, and
     // the watchdog's reports should say so.
     GuiThreadWatchdog::instance().markWindowShown();
+    // Same distinction for the reporter: before this, a stalled heartbeat is a
+    // slow launch and reporting it would bury the real freezes.
+    diag::CrashChannel::markWindowShown();
 
     const int status = app.exec();
     // Joined before the engine and the backend go away: the monitor thread reads
     // the scope pointer the GUI thread publishes, and letting it outlive the
     // objects that publish it would turn a clean exit into a shutdown crash.
+    ItemTreeCensus::stopSampling();
     GuiThreadWatchdog::instance().stop();
+    // Tells the reporter this was a clean quit, so it exits without writing
+    // anything. Without it every normal session would leave an "app vanished"
+    // report behind.
+    CrashReporterHost::stop();
     StartupWarmup::finish();
     return status;
 }

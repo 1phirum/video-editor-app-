@@ -32,6 +32,9 @@ Item {
     readonly property string kind: String(root.clipData.kind || "video")
     readonly property bool isAudio: root.kind === "audio"
     readonly property bool isSubtitle: root.kind === "subtitle"
+    // An effect-track bar. No media behind it, so none of the media layers can
+    // draw: what it gets instead is a glyph and the effect's name.
+    readonly property bool isEffect: root.kind === "effect"
     // Long/large sources still draw a filmstrip and a waveform - both are now
     // produced by seeking rather than by decoding the whole file, so length is no
     // longer a reason to leave a clip blank. What "lightweight" still buys is the
@@ -88,6 +91,11 @@ Item {
     }
     readonly property real mediaDurationMs:
         Number(root.mediaData ? (root.mediaData.durationMs || 0) : 0)
+    // Names this clip's two prefetch wishes. The prefetcher round-robins between
+    // requesters, so one key per clip per layer is what stops a long source from
+    // finishing its whole strip before its neighbours get a single thumbnail. It
+    // is also the handle each layer cancels when it goes away.
+    readonly property string clipKey: String(root.clipData.id || "")
 
     // ---- Density gates --------------------------------------------------
     readonly property bool showFilmstrip: !root.isAudio && !root.isSubtitle
@@ -112,7 +120,9 @@ Item {
     Rectangle {
         anchors.fill: parent
         color: Qt.rgba(0.02, 0.04, 0.06,
-                       root.isAudio ? 0.08 : root.isSubtitle ? 0.30 : 0.05)
+                       root.isAudio ? 0.08
+                                    : root.isSubtitle ? 0.30
+                                                      : root.isEffect ? 0.16 : 0.05)
     }
 
     TimelineClipFilmstrip {
@@ -129,6 +139,7 @@ Item {
         tileToken: root.showFilmstrip ? root.tileToken : ""
         // A still has one frame and no zoom level makes a second one appear.
         preferTiles: !root.mediaIsImage
+        requesterKey: root.clipKey !== "" ? "strip:" + root.clipKey : ""
     }
 
     // Darken the strip so the name plate and waveform stay readable over it.
@@ -155,6 +166,7 @@ Item {
                                                   : root.sourceDurationMs
         viewLeft: root.viewLeft
         viewRight: root.viewRight
+        requesterKey: root.clipKey !== "" ? "wave:" + root.clipKey : ""
     }
 
     Image {
@@ -185,6 +197,35 @@ Item {
         elide: Text.ElideRight
     }
 
+    Image {
+        id: effectIcon
+        visible: root.isEffect && root.width >= 26
+        anchors.left: parent.left
+        anchors.leftMargin: 5
+        anchors.verticalCenter: parent.verticalCenter
+        width: 13
+        height: 13
+        source: "../../assets/icons/sliders-horizontal.svg"
+        opacity: 0.95
+    }
+
+    // The effect's name on one line, the way a short bar can carry it. It follows
+    // the horizontal scroll like a clip's name plate, so a bar trimmed to cover a
+    // long stretch still says what it is wherever the user is looking.
+    Text {
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.rightMargin: 6
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.leftMargin: 22 + Math.max(0, Math.min(root.width - 40, root.viewLeft))
+        visible: root.isEffect && root.width >= Theme.clipMinLabelWidth
+        text: root.isEffect ? String(root.clipData.name || "Effect") : ""
+        color: "#f4f1ff"
+        font.pixelSize: Theme.fsXs
+        font.weight: Font.DemiBold
+        elide: Text.ElideRight
+    }
+
     TimelineClipLabel {
         anchors.left: parent.left
         anchors.right: parent.right
@@ -192,7 +233,7 @@ Item {
         // Follow the clip horizontally so the name stays on screen while a long
         // clip is scrolled, the way Premiere pins it.
         leftInset: 6 + Math.max(0, Math.min(root.width - 40, root.viewLeft))
-        visible: root.showLabel && !root.isSubtitle
+        visible: root.showLabel && !root.isSubtitle && !root.isEffect
         label: String(root.clipData.name || "")
         overThumbnail: root.showFilmstrip
     }

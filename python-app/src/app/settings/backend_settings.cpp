@@ -1,6 +1,9 @@
 #include "app/core_app/backend.h"
 
 #include "app/settings/app_settings.h"
+#include "app/diagnostics/crash_reporter_host.h"
+#include "app/diagnostics/model_guard.h"
+#include "app/diagnostics/playback_trace.h"
 #include "app/lumetri/color_settings.h"
 #include "app/preview/audio_peak_window_service.h"
 #include "app/preview/decode_cost_model.h"
@@ -10,6 +13,7 @@
 #include "app/preview/preview_decode_policy.h"
 #include "app/preview/preview_failure_registry.h"
 #include "app/preview/startup_warmup.h"
+#include "app/preview/timeline_preview_prefetcher.h"
 #include "app/preview/timeline_thumbnail_service.h"
 
 #include <QDir>
@@ -110,6 +114,14 @@ bool Backend::startPreviewDecode(
     const QString &path, const QString &mediaKind, qint64 sourcePositionMs,
     qint64 durationMs, int sourceWidth, int sourceHeight, double frameRate,
     bool audioEnabled, double volume, const QString &audioPath) {
+  // Every session means a container open and a seek, roughly 200 ms before any
+  // picture exists. One per Play is correct; more than that is the restart storm,
+  // and the trace names the QML handler that asked for each one.
+  CUTPRO_PLAYBACK_TRACE("session.start",
+                        QStringLiteral("%1 at source %2 ms, kind %3")
+                            .arg(QFileInfo(path).fileName())
+                            .arg(sourcePositionMs)
+                            .arg(mediaKind));
   // Playback owns the monitor from here; a scrub still that is still decoding
   // would otherwise land on top of the first played frame.
   m_scrubFrames.cancel();
@@ -122,18 +134,22 @@ bool Backend::startPreviewDecode(
 
 bool Backend::requestPreviewFrame(const QString &path,
                                   qint64 sourcePositionMs, int sourceWidth,
-                                  int sourceHeight) {
+                                  int sourceHeight, bool exact) {
   CUTPRO_GUI_SCOPE("Backend::requestPreviewFrame");
   const QString clean = normalizePath(path);
   if (clean.isEmpty())
     return false;
   if (ScrubFrameService::available()) {
     // Playback and scrubbing cannot share the monitor: stop the streaming
-    // decoder, then serve the position from the warm session.
-    m_previewDecoder.stop();
+    // decoder, then serve the position from the warm session. Only when it is
+    // actually running - stop() tears down the WASAPI sink on this thread, and a
+    // scrub asks for a frame every few milliseconds.
+    if (m_previewDecoder.running())
+      m_previewDecoder.stop();
     m_previewFrameFromScrub = true;
     return m_scrubFrames.request(clean, sourcePositionMs,
-                                 previewFrameBound(sourceWidth, sourceHeight));
+                                 previewFrameBound(sourceWidth, sourceHeight),
+                                 exact);
   }
   m_previewFrameFromScrub = false;
   return m_previewDecoder.requestFrame(clean, sourcePositionMs, sourceWidth,
@@ -180,6 +196,95 @@ QString Backend::waveformWindowToken(const QString &path) {
 
 bool Backend::waveformWindowsAvailable() const {
   return AudioPeakWindowService::available();
+}
+
+namespace {
+// Signal-to-signal, so the property's NOTIFY fires whenever the prefetcher
+// reports progress. Qt::UniqueConnection makes it idempotent, which is what lets
+// this be wired from whichever request lands first instead of from the
+// constructor - the prefetcher is not built until the timeline actually wants
+// something.
+void wirePrefetcher(Backend *backend) {
+  QObject::connect(&TimelinePreviewPrefetcher::instance(),
+                   &TimelinePreviewPrefetcher::progressed, backend,
+                   &Backend::timelinePreviewRevisionChanged,
+                   Qt::UniqueConnection);
+}
+
+QVector<qint64> toPositions(const QVariantList &values) {
+  QVector<qint64> positions;
+  positions.reserve(values.size());
+  for (const QVariant &value : values) {
+    bool ok = false;
+    // QML hands whole numbers over as doubles, so this is a conversion rather
+    // than a cast; a value that is not a number at all is skipped instead of
+    // becoming position zero.
+    const qint64 position = qint64(value.toDouble(&ok));
+    if (ok)
+      positions.append(qMax<qint64>(0, position));
+  }
+  return positions;
+}
+} // namespace
+
+int Backend::timelinePreviewRevision() const {
+  return TimelinePreviewPrefetcher::instance().revision();
+}
+
+void Backend::requestTimelineTiles(const QString &requesterId,
+                                   const QString &token,
+                                   const QVariantList &bucketsMs) {
+  if (requesterId.isEmpty() || token.isEmpty() || bucketsMs.isEmpty())
+    return;
+  const QString path =
+      TimelineThumbnailService::instance().pathForToken(token);
+  if (path.isEmpty())
+    return;
+  wirePrefetcher(this);
+  TimelinePreviewPrefetcher::instance().requestTiles(requesterId, path,
+                                                    toPositions(bucketsMs));
+}
+
+void Backend::requestWaveformWindows(const QString &requesterId,
+                                     const QString &token,
+                                     const QVariantList &startsMs,
+                                     qint64 spanMs, int columns) {
+  if (requesterId.isEmpty() || token.isEmpty() || startsMs.isEmpty() ||
+      spanMs <= 0)
+    return;
+  const QString path = AudioPeakWindowService::instance().pathForToken(token);
+  if (path.isEmpty())
+    return;
+  wirePrefetcher(this);
+  TimelinePreviewPrefetcher::instance().requestWindows(
+      requesterId, path, toPositions(startsMs), spanMs, columns);
+}
+
+void Backend::cancelTimelinePreviewRequest(const QString &requesterId) {
+  if (requesterId.isEmpty())
+    return;
+  TimelinePreviewPrefetcher::instance().cancel(requesterId);
+}
+
+bool Backend::timelineTileReady(const QString &token, qint64 bucketMs) const {
+  if (token.isEmpty())
+    return false;
+  TimelineThumbnailService &service = TimelineThumbnailService::instance();
+  const QString path = service.pathForToken(token);
+  if (path.isEmpty())
+    return false;
+  return service.hasTile(path, bucketMs);
+}
+
+bool Backend::waveformWindowReady(const QString &token, qint64 startMs,
+                                  qint64 spanMs, int columns) const {
+  if (token.isEmpty() || spanMs <= 0)
+    return false;
+  AudioPeakWindowService &service = AudioPeakWindowService::instance();
+  const QString path = service.pathForToken(token);
+  if (path.isEmpty())
+    return false;
+  return service.hasWindow(path, startMs, spanMs, columns);
 }
 
 // Called by the monitor whenever its picture area changes size. Decode size
@@ -264,6 +369,12 @@ QVariantMap Backend::previewDecodeStatistics() const {
   const QVariantMap cost = DecodeCostModel::instance().statistics();
   for (auto it = cost.cbegin(); it != cost.cend(); ++it)
     stats.insert(it.key(), it.value());
+  // What the timeline has asked for and how much of it is still owed.
+  // prefetchPending far above zero while prefetchDecoded is flat means the worker
+  // is parked - a gesture that never ended, or a source it cannot read.
+  const QVariantMap prefetch = TimelinePreviewPrefetcher::instance().statistics();
+  for (auto it = prefetch.cbegin(); it != prefetch.cend(); ++it)
+    stats.insert(it.key(), it.value());
   // What the GUI thread actually experienced, as opposed to what the schedulers
   // intended. guiWorstStallScope is the one field worth reading first after a
   // freeze: it names the call the window was inside when it stopped answering.
@@ -285,12 +396,58 @@ QVariantMap Backend::previewDecodeStatistics() const {
   // panel rebuild per event-loop turn instead of one per nested binding level.
   stats[QStringLiteral("selectionDetailNotify")] =
       m_selectionDetailNotify.statistics();
+  // Every guarded QML model, largest first, plus anything that hit its cap. This
+  // is the answer to "which Repeater exploded": gdb showed the freeze inside
+  // QQuickRepeater::clear() but not which Repeater, and one number per call site
+  // is what turns that into a file name.
+  const QVariantMap models = ModelGuard::instance().statistics();
+  for (auto it = models.cbegin(); it != models.cend(); ++it)
+    stats.insert(it.key(), it.value());
+  // How many clips the timeline holds against how many rows the view was asked
+  // for. timelineClips far above timelineClipRows is the collapse doing its job;
+  // the two being equal on a subtitle track means the viewport was set without a
+  // scale and the view is carrying one delegate per segment again.
+  const QVariantMap clipRows = m_timelineClipModel.statistics();
+  for (auto it = clipRows.cbegin(); it != clipRows.cend(); ++it)
+    stats.insert(it.key(), it.value());
+  // Whether the out-of-process reporter is actually watching. A reporter that
+  // failed to start is worth knowing about before a crash, not after.
+  const QVariantMap reporter = CrashReporterHost::statistics();
+  for (auto it = reporter.cbegin(); it != reporter.cend(); ++it)
+    stats.insert(it.key(), it.value());
+  // ItemTreeCensus is deliberately absent. It walks QQuickItems, so it lives in
+  // cutpro_scene where Qt6::Quick is allowed; including it here would give
+  // cutpro_backend a Quick dependency and undo the reason for the split. QML
+  // reads it from the Diagnostics singleton instead, which merges both.
   return stats;
 }
 
 void Backend::stopPreviewDecode() {
+  // Logged whether or not a session is running: a teardown that arrives while
+  // nothing is playing is harmless, and one that arrives 800 ms into playback is
+  // the bug. Which QML handler called it is the answer either way.
+  if (PlaybackTrace::enabled())
+    PlaybackTrace::instance().record(
+        "session.stop",
+        QStringLiteral("decoder %1, picture at %2 ms")
+            .arg(m_previewDecoder.running() ? QStringLiteral("running")
+                                            : QStringLiteral("idle"))
+            .arg(m_previewDecoder.presentedSourceMs()));
   m_scrubFrames.cancel();
   m_previewDecoder.stop();
+}
+
+qint64 Backend::previewPresentedSourceMs() const {
+  // Deliberately not cleared by stopPreviewDecode(): the pause path stops the
+  // session and then asks which frame was on screen so it can re-render that
+  // one. A new session clears it in the decoder's own start().
+  return m_previewDecoder.presentedSourceMs();
+}
+
+void Backend::tracePlaybackDrift(qint64 presentedTimelineMs) const {
+  if (!PlaybackTrace::enabled() || presentedTimelineMs < 0)
+    return;
+  PlaybackTrace::instance().recordDrift(m_playheadMs, presentedTimelineMs);
 }
 
 void Backend::markGuiScope(const QString &label) const {

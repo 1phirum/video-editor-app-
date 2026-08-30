@@ -63,7 +63,11 @@ Rectangle {
         // TimelineClipModel adds its own 30 s margin on each side, and that is
         // what absorbs scrolling without re-projecting the model.
         var rightMs = leftMs + Math.max(1, trackView.width) * msPerPixel
-        Backend.timelineClipModel.setViewport(leftMs, rightMs)
+        // The scale goes with the window: the model collapses runs of clips too
+        // narrow to be seen into single bars, and how narrow that is depends
+        // entirely on the zoom. Without it, Fit zoom on an imported subtitle
+        // track asked the view for one full clip delegate per segment.
+        Backend.timelineClipModel.setViewport(leftMs, rightMs, msPerPixel)
     }
     // Apply Fit synchronously before clip delegates see a new long duration.
     // Deferring this by one event-loop turn briefly made an eight-hour clip
@@ -83,8 +87,40 @@ Rectangle {
     readonly property int subtitleTrackHeight: 26
     readonly property int subtitleTrackCount: Backend.hasSubtitleClips ? 1 : 0
     readonly property int subtitleTrackOffset: subtitleTrackCount * subtitleTrackHeight
-    readonly property int trackContentHeight: (subtitleTrackCount + Backend.videoTrackCount
-                                                + Backend.audioTrackCount) * trackHeight
+    readonly property int effectTrackHeight: 26
+    // The effect lane is not a permanent row. It appears once it holds a bar, and
+    // it also appears while an effect is being dragged - the drop target has to
+    // exist before the drop, and a row that is only there when it can be used is
+    // one less empty lane to explain.
+    readonly property int effectTrackCount:
+        Backend.timelineEffects.length > 0 || Backend.effectDragActive ? 1 : 0
+    readonly property int effectTrackOffset: effectTrackCount * effectTrackHeight
+    // Top of the video stack. Both overlay lanes sit above it, so every
+    // conversion between a track and a y is measured from here.
+    readonly property int overlayTrackOffset: subtitleTrackOffset + effectTrackOffset
+    readonly property int trackContentHeight: overlayTrackOffset
+                                              + (Backend.videoTrackCount
+                                                 + Backend.audioTrackCount) * trackHeight
+    // Which lanes actually hold clips. Only those get a grey band, so the
+    // scan is done once per clip change instead of once per lane repaint, and
+    // it stops as soon as every existing lane has been accounted for (track
+    // counts are pruned to the highest occupied track, so that is the norm).
+    readonly property var occupiedTracks: {
+        var map = ({})
+        var wanted = Backend.videoTrackCount + Backend.audioTrackCount
+                     + subtitleTrackCount + effectTrackCount
+        var found = 0
+        for (var i = 0; i < Backend.clips.length && found < wanted; ++i) {
+            var clip = Backend.clips[i]
+            var key = clip.kind === "subtitle"
+                      ? "S1" : String(clip.track || "").toUpperCase()
+            if (key !== "" && map[key] === undefined) {
+                map[key] = true
+                ++found
+            }
+        }
+        return map
+    }
     property string selectedClipId: ""
     property var selectedClipIds: []
     property var vocalRemovalJobs: []
@@ -107,6 +143,11 @@ Rectangle {
     property bool pointerInteractionActive: false
     property var activeDragClip: null
     property point clipDragPointer: Qt.point(0, 0)
+    // Live snap state for the drag guide. It lives on the panel and not on the
+    // clip delegate because the join it marks belongs to the sequence: the line
+    // has to cross every track, and only one can ever be shown at a time.
+    property bool snapGuideActive: false
+    property real snapGuideMs: 0
     property bool marqueeSelecting: false
     property point marqueeStart: Qt.point(0, 0)
     property point marqueeEnd: Qt.point(0, 0)
@@ -154,11 +195,54 @@ Rectangle {
     }
     function trackLocked(track) { return trackState(track).locked === true }
     function trackVisible(track) { return trackState(track).visible !== false }
+    // Proximity in milliseconds for a given pixel gap, so the pull stays the
+    // same distance on screen at every zoom level instead of covering hours at
+    // the zoomed-out end of a 26-hour source.
+    function snapThresholdMs(pixels) {
+        return Math.max(20, Math.round(1000 * pixels / Math.max(root.pps, 0.1)))
+    }
     function snappedTime(ms, ids) {
         if (!Backend.snappingEnabled)
             return Math.max(0, Math.round(ms))
-        var threshold = Math.max(20, Math.round(1000 * 10 / Math.max(root.pps, 0.1)))
-        return Backend.snapTime(Math.round(ms), ids || [], threshold)
+        return Backend.snapTime(Math.round(ms), ids || [],
+                                root.snapThresholdMs(10))
+    }
+
+    // Snap a clip that is being dragged whole. Unlike snappedTime this offers
+    // both of the clip's edges to the solver, so a clip whose tail meets the
+    // head of the next one locks there even though its own head is nowhere near
+    // a join, and it reports the join back so the guide can be drawn on it.
+    function updateDragSnap(clipItem) {
+        if (!clipItem || !clipItem.dragging || !clipItem.modelData
+                || !Backend.snappingEnabled) {
+            root.clearDragSnap(clipItem)
+            return
+        }
+        var requestedMs = Math.round(clipItem.dragPreviewX / root.pps * 1000)
+        var ids = root.selectedClipIds.indexOf(clipItem.modelData.id) >= 0
+                  ? root.selectedClipIds : [clipItem.modelData.id]
+        var snap = Backend.snapClipDrag(
+                       requestedMs,
+                       Math.round(clipItem.modelData.durationMs || 0),
+                       ids, root.snapThresholdMs(12))
+        if (!snap || snap.snapped !== true) {
+            root.clearDragSnap(clipItem)
+            return
+        }
+        // The pull is an offset laid over the raw pointer position, never a
+        // write back into it. Writing it back is what makes a snap sticky: the
+        // pointer would have to cross the threshold twice to leave a join, and
+        // every move event would drag the clip one more snap along.
+        clipItem.dragSnapOffsetX = (Number(snap.startMs) - requestedMs)
+                                   / 1000 * root.pps
+        root.snapGuideMs = Number(snap.guideMs)
+        root.snapGuideActive = true
+    }
+
+    function clearDragSnap(clipItem) {
+        if (clipItem)
+            clipItem.dragSnapOffsetX = 0
+        root.snapGuideActive = false
     }
 
     SubtitleContextMenu {
@@ -359,15 +443,19 @@ Rectangle {
         var number = Math.max(1, parseInt(track.substring(1)))
         if (track.charAt(0) === "S")
             return 0
+        if (track.charAt(0) === "F")
+            return subtitleTrackOffset
         if (track.charAt(0) === "V")
-            return subtitleTrackOffset + (Backend.videoTrackCount - number) * trackHeight
-        return subtitleTrackOffset + (Backend.videoTrackCount + number - 1) * trackHeight
+            return overlayTrackOffset + (Backend.videoTrackCount - number) * trackHeight
+        return overlayTrackOffset + (Backend.videoTrackCount + number - 1) * trackHeight
     }
 
     function trackForY(y) {
         if (subtitleTrackCount > 0 && y < subtitleTrackHeight)
             return "S1"
-        var adjustedY = Math.max(0, y - subtitleTrackOffset)
+        if (y < overlayTrackOffset)
+            return "F1"
+        var adjustedY = Math.max(0, y - overlayTrackOffset)
         var row = Math.max(0, Math.min(Backend.videoTrackCount
                                       + Backend.audioTrackCount - 1,
                                       Math.floor(adjustedY / trackHeight)))
@@ -381,8 +469,68 @@ Rectangle {
             return false
         if (kind === "subtitle")
             return track === "S1"
+        if (kind === "effect")
+            return track === "F1"
         return kind === "audio" ? track.charAt(0) === "A"
                                 : track.charAt(0) === "V"
+    }
+
+    // The lane under a lane-space y, or "" when the pointer is in the empty
+    // space above the first lane or below the last one. trackForY() clamps
+    // instead, which is what a clip drag wants - it is already constrained to
+    // the lanes - and wrong for a drop: the clamp turns "above the top track"
+    // into "the top track", and once the kind no longer matches, the old
+    // fallback turned that into track 1. Row order comes from the backend so
+    // the drop handlers and the placement rules cannot drift apart.
+    function trackAtY(y) {
+        if (y < 0)
+            return ""
+        if (y < subtitleTrackOffset)
+            return "S1"
+        if (y < overlayTrackOffset)
+            return "F1"
+        return Backend.trackForRow(
+                    Math.floor((y - overlayTrackOffset) / trackHeight))
+    }
+
+    // A drop past the end of the stack means "put it on a new track", the way
+    // Premiere adds a lane when you drag above V1. Only the outward direction
+    // counts for each kind: video grows upwards, audio downwards. The track
+    // itself is created by the placement call, not here, so the rows do not
+    // shift under the pointer mid-gesture.
+    function overflowTrackForY(y, kind) {
+        if (kind === "audio") {
+            var lanesEnd = overlayTrackOffset
+                    + (Backend.videoTrackCount + Backend.audioTrackCount)
+                      * trackHeight
+            return y >= lanesEnd && Backend.audioTrackCount < 64
+                    ? "A" + (Backend.audioTrackCount + 1) : ""
+        }
+        if (kind === "video" || kind === "image") {
+            return y < overlayTrackOffset && Backend.videoTrackCount < 64
+                    ? "V" + (Backend.videoTrackCount + 1) : ""
+        }
+        return ""
+    }
+
+    // Where an item of `kind` belongs for a pointer at lane-space `y`: the lane
+    // under the pointer when it can take the item, a new track when the pointer
+    // is past the end of the stack, otherwise the nearest compatible lane.
+    function dropTrackForY(y, kind) {
+        if (kind === "subtitle")
+            return "S1"
+        if (kind === "effect")
+            return "F1"
+        var row = root.trackAtY(y)
+        if (root.trackAcceptsKind(row, kind))
+            return row
+        var fresh = root.overflowTrackForY(y, kind)
+        if (fresh !== "")
+            return fresh
+        // Nearest compatible lane, measured in rows on screen - not a blind
+        // reset to V1/A1.
+        return Backend.compatibleTrackFor(
+                    kind, row === "" ? root.trackForY(y) : row)
     }
 
     function mediaForId(mediaId) {
@@ -472,7 +620,10 @@ Rectangle {
         if (!clipItem.dragging || !clipItem.modelData)
             return false
         var dragged = clipItem.modelData
-        var draggedStart = clipItem.dragPreviewX / root.pps * 1000
+        // Snapped position, matching what is drawn: the seam has to appear on
+        // the frame the clip is shown at, not the one the pointer is over.
+        var draggedStart = (clipItem.dragPreviewX + clipItem.dragSnapOffsetX)
+                           / root.pps * 1000
         var draggedEnd = draggedStart + Number(dragged.durationMs || 0)
         var toleranceMs = Math.max(2, 2000 / Math.max(1, root.pps))
         for (var i = 0; i < Backend.clips.length; ++i) {
@@ -643,7 +794,8 @@ Rectangle {
     }
 
     function effectDropCompatible(clip, dragSource) {
-        if (!clip || clip.kind === "subtitle" || !dragSource)
+        if (!clip || clip.kind === "subtitle" || clip.kind === "effect"
+                || !dragSource)
             return false
         if (dragSource.dragMediaType === "video")
             return clip.kind === "video" || clip.kind === "image"
@@ -651,35 +803,43 @@ Rectangle {
         return media !== null && Number(media.channels || 0) > 0
     }
 
-    function moveSelectedClip(activeClip, newStartMs, newTrack) {
+    function moveSelectedClip(activeClip, newStartMs, newTrack, preSnapped) {
         if (!activeClip || selectedClipIds.length === 0)
             return
-        var deltaMs = newStartMs - activeClip.startMs
         var oldNumber = parseInt(activeClip.track.substring(1))
         var newNumber = parseInt(newTrack.substring(1))
         var trackDelta = newTrack.charAt(0) === activeClip.track.charAt(0)
                          ? newNumber - oldNumber : 0
-        var requested = newStartMs
-        var snapped = root.snappedTime(requested, selectedClipIds)
+        // A drag has already resolved its own snap against both edges. Running
+        // the start-only solver over the result again would fight it: a clip
+        // parked by its tail would have its head yanked to some other join.
+        var snapped = preSnapped === true
+                      ? Math.max(0, Math.round(newStartMs))
+                      : root.snappedTime(newStartMs, selectedClipIds)
         Backend.moveClips(selectedClipIds, snapped - activeClip.startMs, trackDelta)
     }
 
     function maybeCreateTrackForDrag(clipItem) {
         if (!clipItem.dragAutoTrack || clipItem.dragAutoTrackAdded)
             return
-        if (clipItem.modelData.kind === "subtitle")
+        // The overlay lanes are fixed rows, so dragging a bar around on one of
+        // them never grows the video/audio stack.
+        if (clipItem.modelData.kind === "subtitle"
+                || clipItem.modelData.kind === "effect")
             return
         if (clipItem.modelData.kind === "audio") {
             if (clipItem.y >= root.trackContentHeight - clipItem.height - 2
                     && Backend.audioTrackCount < 64) {
                 clipItem.dragAutoTrackAdded = true
-                Backend.addTrack("audio")
+                // Not sticky: this lane belongs to the clip being dragged, so if
+                // the drag ends somewhere else the lane goes away with it.
+                Backend.addTrack("audio", false)
                 clipItem.dragPreviewY = root.trackContentHeight - clipItem.height
             }
-        } else if (clipItem.y <= root.subtitleTrackOffset + 2
+        } else if (clipItem.y <= root.overlayTrackOffset + 2
                    && Backend.videoTrackCount < 64) {
             clipItem.dragAutoTrackAdded = true
-            Backend.addTrack("video")
+            Backend.addTrack("video", false)
         }
     }
 
@@ -834,7 +994,7 @@ Rectangle {
                 }
                 TrackButton {
                     text: "A-"
-                    enabled: Backend.audioTrackCount > 1
+                    enabled: Backend.audioTrackCount > 0
                     ToolTip.visible: hovered
                     ToolTip.text: "Remove last empty audio track"
                     onClicked: Backend.removeLastTrack("audio")
@@ -1025,6 +1185,10 @@ Rectangle {
                         root.activeDragClip.dragPreviewX = Math.max(
                             0, root.activeDragClip.dragPreviewX + moved)
                         root.activeDragClip.dragLastContentX = trackView.contentX
+                        // The clip keeps travelling here with no pointer event
+                        // behind it, so the snap has to be re-solved from the
+                        // timer or it would freeze at the join it found last.
+                        root.updateDragSnap(root.activeDragClip)
                     }
                 }
             }
@@ -1059,7 +1223,48 @@ Rectangle {
                                       / tickWidth) - 2)
                     readonly property int visibleTickCount: Math.max(
                         1, Math.ceil(body.width / tickWidth) + 5)
-                    model: visibleTickCount
+                    // tickWidth has a 1 px floor, so a fully zoomed-out timeline
+                    // asks for one tick per pixel of body width. 8192 covers an
+                    // 8K display; anything past it is a zoom bug, not a ruler.
+                    //
+                    // The model is a capacity that only grows, in blocks, and not
+                    // visibleTickCount itself. Writing a Repeater's model calls
+                    // QQuickRepeater::clear() and re-incubates every delegate, and
+                    // visibleTickCount moves with body.width - which changes
+                    // several times inside a single SplitView layout pass. The
+                    // stall tracer caught the cost as 2054 ms of "Not Responding"
+                    // during startup:
+                    //   QQuickWindowPrivate::polishItems -> SplitViewPrivate::layout
+                    //     -> QQuickItem::setWidth -> QQuickRepeater::setModel
+                    //       -> clear() -> QQmlEnginePrivate::incubate
+                    // Every splitter drag and every window resize paid it too.
+                    // Ticks past the visible count park themselves on the
+                    // delegate's own visible binding, so the extra capacity costs
+                    // one Item each and nothing to draw.
+                    readonly property int tickCeiling: 8192
+                    property int tickCapacity: 0
+                    function growTicks() {
+                        const want = Math.min(
+                            rulerTicks.tickCeiling,
+                            Math.ceil((rulerTicks.visibleTickCount + 8) / 64) * 64)
+                        if (want > rulerTicks.tickCapacity)
+                            rulerTicks.tickCapacity = want
+                    }
+                    onVisibleTickCountChanged: {
+                        rulerTicks.growTicks()
+                        // restart(), so a burst of width changes keeps pushing the
+                        // shrink out; it only lands once the ruler has settled.
+                        tickShrink.restart()
+                    }
+                    Component.onCompleted: rulerTicks.growTicks()
+                    // Capacity that only grows would keep 8192 live delegates
+                    // after one trip to full zoom-out. Shrinking is the one case
+                    // where a rebuild is worth it, so it waits for the gesture to
+                    // finish: one rebuild after the user stops, never during. The
+                    // Timer is a sibling below, not a child: Repeater's default
+                    // property is its delegate.
+                    model: ModelGuard.bound(tickCapacity, tickCeiling,
+                                            "timeline.rulerTicks")
                     delegate: Item {
                         required property int index
                         readonly property int tickIndex:
@@ -1097,8 +1302,21 @@ Rectangle {
                     }
                 }
 
+                Timer {
+                    id: tickShrink
+                    interval: 900
+                    onTriggered: {
+                        const want = Math.min(
+                            rulerTicks.tickCeiling,
+                            Math.ceil((rulerTicks.visibleTickCount + 8) / 64) * 64)
+                        if (want < rulerTicks.tickCapacity)
+                            rulerTicks.tickCapacity = want
+                    }
+                }
+
                 Repeater {
                     model: Backend.markers
+                    onCountChanged: ModelGuard.note("timeline.markers", count)
                     delegate: Item {
                         id: markerPin
                         required property var modelData
@@ -1174,8 +1392,7 @@ Rectangle {
                     z: 0
                     anchors.fill: parent
                     preventStealing: true
-                    cursorShape: pressed ? Qt.ClosedHandCursor
-                                         : Qt.PointingHandCursor
+                    AppCursor.name: pressed ? "Fist" : "Hand"
                     onPressed: (m) => root.beginPlayheadScrub(m.x)
                     onPositionChanged: (m) => {
                         if (pressed)
@@ -1232,13 +1449,42 @@ Rectangle {
                             required property string trackKind
                             readonly property bool audioTrack: trackKind === "audio"
                             readonly property bool subtitleTrack: trackKind === "subtitle"
+                            readonly property bool effectTrack: trackKind === "effect"
+                            readonly property bool occupied:
+                                root.occupiedTracks[trackId] === true
                             width: tracks.width
                             height: root.trackHeight
 
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.leftMargin: body.laneX
-                                color: Theme.hover
+                                // The effect lane keeps its band while empty: an
+                                // invisible row is not something a user can find
+                                // to drop an effect on.
+                                visible: lane.occupied || lane.effectTrack
+                                opacity: lane.occupied ? 1 : 0.5
+                                color: Theme.laneOccupied
+
+                                Rectangle {
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.bottom: parent.bottom
+                                    height: 1
+                                    color: Theme.laneOccupiedLine
+                                }
+
+                                Text {
+                                    // Pinned to the left edge of the viewport
+                                    // rather than to time 0, so the invitation is
+                                    // still there after a scroll.
+                                    x: 8 + trackView.contentX
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    visible: lane.effectTrack
+                                             && Backend.timelineEffects.length === 0
+                                    text: "Drop an effect here to apply it over time"
+                                    color: Theme.textMuted
+                                    font.pixelSize: Theme.fsXs
+                                }
                             }
                         }
 
@@ -1248,8 +1494,18 @@ Rectangle {
                             trackId: "S1"
                             trackKind: "subtitle"
                         }
+                        Lane {
+                            visible: root.effectTrackCount > 0
+                            height: visible ? root.effectTrackHeight : 0
+                            trackId: "F1"
+                            trackKind: "effect"
+                        }
                         Repeater {
-                            model: Backend.videoTrackCount
+                            // Every lane carries the clips on it, so a track
+                            // count that runs away is not a long timeline, it is
+                            // a frozen one. 256 is well past any real sequence.
+                            model: ModelGuard.bound(Backend.videoTrackCount, 256,
+                                                    "timeline.videoLanes")
                             delegate: Lane {
                                 required property int index
                                 trackId: "V" + (Backend.videoTrackCount - index)
@@ -1257,7 +1513,8 @@ Rectangle {
                             }
                         }
                         Repeater {
-                            model: Backend.audioTrackCount
+                            model: ModelGuard.bound(Backend.audioTrackCount, 256,
+                                                    "timeline.audioLanes")
                             delegate: Lane {
                                 required property int index
                                 trackId: "A" + (index + 1)
@@ -1272,8 +1529,90 @@ Rectangle {
                         x: body.laneX
                         y: trackContent.lanesY
                         width: trackContent.width - body.laneX
-                        height: root.trackContentHeight
+                        // Audio media dropped on a sequence that has no audio
+                        // lane yet lands on A1, one row below the last lane.
+                        // Lend the layer that row for the duration of the drag
+                        // so the target band and the ghost clip stay visible;
+                        // the lane column itself is left alone, otherwise the
+                        // rows would shift under the pointer mid-gesture.
+                        readonly property int pendingAudioRow:
+                            mediaDropArea.containsDrag
+                            && Backend.audioTrackCount === 0
+                            && mediaDropArea.targetTrack.charAt(0) === "A"
+                            ? root.trackHeight : 0
+                        height: root.trackContentHeight + pendingAudioRow
                         clip: true
+
+                        Rectangle {
+                            z: 1
+                            x: 0
+                            y: root.trackContentHeight
+                            width: parent.width
+                            height: root.trackHeight - 1
+                            visible: clipLayer.pendingAudioRow > 0
+                            color: Theme.laneOccupied
+                        }
+
+                        // The effect lane's drop target. An effect dragged here
+                        // from the browser becomes a timeline item of its own
+                        // instead of being attached to one clip, so the extent of
+                        // the bar is the stretch of the sequence it applies to.
+                        // Above the bars (z 20) so a drop always makes a new one
+                        // rather than being swallowed by whatever is already there.
+                        DropArea {
+                            id: effectLaneDropArea
+                            z: 20
+                            x: 0
+                            y: root.subtitleTrackOffset
+                            width: clipLayer.width
+                            height: root.effectTrackOffset
+                            keys: ["cutpro-effect"]
+                            enabled: root.effectTrackCount > 0
+                                     && !root.trackLocked("F1")
+                            property real targetStartMs: 0
+
+                            function updateTarget(event) {
+                                targetStartMs = Math.max(
+                                            0, Math.round(event.x / root.pps * 1000))
+                            }
+
+                            onEntered: drag => {
+                                drag.acceptProposedAction()
+                                updateTarget(drag)
+                            }
+                            onPositionChanged: drag => updateTarget(drag)
+                            onDropped: drop => {
+                                if (!drop.source || !drop.source.dragEffectId)
+                                    return
+                                updateTarget(drop)
+                                drop.acceptProposedAction()
+                                // Same reason the media drop defers: Drag.drop() is
+                                // synchronous on Windows and mutating the timeline
+                                // from inside the callback can deadlock Qt Quick
+                                // before its timers get a turn.
+                                var pendingEffectId = String(drop.source.dragEffectId)
+                                var pendingStartMs = Math.round(
+                                            root.snappedTime(targetStartMs, []))
+                                Qt.callLater(function() {
+                                    var clipId = Backend.addTimelineEffect(
+                                                pendingEffectId, pendingStartMs, 0)
+                                    if (clipId !== "")
+                                        root.selectedClipIds = [clipId]
+                                })
+                            }
+
+                            Rectangle {
+                                x: effectLaneDropArea.targetStartMs / 1000 * root.pps
+                                y: 3
+                                width: Math.max(18, 5 * root.pps)
+                                height: root.effectTrackHeight - 6
+                                visible: effectLaneDropArea.containsDrag
+                                radius: Theme.radiusSm
+                                color: Qt.rgba(0.48, 0.36, 0.77, 0.55)
+                                border.width: 1
+                                border.color: Theme.accent
+                            }
+                        }
 
                         DropArea {
                             id: mediaDropArea
@@ -1292,13 +1631,33 @@ Rectangle {
                             property string previewName: ""
                             property url previewUrl: ""
 
-                            function defaultTrackForMedia(kind) {
-                                if (kind === "video" || kind === "image")
-                                    return "V1"
-                                if (kind === "audio")
-                                    return "A1"
-                                return ""
+                            // The target lane does not exist yet: the drop will
+                            // create it. The placement call in the backend grows
+                            // the track count, so nothing has to be added here
+                            // while the pointer is still moving.
+                            readonly property bool targetNewTrack: {
+                                var prefix = mediaDropArea.targetTrack.charAt(0)
+                                var number = parseInt(
+                                            mediaDropArea.targetTrack.substring(1))
+                                if (isNaN(number))
+                                    return false
+                                if (prefix === "V")
+                                    return number > Backend.videoTrackCount
+                                if (prefix === "A")
+                                    return number > Backend.audioTrackCount
+                                return false
                             }
+
+                            // Row the target lane occupies in body coordinates,
+                            // shared by the highlight band and the ghost clip.
+                            // Both used to live inside the clipped clip layer,
+                            // which hid them whenever the target was the new
+                            // lane above the top track.
+                            readonly property real rowScreenY:
+                                ruler.height + trackContent.lanesY
+                                - trackView.contentY
+                                + (mediaDropArea.targetTrack === ""
+                                   ? 0 : root.trackY(mediaDropArea.targetTrack))
 
                             function timelineHasMedia() {
                                 for (var i = 0; i < Backend.clips.length; ++i) {
@@ -1313,20 +1672,19 @@ Rectangle {
                                 if (!source) {
                                     targetTrack = ""
                                 } else {
-                                    // Always derive the destination from the
-                                    // pointer row, including an empty timeline.
-                                    // The old empty-timeline shortcut forced all
-                                    // media to V1 regardless of where it was
-                                    // released.
-                                    var trackY = event.y - ruler.height
+                                    // Both coordinates are read from the
+                                    // pointer: y picks the lane, x picks the
+                                    // time. The lane is whatever is under the
+                                    // pointer - including a new track past the
+                                    // end of the stack - and only a pointer
+                                    // with no compatible lane anywhere near it
+                                    // falls back, to the nearest one rather
+                                    // than to the first track.
+                                    var laneY = event.y - ruler.height
                                                 + trackView.contentY
                                                 - trackContent.lanesY
-                                    var cursorTrack = root.trackForY(trackY)
-                                    targetTrack = root.trackAcceptsKind(
-                                                cursorTrack,
-                                                source.dragMediaKind)
-                                            ? cursorTrack
-                                            : defaultTrackForMedia(source.dragMediaKind)
+                                    targetTrack = root.dropTrackForY(
+                                                laneY, source.dragMediaKind)
                                 }
                                 targetStartMs = Math.max(
                                             0, Math.round(
@@ -1415,10 +1773,11 @@ Rectangle {
                             anchors.fill: parent
                             acceptedButtons: Qt.LeftButton
                             preventStealing: true
-                            cursorShape: root.activeTool === 4 ? Qt.OpenHandCursor
-                                         : root.activeTool === 3 ? Qt.CrossCursor
-                                         : root.activeTool === 5 ? Qt.SizeAllCursor
-                                         : Qt.ArrowCursor
+                            AppCursor.name: root.activeTool === 4 ? "Hand"
+                                            : root.activeTool === 3 ? "Razor"
+                                            : root.activeTool === 5 ? "TLZoomIn"
+                                            : root.activeTool === 1 ? "MultiSelectRight"
+                                            : "Select"
                             onPressed: mouse => {
                                 root.forceActiveFocus()
                                 root.pointerInteractionActive = true
@@ -1510,12 +1869,19 @@ Rectangle {
                             border.color: "white"
                         }
 
+                        // Target lane highlight. Parented to the body, not to the
+                        // clip layer: the clip layer is clipped to the existing
+                        // lanes, so a target above the top video track - the new
+                        // lane a drop up there asks for - was invisible.
+                        // z sits above the tracks and below the ruler and the
+                        // fixed track headers.
                         Rectangle {
-                            z: 2
-                            x: 0
-                            y: mediaDropArea.targetTrack === ""
-                               ? 0 : root.trackY(mediaDropArea.targetTrack) + 1
-                            width: parent.width
+                            parent: body
+                            z: 25
+                            enabled: false
+                            x: body.laneX
+                            y: mediaDropArea.rowScreenY + 1
+                            width: body.width - body.laneX
                             height: root.trackHeight - 2
                             visible: mediaDropArea.containsDrag
                                      && mediaDropArea.targetTrack !== ""
@@ -1526,15 +1892,23 @@ Rectangle {
 
                         Rectangle {
                             id: mediaDropPreview
-                            z: 3
-                            x: mediaDropArea.targetStartMs / 1000 * root.pps
-                            y: mediaDropArea.targetTrack === ""
-                               ? 0 : root.trackY(mediaDropArea.targetTrack) + 3
+                            parent: body
+                            z: 26
+                            enabled: false
+                            readonly property real laneStartX:
+                                body.laneX + mediaDropArea.targetStartMs / 1000
+                                * root.pps - trackView.contentX
+                            x: Math.max(body.laneX, mediaDropPreview.laneStartX)
+                            y: mediaDropArea.rowScreenY + 3
                             width: Math.max(
-                                       54,
-                                       Math.min(parent.width - x,
-                                                mediaDropArea.previewDurationMs
-                                                / 1000 * root.pps))
+                                       0,
+                                       Math.min(body.width,
+                                                mediaDropPreview.laneStartX
+                                                + Math.max(
+                                                    54,
+                                                    mediaDropArea.previewDurationMs
+                                                    / 1000 * root.pps))
+                                       - mediaDropPreview.x)
                             height: root.trackHeight - 6
                             visible: mediaDropArea.containsDrag
                                      && mediaDropArea.targetTrack !== ""
@@ -1559,7 +1933,10 @@ Rectangle {
                                 anchors.right: parent.right
                                 anchors.rightMargin: 7
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: mediaDropArea.previewName
+                                text: mediaDropArea.targetNewTrack
+                                      ? mediaDropArea.previewName + "  →  new "
+                                        + mediaDropArea.targetTrack
+                                      : mediaDropArea.previewName
                                 color: "white"
                                 font.pixelSize: Theme.fsXs
                                 font.weight: Font.DemiBold
@@ -1569,10 +1946,27 @@ Rectangle {
 
                         Repeater {
                             model: Backend.timelineClipModel
+                            // The heaviest model in the app: every entry is a
+                            // clip rectangle with a filmstrip, a waveform and a
+                            // label inside it. Counted rather than capped -
+                            // hiding a clip the user placed would be worse than
+                            // the freeze - but the number belongs in the report.
+                            onCountChanged: ModelGuard.note("timeline.clips",
+                                                            count)
                             delegate: Rectangle {
                                 id: clipItem
                                 z: 10
                                 required property var modelData
+                                // A row standing for a run of clips too narrow to
+                                // be seen individually. The model produces these
+                                // instead of one delegate per clip, so this is
+                                // drawn as a plain bar with a count and takes no
+                                // part in selection, dragging or trimming - at
+                                // this zoom none of those could hit one clip
+                                // anyway. Zooming in shrinks the collapse
+                                // threshold and the bar breaks back into clips.
+                                readonly property bool isCluster:
+                                    clipItem.modelData.isCluster === true
                                 property bool dragAutoTrack: false
                                 property bool dragAutoTrackAdded: false
                                 property bool dragging: false
@@ -1587,6 +1981,11 @@ Rectangle {
                                 property real dragOriginY: 0
                                 property real dragPreviewX: 0
                                 property real dragPreviewY: 0
+                                // Correction from the snap solver, kept apart
+                                // from dragPreviewX so the raw pointer position
+                                // stays honest and the clip can walk out of a
+                                // join as soon as the pointer does.
+                                property real dragSnapOffsetX: 0
                                 property bool trimmingStart: false
                                 property bool trimmingEnd: false
                                 property real previewStartMs: modelData.startMs
@@ -1617,7 +2016,7 @@ Rectangle {
                                     clipItem.width,
                                     trackView.contentX - body.laneX - clipItem.x
                                     + trackView.width + clipItem.viewPad)
-                                x: dragging ? dragPreviewX
+                                x: dragging ? dragPreviewX + dragSnapOffsetX
                                             : displayStartMs / 1000 * root.pps
                                 y: dragging ? dragPreviewY
                                             : root.trackY(modelData.track) + 3
@@ -1625,12 +2024,16 @@ Rectangle {
                                                     / 1000 * root.pps)
                                 height: modelData.kind === "subtitle"
                                         ? root.subtitleTrackHeight - 6
-                                        : root.trackHeight - 6
+                                        : modelData.kind === "effect"
+                                          ? root.effectTrackHeight - 6
+                                          : root.trackHeight - 6
                                 radius: Theme.radiusSm
                                 color: modelData.kind === "subtitle"
                                        ? Theme.clipSubtitle
-                                       : modelData.kind === "audio"
-                                         ? Theme.clipAudio : Theme.clipVideo
+                                       : modelData.kind === "effect"
+                                         ? Theme.clipEffect
+                                         : modelData.kind === "audio"
+                                           ? Theme.clipAudio : Theme.clipVideo
                                 opacity: root.trackVisible(modelData.track) ? 1 : 0.35
                                 border.width: root.isClipSelected(modelData.id) ? 2 : 0
                                 border.color: Theme.accent
@@ -1638,7 +2041,14 @@ Rectangle {
                                 TimelineClipContent {
                                     anchors.fill: parent
                                     clipData: clipItem.modelData
-                                    mediaData: root.mediaForId(clipItem.modelData.mediaId)
+                                    // No source behind a collapsed row, so every
+                                    // density gate inside falls closed: no
+                                    // filmstrip, no waveform, no thumbnail
+                                    // request. What is left is the count the
+                                    // model put in the payload.
+                                    mediaData: clipItem.isCluster
+                                               ? ({})
+                                               : root.mediaForId(clipItem.modelData.mediaId)
                                     pixelsPerSecond: root.pps
                                     sourceInMs: clipItem.modelData.sourceInMs
                                                 + (clipItem.displayStartMs
@@ -1675,6 +2085,7 @@ Rectangle {
                                     id: effectDropArea
                                     anchors.fill: parent
                                     z: 30
+                                    enabled: !clipItem.isCluster
                                     keys: ["cutpro-effect"]
                                     onEntered: drag => {
                                         if (!root.effectDropCompatible(
@@ -1715,6 +2126,7 @@ Rectangle {
 
                                 TapHandler {
                                     acceptedButtons: Qt.RightButton
+                                    enabled: !clipItem.isCluster
                                     onTapped: {
                                         if (!root.isClipSelected(clipItem.modelData.id))
                                             root.selectClip(clipItem.modelData.id, Qt.NoModifier)
@@ -1733,11 +2145,16 @@ Rectangle {
 
                                 MouseArea {
                                     anchors.fill: parent
-                                    cursorShape: root.activeTool === 3 ? Qt.CrossCursor
-                                                 : root.activeTool === 4 ? Qt.OpenHandCursor
-                                                 : root.activeTool === 5 ? Qt.SizeAllCursor
-                                                 : clipItem.dragging ? Qt.ClosedHandCursor
-                                                                     : Qt.OpenHandCursor
+                                    // A collapsed bar is not a clip: it cannot be
+                                    // selected, cut or dragged, and letting the
+                                    // press through means a click there still
+                                    // moves the playhead like a click on the lane.
+                                    enabled: !clipItem.isCluster
+                                    AppCursor.name: root.activeTool === 3 ? "Razor"
+                                                    : root.activeTool === 4 ? "Hand"
+                                                    : root.activeTool === 5 ? "TLZoomIn"
+                                                    : root.activeTool === 1 ? "MultiSelectRight"
+                                                    : clipItem.dragging ? "Fist" : "Hand"
                                     preventStealing: true
                                     onPressed: (mouse) => {
                                         root.forceActiveFocus()
@@ -1855,16 +2272,21 @@ Rectangle {
                                             clipItem.dragLastContentX = trackView.contentX
                                             if (clipItem.modelData.kind === "subtitle") {
                                                 clipItem.dragPreviewY = 3
+                                            } else if (clipItem.modelData.kind === "effect") {
+                                                // One effect lane, so the bar only
+                                                // travels in time.
+                                                clipItem.dragPreviewY =
+                                                        root.subtitleTrackOffset + 3
                                             } else {
                                                 var minimumY = clipItem.modelData.kind === "audio"
-                                                        ? root.subtitleTrackOffset
+                                                        ? root.overlayTrackOffset
                                                           + Backend.videoTrackCount
                                                             * root.trackHeight
-                                                        : root.subtitleTrackOffset
+                                                        : root.overlayTrackOffset
                                                 var maximumY = clipItem.modelData.kind === "audio"
                                                         ? root.trackContentHeight
                                                           - clipItem.height
-                                                        : root.subtitleTrackOffset
+                                                        : root.overlayTrackOffset
                                                           + Backend.videoTrackCount
                                                             * root.trackHeight
                                                           - clipItem.height
@@ -1873,11 +2295,16 @@ Rectangle {
                                                         clipItem.dragPreviewY))
                                             }
                                             root.maybeCreateTrackForDrag(clipItem)
+                                            root.updateDragSnap(clipItem)
                                         }
                                     }
                                     onReleased: {
                                         root.pointerInteractionActive = false
                                         root.activeDragClip = null
+                                        // The guide belongs to the press, so it
+                                        // goes away here whichever of the paths
+                                        // below this release takes.
+                                        root.snapGuideActive = false
                                         if (root.activeTool === 4) {
                                             root.handPanning = false
                                             return
@@ -1888,10 +2315,15 @@ Rectangle {
                                         if (!clipItem.dragging
                                                 || root.trackLocked(
                                                     clipItem.modelData.track)) {
+                                            clipItem.dragSnapOffsetX = 0
                                             clipItem.dragging = false
                                             return
                                         }
+                                        // Commit what was on screen, snap and
+                                        // all, so the clip lands on the join the
+                                        // guide was standing on.
                                         var targetX = clipItem.dragPreviewX
+                                                      + clipItem.dragSnapOffsetX
                                         var targetY = clipItem.dragPreviewY
                                         var track = root.trackForY(
                                             targetY + clipItem.height / 2)
@@ -1900,7 +2332,8 @@ Rectangle {
                                         if (compatible)
                                             root.moveSelectedClip(clipItem.modelData,
                                                                   Math.round(targetX / root.pps * 1000),
-                                                                  track)
+                                                                  track, true)
+                                        clipItem.dragSnapOffsetX = 0
                                         clipItem.dragging = false
                                     }
                                     onCanceled: {
@@ -1908,6 +2341,7 @@ Rectangle {
                                         root.activeDragClip = null
                                         root.handPanning = false
                                         clipItem.dragAutoTrack = false
+                                        root.clearDragSnap(clipItem)
                                         clipItem.dragging = false
                                     }
                                     onPressedChanged: {
@@ -1916,6 +2350,7 @@ Rectangle {
                                             root.pointerInteractionActive = false
                                             root.activeDragClip = null
                                             root.handPanning = false
+                                            root.snapGuideActive = false
                                         }
                                     }
                                 }
@@ -1927,14 +2362,17 @@ Rectangle {
                                     anchors.top: parent.top
                                     anchors.bottom: parent.bottom
                                     width: Math.min(12, parent.width / 2)
-                                    enabled: (root.activeTool === 0 || root.activeTool === 2)
+                                    enabled: !clipItem.isCluster
+                                             && (root.activeTool === 0 || root.activeTool === 2)
                                              && !root.trackLocked(clipItem.modelData.track)
                                     hoverEnabled: true
-                                    cursorShape: Qt.SizeHorCursor
+                                    AppCursor.name: root.activeTool === 2 ? "RippleHead"
+                                                                          : "TrimHead"
                                     preventStealing: true
-                                    property real pointerY: height / 2
-                                    ToolTip.visible: containsMouse && !pressed
-                                    ToolTip.text: "Trim clip start"
+                                    // No tooltip and no glyph drawn at the
+                                    // pointer: the TrimHead cursor is already
+                                    // there, and a second trim symbol on the
+                                    // same pixels reads as one broken icon.
 
                                     onPressed: mouse => {
                                         root.forceActiveFocus()
@@ -1943,16 +2381,19 @@ Rectangle {
                                         clipItem.previewEndMs = clipItem.modelData.startMs
                                                                 + clipItem.modelData.durationMs
                                         clipItem.trimmingStart = true
-                                        pointerY = mouse.y
                                         mouse.accepted = true
                                     }
                                     onPositionChanged: mouse => {
-                                        pointerY = mouse.y
                                         if (!pressed)
                                             return
                                         var point = mapToItem(clipLayer, mouse.x, mouse.y)
                                         var requested = Math.round(point.x / root.pps * 1000)
-                                        var minimum = Math.max(0,
+                                        // An effect bar has no source footage
+                                        // behind it, so its head is free: it can be
+                                        // pulled back to the head of the sequence.
+                                        var minimum = clipItem.modelData.kind === "effect"
+                                                      ? 0
+                                                      : Math.max(0,
                                                                clipItem.modelData.startMs
                                                                - clipItem.modelData.sourceInMs)
                                         clipItem.previewStartMs = Math.max(
@@ -1981,20 +2422,10 @@ Rectangle {
                                         visible: root.isClipSelected(clipItem.modelData.id)
                                                  || trimStartArea.containsMouse
                                     }
-
-                                    Image {
-                                        visible: trimStartArea.containsMouse
-                                                 || trimStartArea.pressed
-                                        width: 28
-                                        height: 28
-                                        x: (parent.width - width) / 2
-                                        y: Math.max(-height / 2,
-                                                    Math.min(parent.height - height / 2,
-                                                             trimStartArea.pointerY - height / 2))
-                                        source: "../../assets/icons/trim-start.svg"
-                                        sourceSize.width: width
-                                        sourceSize.height: height
-                                    }
+                                    // No glyph drawn at the pointer here: the
+                                    // TrimHead cursor is already under it, and
+                                    // two trim symbols on the same pixels read
+                                    // as one broken icon.
                                 }
 
                                 MouseArea {
@@ -2004,14 +2435,13 @@ Rectangle {
                                     anchors.top: parent.top
                                     anchors.bottom: parent.bottom
                                     width: Math.min(12, parent.width / 2)
-                                    enabled: (root.activeTool === 0 || root.activeTool === 2)
+                                    enabled: !clipItem.isCluster
+                                             && (root.activeTool === 0 || root.activeTool === 2)
                                              && !root.trackLocked(clipItem.modelData.track)
                                     hoverEnabled: true
-                                    cursorShape: Qt.SizeHorCursor
+                                    AppCursor.name: root.activeTool === 2 ? "RippleTail"
+                                                                          : "TrimTail"
                                     preventStealing: true
-                                    property real pointerY: height / 2
-                                    ToolTip.visible: containsMouse && !pressed
-                                    ToolTip.text: "Trim clip end"
 
                                     onPressed: mouse => {
                                         root.forceActiveFocus()
@@ -2020,18 +2450,21 @@ Rectangle {
                                         clipItem.previewEndMs = clipItem.modelData.startMs
                                                                 + clipItem.modelData.durationMs
                                         clipItem.trimmingEnd = true
-                                        pointerY = mouse.y
                                         mouse.accepted = true
                                     }
                                     onPositionChanged: mouse => {
-                                        pointerY = mouse.y
                                         if (!pressed)
                                             return
                                         var point = mapToItem(clipLayer, mouse.x, mouse.y)
                                         var requested = Math.round(point.x / root.pps * 1000)
-                                        var maximum = clipItem.modelData.startMs
-                                                      + clipItem.sourceDurationMs
-                                                      - clipItem.modelData.sourceInMs
+                                        // Nothing runs out at the end of an effect
+                                        // bar, so the tail is free. The 24 h stop is
+                                        // the same one the backend applies.
+                                        var maximum = clipItem.modelData.kind === "effect"
+                                                      ? 86400000
+                                                      : clipItem.modelData.startMs
+                                                        + clipItem.sourceDurationMs
+                                                        - clipItem.modelData.sourceInMs
                                         clipItem.previewEndMs = Math.min(
                                                     maximum,
                                                     Math.max(clipItem.previewStartMs + 1,
@@ -2063,20 +2496,6 @@ Rectangle {
                                         visible: root.isClipSelected(clipItem.modelData.id)
                                                  || trimEndArea.containsMouse
                                     }
-
-                                    Image {
-                                        visible: trimEndArea.containsMouse
-                                                 || trimEndArea.pressed
-                                        width: 28
-                                        height: 28
-                                        x: (parent.width - width) / 2
-                                        y: Math.max(-height / 2,
-                                                    Math.min(parent.height - height / 2,
-                                                             trimEndArea.pointerY - height / 2))
-                                        source: "../../assets/icons/trim-end.svg"
-                                        sourceSize.width: width
-                                        sourceSize.height: height
-                                    }
                                 }
                             }
                         }
@@ -2094,6 +2513,24 @@ Rectangle {
                 height: trackView.height + ruler.height
                 color: Qt.rgba(0.29, 0.56, 0.96, 0.9)
                 visible: x >= body.laneX && x <= body.width
+            }
+
+            // Snap guide. Viewport space beside the playhead rather than a child
+            // of the dragged clip, because the join it names belongs to the
+            // sequence and has to be readable across every track at once. It
+            // sits just under the playhead so the two never trade places.
+            Rectangle {
+                id: snapGuideLine
+                z: 139
+                x: Math.round(body.laneX
+                              + root.snapGuideMs / 1000 * root.pps
+                              - trackView.contentX)
+                y: ruler.height
+                width: 2
+                height: trackView.height
+                color: Theme.snapGuide
+                visible: root.snapGuideActive
+                         && x >= body.laneX && x <= body.width
             }
 
             // Keep the playhead head above the ruler, clips, and fixed headers.
@@ -2142,6 +2579,7 @@ Rectangle {
                         readonly property bool audioTrack: trackKind === "audio"
                         readonly property bool videoTrack: trackKind === "video"
                         readonly property bool subtitleTrack: trackKind === "subtitle"
+                        readonly property bool effectTrack: trackKind === "effect"
                         width: fixedTrackHeaders.width
                         height: root.trackHeight
                         color: Theme.bgPanel
@@ -2159,8 +2597,10 @@ Rectangle {
                                 Layout.preferredWidth: 24
                             }
                             Image {
-                                visible: header.subtitleTrack
-                                source: "../../assets/icons/subtitles.svg"
+                                visible: header.subtitleTrack || header.effectTrack
+                                source: header.effectTrack
+                                        ? "../../assets/icons/sliders-horizontal.svg"
+                                        : "../../assets/icons/subtitles.svg"
                                 sourceSize.width: 14
                                 sourceSize.height: 14
                                 Layout.preferredWidth: 14
@@ -2169,7 +2609,7 @@ Rectangle {
                             }
                             Item { Layout.fillWidth: true }
                             IconButton {
-                                visible: header.videoTrack
+                                visible: header.videoTrack || header.effectTrack
                                 iconName: root.trackVisible(header.trackId)
                                           ? "eye" : "eye-off"
                                 boxSize: 20
@@ -2178,11 +2618,13 @@ Rectangle {
                                            ? Theme.textMuted : Theme.textPrimary
                                 onClicked: root.toggleVisible(header.trackId)
                                 ToolTip.visible: hovered
-                                ToolTip.text: root.trackVisible(header.trackId)
-                                              ? "Hide video track" : "Show video track"
+                                ToolTip.text: (root.trackVisible(header.trackId)
+                                               ? "Hide " : "Show ")
+                                              + (header.effectTrack ? "effect track"
+                                                                    : "video track")
                             }
                             IconButton {
-                                visible: !header.subtitleTrack
+                                visible: !header.subtitleTrack && !header.effectTrack
                                 readonly property bool trackMuted:
                                     Backend.mutedTracks.indexOf(header.trackId) >= 0
                                 iconName: trackMuted ? "volume-x" : "volume-2"
@@ -2216,8 +2658,15 @@ Rectangle {
                         trackId: "S1"
                         trackKind: "subtitle"
                     }
+                    Header {
+                        visible: root.effectTrackCount > 0
+                        height: visible ? root.effectTrackHeight : 0
+                        trackId: "F1"
+                        trackKind: "effect"
+                    }
                     Repeater {
-                        model: Backend.videoTrackCount
+                        model: ModelGuard.bound(Backend.videoTrackCount, 256,
+                                                "timeline.videoHeaders")
                         delegate: Header {
                             required property int index
                             trackId: "V" + (Backend.videoTrackCount - index)
@@ -2225,7 +2674,8 @@ Rectangle {
                         }
                     }
                     Repeater {
-                        model: Backend.audioTrackCount
+                        model: ModelGuard.bound(Backend.audioTrackCount, 256,
+                                                "timeline.audioHeaders")
                         delegate: Header {
                             required property int index
                             trackId: "A" + (index + 1)

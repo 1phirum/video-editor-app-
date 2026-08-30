@@ -80,6 +80,11 @@ public:
   // Cache-only, never opens a file: safe to call from the GUI thread.
   Window cachedWindow(const QString &path, qint64 startMs, qint64 spanMs,
                       int columns);
+  // Presence only, and no LRU touch. The timeline asks this per visible window
+  // on every prefetch revision, and a predicate must not copy a peak array or
+  // reorder the cache just by being read.
+  bool hasWindow(const QString &path, qint64 startMs, qint64 spanMs,
+                 int columns);
   Window window(const QString &path, qint64 startMs, qint64 spanMs, int columns,
                 const std::atomic_bool *cancel);
 

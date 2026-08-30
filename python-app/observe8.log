@@ -1,0 +1,224 @@
+16:02:49.204 CrashReporterHost: watching pid 1904 from pid 9980 | reports -> C:/Users/USER/AppData/Local/Antigravity/Cut Pro/crash-reports
+16:02:49.221 Cut Pro: native C++/Qt backend, coreVersion = 0.1.2 | built = Aug 30 2026 16:01:52 | executable = C:/premier-pro/python-app/dist/Cut Pro 2026/cutpro.exe
+16:02:49.586 GUI thread unresponsive for 421 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+16:02:49.650   GUI thread backtrace, innermost first (14 frames):
+16:02:49.650     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+16:02:49.650     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+16:02:49.650     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+16:02:49.650     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+16:02:49.650     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+16:02:49.650     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+16:02:49.650     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+16:02:49.650     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+16:02:49.650     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+16:02:49.650     #9  "cutpro.exe+0x2d21"
+16:02:49.650     #10  "cutpro.exe+0x12ef"
+16:02:49.650     #11  "cutpro.exe+0x1406"
+16:02:49.650     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+16:02:49.650     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+16:02:50.028 GUI thread unresponsive for 863 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+16:02:50.028   GUI thread backtrace, innermost first (14 frames):
+16:02:50.030     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+16:02:50.030     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+16:02:50.030     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+16:02:50.030     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+16:02:50.030     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+16:02:50.030     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+16:02:50.030     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+16:02:50.030     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+16:02:50.030     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+16:02:50.030     #9  "cutpro.exe+0x2d21"
+16:02:50.030     #10  "cutpro.exe+0x12ef"
+16:02:50.030     #11  "cutpro.exe+0x1406"
+16:02:50.030     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+16:02:50.030     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+16:02:50.902 GUI thread unresponsive for 1737 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+16:02:50.902   GUI thread backtrace, innermost first (14 frames):
+16:02:50.904     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+16:02:50.904     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+16:02:50.904     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+16:02:50.904     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+16:02:50.904     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+16:02:50.904     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+16:02:50.904     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+16:02:50.904     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+16:02:50.904     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+16:02:50.904     #9  "cutpro.exe+0x2d21"
+16:02:50.904     #10  "cutpro.exe+0x12ef"
+16:02:50.904     #11  "cutpro.exe+0x1406"
+16:02:50.904     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+16:02:50.904     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+16:02:51.217 GUI thread STILL blocked after 2052 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)" - during launch, before any window exists: this delays startup but cannot show as "Not Responding".
+16:02:51.249   GUI thread backtrace, innermost first (48 frames):
+16:02:51.249     #0  "DWrite.dll+0xf30a"
+16:02:51.249     #1  "DWrite.dll+0xebf1"
+16:02:51.249     #2  "DWrite.dll+0xac156"
+16:02:51.249     #3  "DWrite.dll+0x43654"
+16:02:51.249     #4  "DWrite.dll+0x434e3"
+16:02:51.249     #5  "DWrite.dll+0x426da"
+16:02:51.249     #6  "DWrite.dll+0xd8832"
+16:02:51.249     #7  "Qt6Gui.dll!QWindowsDirectWriteFontDatabase::populateFontDatabase()+0x523"
+16:02:51.249     #8  "Qt6Gui.dll!QFontDatabasePrivate::ensureFontDatabase()+0xa7"
+16:02:51.249     #9  "Qt6Gui.dll!QFontDatabasePrivate::findFont(QFontDef const&, int, bool)+0x6e"
+16:02:51.249     #10  "Qt6Gui.dll!QFontDatabasePrivate::load(QFontPrivate const*, int)+0x7fd"
+16:02:51.249     #11  "Qt6Gui.dll!QFontPrivate::engineForScript(int) const+0xc3"
+16:02:51.249     #12  "Qt6Gui.dll!QFontMetricsF::height() const+0x17"
+16:02:51.249     #13  "Qt6Quick.dll!QQuickTextPrivate::lineHeightOffset() const+0x3d"
+16:02:51.249     #14  "Qt6Quick.dll!QQuickTextPrivate::updateSize()+0xc9"
+16:02:51.249     #15  "Qt6Quick.dll!QQuickTextPrivate::updateLayout()+0x1f0"
+16:02:51.249     #16  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+16:02:51.249     #17  "Qt6Qml.dll!QQmlComponentPrivate::complete(QQmlEnginePrivate*, QQmlComponentPrivate::ConstructionState*)+0x74"
+16:02:51.249     #18  "Qt6Qml.dll!QQmlComponentPrivate::completeDeferred(QQmlEnginePrivate*, std::vector<QQmlComponentPrivate::ConstructionState, std::allocator<QQmlComponentPrivate::ConstructionState> >*)+0x2f"
+16:02:51.249     #19  "Qt6QuickTemplates2.dll!QtQuickPrivate::completeDeferred(QObject*, QString const&, QQuickUntypedDeferredPointer*, QQmlEngine*)+0xc9"
+16:02:51.249     #20  "Qt6QuickTemplates2.dll!QQuickPopupItemPrivate::executeContentItem(bool)+0x12f"
+16:02:51.249     #21  "Qt6QuickTemplates2.dll!QQuickControl::componentComplete()+0x46"
+16:02:51.249     #22  "Qt6QuickTemplates2.dll!QQuickPane::componentComplete()+0x12"
+16:02:51.249     #23  "Qt6QuickTemplates2.dll!QQuickPage::componentComplete()+0x12"
+16:02:51.249     #24  "Qt6QuickTemplates2.dll!QQuickPopup::componentComplete()+0xca"
+16:02:51.249     #25  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+16:02:51.249     #26  "Qt6Qml.dll!QQmlComponentPrivate::complete(QQmlEnginePrivate*, QQmlComponentPrivate::ConstructionState*)+0x74"
+16:02:51.249     #27  "Qt6Qml.dll!QQmlComponentPrivate::completeCreate()+0x2ae"
+16:02:51.249     #28  "Qt6Qml.dll!QQmlComponentPrivate::createWithProperties(QObject*, QMap<QString, QVariant> const&, QQmlContext*, QQmlComponentPrivate::CreateBehavior, bool)+0xc4"
+16:02:51.249     #29  "Qt6Qml.dll!QQmlComponent::create(QQmlContext*)+0x46"
+16:02:51.249     #30  "Qt6QuickTemplates2.dll!QQuickToolTip::accessibilityActiveChanged(bool)+0x1cf"
+16:02:51.249     #31  "Qt6QuickTemplates2.dll+0x1070a7 (nearest export: QQuickComboBox::qt_metacall(QMetaObject::Call, int, void**)+0x248a7)"
+16:02:51.249     #32  "Qt6QuickTemplates2.dll+0x10eb9a (nearest export: QQuickComboBox::qt_metacall(QMetaObject::Call, int, void**)+0x2c39a)"
+16:02:51.249     #33  "Qt6Core.dll+0x3fd299 (nearest export: z_adler32_combine64+0x6b4b9)"
+16:02:51.249     #34  "Qt6Quick.dll!QQuickColorGroup::qt_static_metacall(QObject*, QMetaObject::Call, int, void**)+0xcca"
+16:02:51.249     #35  "Qt6Qml.dll!QQmlNotifier::notify(QQmlData*, int)+0x7db"
+16:02:51.249     #36  "Qt6Qml.dll+0x20fe13 (nearest export: QQmlObjectCreator::setPropertyValue(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x13d3)"
+16:02:51.249     #37  "Qt6Qml.dll!QQmlObjectCreator::setPropertyBinding(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x107"
+16:02:51.249     #38  "Qt6Qml.dll!QQmlObjectCreator::setupBindings(QFlags<QQmlObjectCreator::BindingMode>)+0x53e"
+16:02:51.249     #39  "Qt6Qml.dll!QQmlObjectCreator::populateInstance(int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x230"
+16:02:51.249     #40  "Qt6Qml.dll!QQmlObjectCreator::setPropertyBinding(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0xd4e"
+16:02:51.249     #41  "Qt6Qml.dll!QQmlObjectCreator::setupBindings(QFlags<QQmlObjectCreator::BindingMode>)+0x53e"
+16:02:51.249     #42  "Qt6Qml.dll!QQmlObjectCreator::populateInstance(int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x230"
+16:02:51.249     #43  "Qt6Qml.dll!QQmlObjectCreator::createInstance(int, QObject*, bool)+0x4ca"
+16:02:51.249     #44  "Qt6Qml.dll!QQmlObjectCreator::populateDeferredInstance(QObject*, int, int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x4c1"
+16:02:51.249     #45  "Qt6Qml.dll!QQmlComponentPrivate::beginCreate(QQmlRefPointer<QQmlContextData>)+0x9a4"
+16:02:51.249     #46  "Qt6Qml.dll!QQmlComponent::beginCreate(QQmlContext*)+0x3f"
+16:02:51.249     #47  "Qt6Qml.dll!QQmlComponentPrivate::createWithProperties(QObject*, QMap<QString, QVariant> const&, QQmlContext*, QQmlComponentPrivate::CreateBehavior, bool)+0x43"
+16:02:51.366 Using Qt multimedia with FFmpeg version 7.1.3 LGPL version 2.1 or later
+16:03:17.282 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:03:17.283 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:03:21.049 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740b40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:03:21.049 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740b40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:03:21.360 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740080] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:03:21.360 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740080] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:03:23.172 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:03:23.172 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:03:23.306 preview playback: first frame after 159 ms, at source 0 ms (requested 0 ms)
+16:03:25.300 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:03:25.300 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:03:25.444 preview playback: first frame after 193 ms, at source 1083 ms (requested 1083 ms)
+16:03:26.720 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:03:26.721 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:03:26.874 preview playback: first frame after 192 ms, at source 1666 ms (requested 1666 ms)
+16:03:28.907 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740e00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:03:28.909 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740e00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:03:29.075 preview playback: first frame after 220 ms, at source 2875 ms (requested 2875 ms)
+16:03:31.471 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:03:31.471 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:03:31.651 preview playback: first frame after 223 ms, at source 4291 ms (requested 4291 ms)
+16:03:33.333 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:03:33.334 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:03:33.464 preview playback: first frame after 178 ms, at source 5500 ms (requested 5500 ms)
+16:03:37.452 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:03:37.452 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:03:37.642 preview playback: first frame after 232 ms, at source 8750 ms (requested 8750 ms)
+16:03:39.585 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:03:39.586 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:03:39.793 preview playback: first frame after 244 ms, at source 9541 ms (requested 9541 ms)
+16:04:18.745 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:04:18.746 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:04:18.880 preview playback: first frame after 181 ms, at source 47750 ms (requested 47750 ms)
+16:04:19.826 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:04:19.826 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:04:19.959 preview playback: first frame after 162 ms, at source 48291 ms (requested 48291 ms)
+16:04:21.055 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:04:21.056 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:04:21.195 preview playback: first frame after 189 ms, at source 48791 ms (requested 48791 ms)
+16:04:22.892 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:04:22.893 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:04:23.048 preview playback: first frame after 201 ms, at source 49416 ms (requested 49416 ms)
+16:04:24.718 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:04:24.718 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:04:24.857 preview playback: first frame after 168 ms, at source 50041 ms (requested 50041 ms)
+16:04:26.710 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740880] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:04:26.710 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740880] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:04:26.855 preview playback: first frame after 191 ms, at source 51083 ms (requested 51083 ms)
+16:04:28.227 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:04:28.228 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:04:28.350 preview playback: first frame after 161 ms, at source 51916 ms (requested 51916 ms)
+16:04:29.099 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f880] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:04:29.100 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f880] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:04:29.221 preview playback: first frame after 148 ms, at source 52416 ms (requested 52416 ms)
+16:04:29.906 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73fdc0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:04:29.907 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73fdc0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:04:30.065 preview playback: first frame after 199 ms, at source 52500 ms (requested 52500 ms)
+16:04:31.698 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:04:31.699 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:04:31.846 preview playback: first frame after 183 ms, at source 53500 ms (requested 53500 ms)
+16:04:40.994 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73fb00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:04:40.994 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73fb00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:04:41.047 preview playback: first frame after 69 ms, at source 61916 ms (requested 61916 ms)
+16:05:09.836 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:09.837 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:09.948 preview playback: first frame after 147 ms, at source 62583 ms (requested 62583 ms)
+16:05:11.196 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f880] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:11.197 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f880] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:11.404 preview playback: first frame after 251 ms, at source 41250 ms (requested 41235 ms)
+16:05:12.813 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f880] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:12.814 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f880] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:12.963 preview playback: first frame after 206 ms, at source 44375 ms (requested 44347 ms)
+16:05:15.390 [h264 @ 000002225d4b1700] illegal short term buffer state detected
+16:05:21.202 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:21.205 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:21.388 preview playback: first frame after 235 ms, at source 209291 ms (requested 209285 ms)
+16:05:24.528 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:24.529 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:24.727 preview playback: first frame after 239 ms, at source 7041 ms (requested 7002 ms)
+16:05:27.764 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:27.765 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:28.054 preview playback: first frame after 348 ms, at source 22583 ms (requested 22562 ms)
+16:05:30.948 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:30.948 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:31.198 preview playback: first frame after 302 ms, at source 22583 ms (requested 22562 ms)
+16:05:34.011 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740e00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:34.011 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740e00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:34.189 preview playback: first frame after 203 ms, at source 36291 ms (requested 36286 ms)
+16:05:35.351 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:35.352 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:35.576 preview playback: first frame after 278 ms, at source 36291 ms (requested 36286 ms)
+16:05:36.687 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73fdc0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:36.688 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73fdc0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:36.870 preview playback: first frame after 224 ms, at source 87541 ms (requested 87513 ms)
+16:05:40.673 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f880] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:40.674 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f880] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:40.843 preview playback: first frame after 211 ms, at source 2166 ms (requested 2134 ms)
+16:05:42.402 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:42.402 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73f5c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:42.597 preview playback: first frame after 231 ms, at source 3125 ms (requested 3125 ms)
+16:05:43.295 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:43.296 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:43.493 preview playback: first frame after 224 ms, at source 3625 ms (requested 3625 ms)
+16:05:43.670 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740e00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:05:43.670 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740e00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:05:43.867 preview playback: first frame after 223 ms, at source 3625 ms (requested 3625 ms)
+16:07:54.324 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740e00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:07:54.325 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740e00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:07:54.568 preview playback: first frame after 281 ms, at source 133708 ms (requested 133708 ms)
+16:07:55.117 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73fb00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:07:55.117 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73fb00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:07:55.417 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740e00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:07:55.417 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d740e00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:07:55.600 preview playback: first frame after 200 ms, at source 134208 ms (requested 134208 ms)
+16:07:56.793 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73fb00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:07:56.794 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73fb00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:07:57.026 preview playback: first frame after 284 ms, at source 134416 ms (requested 134416 ms)
+16:08:12.397 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:12.397 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d7405c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:12.576 preview playback: first frame after 229 ms, at source 149166 ms (requested 149166 ms)
+16:08:14.185 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73fb00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:14.186 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002225d73fb00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:14.372 preview playback: first frame after 267 ms, at source 150000 ms (requested 150000 ms)

@@ -57,6 +57,14 @@ QtObject {
     readonly property color clipVideo: "#3f6a9e"
     readonly property color clipAudio: "#3f8a52"
     readonly property color clipSubtitle: "#e8c546"
+    // Effect-track bars. Purple so a bar reads as "not footage" at a glance,
+    // the way the yellow subtitle row does.
+    readonly property color clipEffect: "#7a5cc4"
+
+    // Snap guide on the timeline. Yellow because the three lines it has to be
+    // told apart from are already taken: blue is the playhead, red is a trim
+    // handle, near-black is a butt joint between two clips.
+    readonly property color snapGuide: "#f2c531"
 
     // ---- Audio meter gradient stops -----------------------------------
     readonly property color meterGreen: "#35c15a"
@@ -93,6 +101,13 @@ QtObject {
     readonly property int ecValueWidth: 84   // value column
     readonly property int ecNavWidth: 56     // keyframe navigator column
     readonly property int ecResetWidth: 22   // per-row reset column
+
+    // ---- Timeline lanes -------------------------------------------------
+    // A lane only gets its grey band once it actually holds clips, the way
+    // CapCut does it: the occupied rows read as the sequence and the rest of
+    // the canvas stays flat, so there is no phantom row to aim at.
+    readonly property color laneOccupied: surface("#3b3b3b")
+    readonly property color laneOccupiedLine: surface("#262626")
 
     // ---- Timeline clip density -----------------------------------------
     // A clip only earns its decorations once it is wide enough to read them.

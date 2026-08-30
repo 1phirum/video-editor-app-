@@ -1,0 +1,199 @@
+15:40:05.773 CrashReporterHost: watching pid 19916 from pid 18280 | reports -> C:/Users/USER/AppData/Local/Antigravity/Cut Pro/crash-reports
+15:40:05.782 Cut Pro: native C++/Qt backend, coreVersion = 0.1.2 | built = Aug 30 2026 15:39:15 | executable = C:/premier-pro/python-app/dist/Cut Pro 2026/cutpro.exe
+15:40:06.184 GUI thread unresponsive for 450 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+15:40:06.200   GUI thread backtrace, innermost first (14 frames):
+15:40:06.200     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+15:40:06.200     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+15:40:06.200     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+15:40:06.200     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+15:40:06.205     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+15:40:06.205     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+15:40:06.205     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+15:40:06.205     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+15:40:06.205     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+15:40:06.205     #9  "cutpro.exe+0x2d21"
+15:40:06.205     #10  "cutpro.exe+0x12ef"
+15:40:06.205     #11  "cutpro.exe+0x1406"
+15:40:06.205     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+15:40:06.205     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+15:40:06.647 GUI thread unresponsive for 913 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+15:40:06.647   GUI thread backtrace, innermost first (14 frames):
+15:40:06.647     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+15:40:06.647     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+15:40:06.647     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+15:40:06.647     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+15:40:06.647     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+15:40:06.647     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+15:40:06.647     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+15:40:06.647     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+15:40:06.647     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+15:40:06.647     #9  "cutpro.exe+0x2d21"
+15:40:06.647     #10  "cutpro.exe+0x12ef"
+15:40:06.647     #11  "cutpro.exe+0x1406"
+15:40:06.647     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+15:40:06.647     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+15:40:07.350 Using Qt multimedia with FFmpeg version 7.1.3 LGPL version 2.1 or later
+15:40:07.585 GUI thread unresponsive for 1851 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+15:40:07.604   GUI thread backtrace, innermost first (48 frames):
+15:40:07.605     #0  "ntdll.dll!RtlAnsiCharToUnicodeChar+0x85"
+15:40:07.605     #1  "ntdll.dll+0x12f409 (nearest export: wcstombs+0x41c9)"
+15:40:07.605     #2  "ntdll.dll+0x12c5ff (nearest export: wcstombs+0x13bf)"
+15:40:07.605     #3  "ntdll.dll!vsnwprintf+0x98"
+15:40:07.605     #4  "ntdll.dll!vsnwprintf+0x11"
+15:40:07.605     #5  "ntdll.dll!RtlSleepConditionVariableCS+0xff9"
+15:40:07.605     #6  "ntdll.dll!RtlSleepConditionVariableCS+0xb96"
+15:40:07.605     #7  "ntdll.dll!LdrGetDllHandleEx+0xb63"
+15:40:07.605     #8  "ntdll.dll+0x20436 (nearest export: LdrGetDllHandleEx+0x1226)"
+15:40:07.605     #9  "ntdll.dll+0x3be23 (nearest export: RtlReleaseSRWLockExclusive+0x1cf3)"
+15:40:07.605     #10  "ntdll.dll!LdrGetProcedureAddressForCaller+0x3e7"
+15:40:07.605     #11  "KERNELBASE.dll!GetProcAddress+0x82"
+15:40:07.605     #12  "dxgi.dll+0xee83 (nearest export: CompatString+0x6623)"
+15:40:07.605     #13  "dxgi.dll+0xe140 (nearest export: CompatString+0x58e0)"
+15:40:07.605     #14  "dxgi.dll+0xcacd (nearest export: CompatString+0x426d)"
+15:40:07.605     #15  "IntelControlLib.dll+0x4a313"
+15:40:07.605     #16  "IntelControlLib.dll+0x1bc07"
+15:40:07.605     #17  "IntelControlLib.dll+0x15d50"
+15:40:07.605     #18  "IntelControlLib.dll+0x14068"
+15:40:07.605     #19  "IntelControlLib.dll+0x4f7a"
+15:40:07.605     #20  "ControlLib.dll+0xf28c"
+15:40:07.605     #21  "ControlLib.dll+0xee65"
+15:40:07.605     #22  "igd9trinity64.dll+0x346d2a"
+15:40:07.605     #23  "igd9trinity64.dll+0x3464f7"
+15:40:07.605     #24  "igd9trinity64.dll+0x345d5c"
+15:40:07.605     #25  "igd9trinity64.dll+0x3404c6"
+15:40:07.605     #26  "igd9trinity64.dll+0x33f8e7"
+15:40:07.605     #27  "igd9trinity64.dll+0x1dadf5"
+15:40:07.605     #28  "igd9trinity64.dll+0x202a61"
+15:40:07.605     #29  "igd9trinity64.dll+0x1daca9"
+15:40:07.605     #30  "igd9trinity64.dll+0x1a8f4c"
+15:40:07.605     #31  "igd9trinity64.dll+0xf1f36"
+15:40:07.605     #32  "igd9trinity64.dll+0xe7b53f"
+15:40:07.605     #33  "igd9trinity64.dll+0xe7a61f"
+15:40:07.605     #34  "igd9trinity64.dll+0xe149fe"
+15:40:07.605     #35  "igd9trinity64.dll+0xe1570f"
+15:40:07.605     #36  "igdumdim64.dll+0xf0647"
+15:40:07.606     #37  "igdumdim64.dll+0xef1bc"
+15:40:07.606     #38  "d3d9.dll+0x6d1fd (nearest export: D3DPERF_EndEvent+0x298d)"
+15:40:07.606     #39  "d3d9.dll+0x6cc4d (nearest export: D3DPERF_EndEvent+0x23dd)"
+15:40:07.606     #40  "d3d9.dll+0x7b6a"
+15:40:07.606     #41  "d3d9.dll+0x5a1e"
+15:40:07.606     #42  "d3d9.dll+0x50ef"
+15:40:07.606     #43  "d3d9.dll!Direct3DCreate9Ex+0x15b"
+15:40:07.606     #44  "d3d9.dll!Direct3DCreate9+0x1e"
+15:40:07.606     #45  "qwindows.dll+0x3c4ae (nearest export: qt_plugin_instance+0x3a80e)"
+15:40:07.606     #46  "qwindows.dll+0x6ad2a (nearest export: qt_plugin_instance+0x6908a)"
+15:40:07.606     #47  "qwindows.dll+0xdac88 (nearest export: qt_plugin_instance+0xd8fe8)"
+15:40:07.789 GUI thread STILL blocked after 2054 ms, "stalled somewhere unmarked": "no marked scope" - this is the state Windows shows as "Not Responding".
+15:40:07.824   GUI thread backtrace, innermost first (48 frames):
+15:40:07.824     #0  "Qt6Qml.dll!QQmlPropertyCapture::captureNonBindableProperty(QObject*, int, int, bool)+0x1c9"
+15:40:07.824     #1  "Qt6Qml.dll!QV4::QObjectWrapper::getProperty(QV4::ExecutionEngine*, QV4::Heap::Object*, QObject*, QQmlPropertyData const*, QFlags<QV4::QObjectWrapper::Flag>)+0xd7"
+15:40:07.824     #2  "Qt6Qml.dll!QV4::Lookup::getterQObject(QV4::Lookup*, QV4::ExecutionEngine*, QV4::Value const&)+0x146"
+15:40:07.824     #3  "0x1a5d43a0842"
+15:40:07.824     #4  "Qt6Qml.dll+0x165b98 (nearest export: qt_v4DebuggerHook+0x7ba8)"
+15:40:07.824     #5  "Qt6Qml.dll!QV4::ExecutableCompilationUnit::createNamedObjectsPerComponent(int)+0x82f"
+15:40:07.824     #6  "Qt6Qml.dll!QQmlJavaScriptExpression::evaluate(QV4::CallData*, bool*)+0x31d"
+15:40:07.824     #7  "Qt6Qml.dll!QQmlBinding::evaluate(bool*)+0xb7"
+15:40:07.824     #8  "Qt6Qml.dll!QQmlBinding::doUpdate(QQmlJavaScriptExpression::DeleteWatcher const&, QFlags<QQmlPropertyData::WriteFlag>, QV4::Scope&)+0x7e"
+15:40:07.824     #9  "Qt6Qml.dll!QQmlBinding::update(QFlags<QQmlPropertyData::WriteFlag>)+0x211"
+15:40:07.824     #10  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x161"
+15:40:07.824     #11  "Qt6Qml.dll!QQmlIncubatorPrivate::incubate(QQmlInstantiationInterrupt&)+0x4b8"
+15:40:07.824     #12  "Qt6Qml.dll!QQmlEnginePrivate::incubate(QQmlIncubator&, QQmlRefPointer<QQmlContextData> const&)+0x246"
+15:40:07.824     #13  "Qt6QmlModels.dll!QQmlDelegateModel::cancel(int)+0x88b"
+15:40:07.824     #14  "Qt6Quick.dll!QQuickRepeater::clear()+0x370"
+15:40:07.824     #15  "Qt6Quick.dll!QQuickRepeater::setModel(QVariant const&)+0x290"
+15:40:07.824     #16  "Qt6Qml.dll+0x42a5af (nearest export: QQmlLocale::registerStringLocaleCompare(QV4::ExecutionEngine*)+0x1462df)"
+15:40:07.824     #17  "Qt6Qml.dll!QQmlPropertyPrivate::write(QObject*, QQmlPropertyData const&, QVariant const&, QQmlRefPointer<QQmlContextData> const&, QFlags<QQmlPropertyData::WriteFlag>)+0xb88"
+15:40:07.824     #18  "Qt6Qml.dll!QQmlBinding::slowWrite(QQmlPropertyData const&, QQmlPropertyData const&, QV4::Value const&, bool, QFlags<QQmlPropertyData::WriteFlag>)+0x54f"
+15:40:07.824     #19  "Qt6Qml.dll+0x347e9a (nearest export: QQmlLocale::registerStringLocaleCompare(QV4::ExecutionEngine*)+0x63bca)"
+15:40:07.824     #20  "Qt6Qml.dll!QQmlBinding::doUpdate(QQmlJavaScriptExpression::DeleteWatcher const&, QFlags<QQmlPropertyData::WriteFlag>, QV4::Scope&)+0x19f"
+15:40:07.824     #21  "Qt6Qml.dll!QQmlBinding::update(QFlags<QQmlPropertyData::WriteFlag>)+0x211"
+15:40:07.824     #22  "Qt6Qml.dll!QQmlNotifier::emitNotify(QQmlNotifierEndpoint*, void**)+0x215"
+15:40:07.824     #23  "Qt6Core.dll+0x3fcf21 (nearest export: z_adler32_combine64+0x6b141)"
+15:40:07.824     #24  "Qt6Qml.dll!QQmlVMEMetaObject::metaCall(QObject*, QMetaObject::Call, int, void**)+0x436"
+15:40:07.824     #25  "Qt6Qml.dll+0x34915c (nearest export: QQmlLocale::registerStringLocaleCompare(QV4::ExecutionEngine*)+0x64e8c)"
+15:40:07.824     #26  "Qt6Qml.dll!QQmlBinding::doUpdate(QQmlJavaScriptExpression::DeleteWatcher const&, QFlags<QQmlPropertyData::WriteFlag>, QV4::Scope&)+0x19f"
+15:40:07.824     #27  "Qt6Qml.dll!QQmlBinding::update(QFlags<QQmlPropertyData::WriteFlag>)+0x211"
+15:40:07.824     #28  "Qt6Quick.dll!QQuickKeysAttached::volumeDownPressed(QQuickKeyEvent*)+0xa8d"
+15:40:07.824     #29  "Qt6Quick.dll+0x3d0e25 (nearest export: QQuickInputMethod::qt_metacall(QMetaObject::Call, int, void**)+0x9edc5)"
+15:40:07.824     #30  "Qt6Quick.dll!QQuickItem::geometryChange(QRectF const&, QRectF const&)+0x20f"
+15:40:07.824     #31  "Qt6Quick.dll!QQuickItem::setSize(QSizeF const&)+0xda"
+15:40:07.824     #32  "Qt6QuickLayouts.dll+0x3504a (nearest export: QQuickFlexboxLayoutAttached::qt_metacall(QMetaObject::Call, int, void**)+0x1d69a)"
+15:40:07.824     #33  "Qt6Gui.dll!QGridLayoutEngine::setGeometries(QRectF const&, QAbstractLayoutStyleInfo const*)+0x231"
+15:40:07.824     #34  "Qt6QuickLayouts.dll!QQuickGridLayoutBase::rearrange(QSizeF const&)+0x133"
+15:40:07.824     #35  "Qt6QuickLayouts.dll!QQuickLayout::geometryChange(QRectF const&, QRectF const&)+0x44d"
+15:40:07.824     #36  "Qt6Quick.dll!QQuickItem::setSize(QSizeF const&)+0xda"
+15:40:07.824     #37  "Qt6Quick.dll!QQuickAnchors::QQuickAnchors(QQuickItem*, QObject*)+0x312"
+15:40:07.824     #38  "Qt6Quick.dll!QQuickItem::geometryChange(QRectF const&, QRectF const&)+0x194"
+15:40:07.824     #39  "Qt6Quick.dll!QQuickItem::setWidth(double)+0x11f"
+15:40:07.824     #40  "Qt6QuickTemplates2.dll!QQuickSplitViewPrivate::limitAndApplySizes(double, double)+0x2d1"
+15:40:07.824     #41  "Qt6QuickTemplates2.dll!QQuickSplitViewPrivate::layout()+0x1df"
+15:40:07.824     #42  "Qt6Quick.dll!QQuickWindowPrivate::polishItems()+0x492"
+15:40:07.824     #43  "Qt6Quick.dll+0x267f90 (nearest export: QQuickOpenGLUtils::resetOpenGLState()+0x8f90)"
+15:40:07.824     #44  "Qt6Quick.dll+0x269d9f (nearest export: QQuickOpenGLUtils::resetOpenGLState()+0xad9f)"
+15:40:07.824     #45  "Qt6Gui.dll!QWindow::event(QEvent*)+0x138"
+15:40:07.824     #46  "Qt6Core.dll!QCoreApplication::notifyInternal2(QObject*, QEvent*)+0x19a"
+15:40:07.824     #47  "Qt6Gui.dll!QGuiApplicationPrivate::processExposeEvent(QWindowSystemInterfacePrivate::ExposeEvent*)+0x1b1"
+15:40:08.281 Failed to initialize COM library (Cannot change thread mode after it is set.)
+15:40:17.855 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724a3c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:40:17.855 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724a3c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:40:19.970 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249bc0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:40:19.970 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249bc0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:40:20.212 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ac00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:40:20.212 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ac00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:40:29.793 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:40:29.793 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:24.827 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724a140] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:24.828 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724a140] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:26.147 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:26.148 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:27.931 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249e80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:27.931 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249e80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:28.576 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:28.577 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:28.889 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724a140] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:28.890 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724a140] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:29.194 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:29.194 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:30.219 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724b400] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:30.220 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724b400] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:31.427 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:31.428 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:32.363 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:32.364 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:33.684 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724b400] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:33.685 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724b400] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:35.650 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724a140] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:35.651 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724a140] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:37.575 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:37.575 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:38.615 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:38.616 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:40.087 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249900] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:40.088 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249900] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:41.846 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249e80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:41.847 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249e80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:43.616 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249900] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:43.616 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249900] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:45.851 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249900] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:45.852 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249900] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:47.390 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249e80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:47.391 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249e80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:48.940 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:48.941 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:50.466 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249e80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:50.468 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249e80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:57.713 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249900] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:57.715 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249900] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:42:59.152 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724a680] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:42:59.153 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724a680] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:43:25.406 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:43:25.406 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724ae80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:43:35.230 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249e80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:43:35.231 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249e80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:43:36.660 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249e80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:43:36.660 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e7249e80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:43:38.001 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724a140] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:43:38.003 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724a140] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:43:40.180 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724b140] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+15:43:40.181 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001a5e724b140] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+15:44:55.420 Retrying to obtain clipboard.

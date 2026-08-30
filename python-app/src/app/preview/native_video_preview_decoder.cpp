@@ -1,5 +1,6 @@
 #include "app/preview/native_video_preview_decoder.h"
 
+#include "app/diagnostics/playback_trace.h"
 #include "app/media/media_path.h"
 #include "app/preview/decode_cost_model.h"
 #include "app/preview/gui_thread_watchdog.h"
@@ -187,6 +188,10 @@ bool NativeVideoPreviewDecoder::start(const QString &path,
 
   m_stopRequested.store(false, std::memory_order_release);
   m_running.store(true, std::memory_order_release);
+  // Cleared here and not in stop(): the pause path stops the playback session
+  // and then asks what frame was on screen, so the answer has to outlive the
+  // session that produced it.
+  m_presentedSourceMs.store(-1, std::memory_order_release);
   emit stateChanged();
   m_thread = std::thread([this, request]() { decode(request); });
   return true;
@@ -228,7 +233,8 @@ void NativeVideoPreviewDecoder::setError(const QString &message) {
   emit errorChanged();
 }
 
-void NativeVideoPreviewDecoder::publishFrame(QImage image, quint64 generation) {
+void NativeVideoPreviewDecoder::publishFrame(QImage image, quint64 generation,
+                                             qint64 sourceMs) {
   if (image.isNull() || m_stopRequested.load(std::memory_order_acquire) ||
       superseded(generation)) {
     m_droppedFrames.fetch_add(1, std::memory_order_relaxed);
@@ -245,6 +251,13 @@ void NativeVideoPreviewDecoder::publishFrame(QImage image, quint64 generation) {
     }
     m_frame = std::move(image);
   }
+  // Only frames that reach the screen move this. A dropped or superseded frame
+  // leaves it alone, so it always names the picture the user is looking at.
+  m_presentedSourceMs.store(sourceMs, std::memory_order_release);
+  // Called from the decode thread, which is why the trace never evaluates
+  // JavaScript here: it records the pacing of the picture, and only lines that
+  // break the expected one-frame-per-interval rhythm are emitted.
+  PlaybackTrace::instance().recordPresentedFrame(sourceMs);
   emit frameReady(m_revision.fetch_add(1, std::memory_order_relaxed) + 1);
 }
 
@@ -299,6 +312,12 @@ void NativeVideoPreviewDecoder::decode(Request request) {
   AVFrame *softwareFrame = nullptr;
   SwsContext *scaler = nullptr;
   AVDictionary *options = nullptr;
+  // From the first instruction this thread runs to the first frame that reaches
+  // the screen: container open, seek, hardware device creation on first use, and
+  // one decode. The monitor's playhead used to start counting before all of it,
+  // which is the whole of the lead the picture appeared to have.
+  QElapsedTimer sessionTimer;
+  sessionTimer.start();
 
   auto finish = [&]() {
     sws_freeContext(scaler);
@@ -608,8 +627,14 @@ void NativeVideoPreviewDecoder::decode(Request request) {
         continue;
 
       packetsWithoutOutput = 0;
-      if (firstOutputSeconds < 0)
+      if (firstOutputSeconds < 0) {
         firstOutputSeconds = seconds;
+        if (!request.singleFrame)
+          qCInfo(previewFfmpegLog).nospace()
+              << "preview playback: first frame after " << sessionTimer.elapsed()
+              << " ms, at source " << qint64(seconds * 1000.0) << " ms"
+              << " (requested " << request.sourcePositionMs << " ms)";
+      }
       if (!request.singleFrame)
         DecodeCostModel::instance().notePlaybackFrame(
             request.path, double(frameWorkTimer.elapsed()),
@@ -624,7 +649,8 @@ void NativeVideoPreviewDecoder::decode(Request request) {
         while (!cancelled() && std::chrono::steady_clock::now() < target)
           QThread::msleep(2);
       }
-      publishFrame(std::move(image), request.generation);
+      publishFrame(std::move(image), request.generation,
+                   qint64(seconds * 1000.0));
       // Restarted after the pacing sleep so the next measurement is decode cost
       // only.
       frameWorkTimer.restart();

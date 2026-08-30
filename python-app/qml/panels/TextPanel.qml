@@ -655,6 +655,7 @@ Rectangle {
                         visible: !Backend.transcriptionInProgress
                                  && !Backend.translationInProgress
                         model: Backend.transcript
+                        onCountChanged: ModelGuard.note("text.transcript", count)
                         spacing: 2
                         delegate: Rectangle {
                             id: transcriptRow

@@ -4,9 +4,11 @@
 #include <QTimer>
 #include <QVariantList>
 
+#include "core/module_api.h"
+
 // Schedules timeline insertion in small event-loop steps so QML can keep
 // painting its loading state while a batch of clips is placed.
-class TimelinePlacementJob final : public QObject {
+class CUTPRO_TIMELINE_API TimelinePlacementJob final : public QObject {
   Q_OBJECT
   Q_PROPERTY(bool inProgress READ inProgress NOTIFY stateChanged)
   Q_PROPERTY(double progress READ progress NOTIFY stateChanged)

@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
+#include <QJsonArray>
 #include <QRegularExpression>
 #include <QSettings>
 #include <QJsonDocument>
@@ -33,12 +34,20 @@ QString settingsDatabasePath() {
   return QDir(root).filePath(QStringLiteral("cutpro.sqlite"));
 }
 
-QString settingsJson(const QVariant &value) {
-  return QString::fromUtf8(QJsonDocument::fromVariant(value).toJson(QJsonDocument::Compact));
-}
-
 QVariant settingsValue(const QString &value) {
-  return QJsonDocument::fromJson(value.toUtf8()).toVariant();
+  // Rows in the SQLite store, which is now read once for migration and never
+  // written. Two shapes exist there: a whole JSON document, and - from the builds
+  // whose writes silently did nothing - an empty string. QJsonDocument wraps only
+  // arrays and objects, so fromVariant() on an int, a bool or a string returned a
+  // null document whose toJson() is empty; that is why the table has no usable
+  // rows despite weeks of saves, and why an unreadable row must come back
+  // invalid rather than as an empty value that would overwrite a real default.
+  const QJsonDocument document = QJsonDocument::fromJson(value.toUtf8());
+  if (document.isArray()) {
+    const QJsonArray array = document.array();
+    return array.isEmpty() ? QVariant() : array.first().toVariant();
+  }
+  return document.isNull() ? QVariant() : document.toVariant();
 }
 
 bool openSettingsDatabase(QSqlDatabase *database, QString *connectionName,
@@ -97,6 +106,7 @@ QVariantMap AppSettings::defaults() {
   return {{"startupWorkspace", "Edit"},
           {"startupLayout", "ESSENTIALS"},
           {"defaultMediaView", "list"},
+          {"effectsBrowserView", "folder"},
           {"appearanceBrightness", 50},
           {"accentColor", "#4b8ff5"},
           {"masterVolume", 100},
@@ -105,7 +115,6 @@ QVariantMap AppSettings::defaults() {
           {"autoSaveEnabled", true},
           {"autoSaveIntervalMinutes", 5},
           {"defaultImageDurationMs", 5000},
-          {"pauseOnFocusLoss", true},
           {"loopPlayback", false},
           {"defaultVideoTracks", 1},
           {"defaultAudioTracks", 1},
@@ -140,6 +149,12 @@ QVariantMap AppSettings::normalized(const QVariantMap &values) {
              fallback.value("startupLayout").toString());
   result["defaultMediaView"] =
       choice(values, "defaultMediaView", {"list", "grid"}, "list");
+  // Written by the effects panel's own layout dropdown rather than by a settings
+  // page, so that the button the user pressed is what decides. An install saved
+  // before the sidebar existed has no row for this, and choice() then falls back
+  // to the tree that build shipped with.
+  result["effectsBrowserView"] =
+      choice(values, "effectsBrowserView", {"folder", "sidebar"}, "folder");
   result["appearanceBrightness"] =
       bounded(values, "appearanceBrightness", 50, 20, 80);
   const QString accent = values.value("accentColor", "#4b8ff5").toString();
@@ -158,8 +173,9 @@ QVariantMap AppSettings::normalized(const QVariantMap &values) {
       bounded(values, "autoSaveIntervalMinutes", 5, 1, 120);
   result["defaultImageDurationMs"] =
       bounded(values, "defaultImageDurationMs", 5000, 1000, 60000);
-  result["pauseOnFocusLoss"] =
-      values.value("pauseOnFocusLoss", true).toBool();
+  // "pauseOnFocusLoss" was dropped: playback keeps running while another
+  // application is in front, the way Premiere and CapCut behave. Values written
+  // by older builds are simply ignored.
   result["loopPlayback"] = values.value("loopPlayback", false).toBool();
   result["defaultVideoTracks"] =
       bounded(values, "defaultVideoTracks", 1, 1, 16);
@@ -221,37 +237,17 @@ QVariantMap AppSettings::load() {
   const QVariantMap fallback = defaults();
   QVariantMap saved;
 
-  QSqlDatabase database;
-  QString connectionName;
-  QString databaseError;
-  if (openSettingsDatabase(&database, &connectionName, &databaseError)) {
-    QSqlQuery query(database);
-    if (query.exec(QStringLiteral("SELECT key,value FROM app_settings"))) {
-      while (query.next())
-        saved[query.value(0).toString()] = settingsValue(query.value(1).toString());
-    }
-    const bool hasStoredSettings = !saved.isEmpty();
-    if (!hasStoredSettings) {
-      auto legacy = settingsStore();
-      legacy->beginGroup(QStringLiteral("Preferences"));
-      for (auto it = fallback.cbegin(); it != fallback.cend(); ++it)
-        saved[it.key()] = legacy->value(it.key(), it.value());
-      legacy->endGroup();
-      QSqlQuery insert(database);
-      insert.prepare(QStringLiteral("INSERT OR REPLACE INTO app_settings(key,value) VALUES(:key,:value)"));
-      for (auto it = saved.cbegin(); it != saved.cend(); ++it) {
-        insert.bindValue(":key", it.key());
-        insert.bindValue(":value", settingsJson(it.value()));
-        insert.exec();
-      }
-    }
-    closeSettingsDatabase(database, connectionName);
-    return normalized(saved);
-  }
-
-  // Keep the legacy INI fallback available if SQLite cannot be opened.
+  // Read the registry first. It is where every value this app has ever saved
+  // actually is, and reading it costs microseconds.
+  //
+  // SQLite used to come first, and the stall tracer caught what that cost: 450 ms
+  // on the GUI thread inside QSqlDatabase::addDatabase, before any window exists,
+  // spent by QFactoryLoader walking the plugin directories and canonicalising
+  // every path it found. Paid on every launch, to read a table with no rows in
+  // it. The driver is now loaded only on the one launch that has to migrate.
   auto settings = settingsStore();
   settings->beginGroup(QStringLiteral("Preferences"));
+  const bool hasStoredSettings = !settings->allKeys().isEmpty();
   for (auto it = fallback.cbegin(); it != fallback.cend(); ++it)
     saved[it.key()] = settings->value(it.key(), it.value());
   // Migrate settings written before Gemini and Tabitoken had separate
@@ -271,43 +267,54 @@ QVariantMap AppSettings::load() {
   if (!settings->contains(QStringLiteral("translationTabitokenBaseUrl")))
     saved["translationTabitokenBaseUrl"] = saved.value("translationBaseUrl");
   settings->endGroup();
+  if (hasStoredSettings)
+    return normalized(saved);
+
+  // Nothing under Preferences: either a first run, or a machine whose settings an
+  // older build wrote to the SQLite store. That is the only case worth loading
+  // the driver for, and it happens once.
+  QSqlDatabase database;
+  QString connectionName;
+  QString databaseError;
+  if (openSettingsDatabase(&database, &connectionName, &databaseError)) {
+    QSqlQuery query(database);
+    QVariantMap stored;
+    if (query.exec(QStringLiteral("SELECT key,value FROM app_settings"))) {
+      while (query.next()) {
+        const QVariant value = settingsValue(query.value(1).toString());
+        if (value.isValid())
+          stored[query.value(0).toString()] = value;
+      }
+    }
+    closeSettingsDatabase(database, connectionName);
+    if (!stored.isEmpty()) {
+      for (auto it = stored.cbegin(); it != stored.cend(); ++it)
+        saved[it.key()] = it.value();
+      // Written back to the registry, so the next launch skips all of the above.
+      QString ignored;
+      save(saved, &ignored);
+    }
+  }
   return normalized(saved);
 }
 
 bool AppSettings::save(const QVariantMap &values, QString *error) {
   const QVariantMap clean = normalized(values);
-  QSqlDatabase database;
-  QString connectionName;
-  QString databaseError;
-  if (openSettingsDatabase(&database, &connectionName, &databaseError)) {
-    const bool transactionStarted = database.transaction();
-    QSqlQuery query(database);
-    query.prepare(QStringLiteral("INSERT OR REPLACE INTO app_settings(key,value) VALUES(:key,:value)"));
-    bool ok = transactionStarted;
-    for (auto it = clean.cbegin(); ok && it != clean.cend(); ++it) {
-      query.bindValue(":key", it.key());
-      query.bindValue(":value", settingsJson(it.value()));
-      ok = query.exec();
-    }
-    if (ok) ok = database.commit();
-    if (!ok) databaseError = query.lastError().text();
-    closeSettingsDatabase(database, connectionName);
-    if (ok) return true;
-  }
-
-  // SQLite is the durable primary store, but preserve compatibility with
-  // environments where the Qt SQLite driver is not deployed yet.
-  auto legacy = settingsStore();
-  legacy->beginGroup(QStringLiteral("Preferences"));
+  // Registry only. The SQLite write that used to come first has been removed:
+  // it silently failed on every save - the serialiser above turned every scalar
+  // into an empty string, so the table stayed empty - and the values were only
+  // durable because this fallback ran afterwards. Loading the SQL driver to write
+  // rows nothing reads cost a Qt plugin scan per settings change.
+  auto store = settingsStore();
+  store->beginGroup(QStringLiteral("Preferences"));
   for (auto it = clean.cbegin(); it != clean.cend(); ++it)
-    legacy->setValue(it.key(), it.value());
-  legacy->endGroup();
-  legacy->sync();
-  if (legacy->status() == QSettings::NoError)
+    store->setValue(it.key(), it.value());
+  store->endGroup();
+  store->sync();
+  if (store->status() == QSettings::NoError)
     return true;
   if (error)
-    *error = QStringLiteral("Could not save application settings to SQLite or legacy storage: %1")
-                 .arg(databaseError);
+    *error = QStringLiteral("Could not save application settings.");
   return false;
 }
 

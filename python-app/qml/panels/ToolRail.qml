@@ -35,13 +35,16 @@ Rectangle {
         spacing: 1
 
         Repeater {
-            model: ["selection-tool", "track-select-tool", "ripple-edit-tool",
-                    "razor-tool", "hand", "zoom-in"]
+            // Premiere's own tool glyphs. Their canvas is 44 units wide, so a
+            // 22px glyph draws them at exactly the size Premiere does in a 32px
+            // cell; the old lucide icons needed 18 because they were 24-unit.
+            model: ["pr-select", "pr-track-select", "pr-ripple",
+                    "pr-razor", "pr-hand", "pr-zoom"]
             delegate: IconButton {
                 required property int index
                 required property string modelData
                 boxSize: 32
-                glyphSize: 18
+                glyphSize: 22
                 iconName: modelData
                 active: root.currentTool === index
                 adobeStyle: true

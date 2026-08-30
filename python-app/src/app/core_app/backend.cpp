@@ -6,6 +6,7 @@
 #include "app/preview/media_preview_generator.h"
 #include "app/preview/large_media_preview_job.h"
 #include "app/export/sequence_export_builder.h"
+#include "app/export/timeline_effect_window.h"
 #include "app/subtitles/subtitle_io.h"
 #include "app/subtitles/subtitle_timeline.h"
 #include "app/timeline/timeline_clip_binding.h"
@@ -18,6 +19,7 @@
 #include "app/media/media_scan.h"
 #include "app/preview/audio_peak_builder.h"
 #include "app/preview/filmstrip_builder.h"
+#include "app/diagnostics/playback_trace.h"
 #include "app/preview/gui_thread_watchdog.h"
 #include "core/ids.h"
 #include "core/version.h"
@@ -128,8 +130,21 @@ Backend::Backend(QObject *parent)
     m_videoPreviewHelper.setPosition(m_playheadMs);
   });
   connect(this, &Backend::customBlurEditChanged, this, [this]() {
-    m_videoPreviewHelper.setCustomPreviewClipId(m_customBlurEditClipId);
+    // Pinning the preview to the clip being masked only makes sense when that
+    // clip has a picture. An effect-track item does not, so editing its mask
+    // leaves the monitor showing whatever video is under the playhead - which is
+    // the footage the mask is being drawn over.
+    const int index = clipIndex(m_customBlurEditClipId);
+    const bool pictureClip =
+        index >= 0 &&
+        m_clips.at(index).toMap().value("kind") != QStringLiteral("effect");
+    m_videoPreviewHelper.setCustomPreviewClipId(
+        pictureClip ? m_customBlurEditClipId : QString());
   });
+  // Keyframes are part of the project now, so touching one is an unsaved change
+  // like any other edit.
+  connect(&m_keyframeEngine, &KeyframeEngine::keyframesChanged, this,
+          [this](const QString &) { markDirty(); });
   connect(&m_videoPreviewHelper, &VideoPreviewHelper::activeStateChanged, this,
           &Backend::colorSettingsChanged);
   m_videoPreviewHelper.setTimeline(m_clips, m_media);
@@ -181,7 +196,12 @@ Backend::Backend(QObject *parent)
   m_activeWorkspace = m_appSettings.value("startupWorkspace").toString();
   m_layoutPreset = m_appSettings.value("startupLayout").toString();
   m_videoTrackCount = m_appSettings.value("defaultVideoTracks").toInt();
-  m_audioTrackCount = m_appSettings.value("defaultAudioTracks").toInt();
+  // Audio lanes are created by content, CapCut-style: a sequence opens with
+  // none, and the first audio clip (or the A+ button) is what brings A1 into
+  // existence. Video keeps its configured default so V1 is always there.
+  m_audioTrackCount = 0;
+  m_minVideoTracks = m_videoTrackCount;
+  m_minAudioTracks = 0;
   m_snappingEnabled = m_appSettings.value("timelineSnapping").toBool();
   connect(&m_exportProcess, &QProcess::readyReadStandardError, this,
           &Backend::updateExportProgress);
@@ -811,17 +831,20 @@ QString Backend::coreVersion() const {
 }
 qint64 Backend::durationMs() const {
   qint64 mediaEnd = 0;
-  qint64 subtitleEnd = 0;
+  qint64 overlayEnd = 0;
   for (const auto &v : m_clips) {
     auto c = v.toMap();
     const qint64 end =
         c.value("startMs").toLongLong() + c.value("durationMs").toLongLong();
-    if (c.value("kind") == "subtitle")
-      subtitleEnd = std::max(subtitleEnd, end);
+    const QString kind = c.value("kind").toString();
+    // Subtitles and effect bars ride over the picture; on their own they are not
+    // something to render, so they only set the length when nothing else does.
+    if (kind == "subtitle" || kind == "effect")
+      overlayEnd = std::max(overlayEnd, end);
     else
       mediaEnd = std::max(mediaEnd, end);
   }
-  return mediaEnd > 0 ? mediaEnd : subtitleEnd;
+  return mediaEnd > 0 ? mediaEnd : overlayEnd;
 }
 
 bool Backend::hasSubtitleClips() const {
@@ -830,10 +853,21 @@ bool Backend::hasSubtitleClips() const {
   });
 }
 
+QVariantList Backend::timelineEffects() const {
+  QVariantList result;
+  for (const auto &value : m_clips) {
+    if (value.toMap().value("kind") == QStringLiteral("effect"))
+      result.append(value);
+  }
+  return result;
+}
+
 bool Backend::canExport() const {
   return hasSequence() &&
          std::any_of(m_clips.cbegin(), m_clips.cend(), [](const auto &value) {
-           return value.toMap().value("kind") != "subtitle";
+           const QString kind = value.toMap().value("kind").toString();
+           return kind != QStringLiteral("subtitle") &&
+                  kind != QStringLiteral("effect");
          });
 }
 void Backend::setProjectName(const QString &v) {
@@ -870,6 +904,21 @@ void Backend::setPlayheadMs(qint64 v) {
   v = qBound<qint64>(0, v, durationMs());
   if (v == m_playheadMs)
     return;
+  // A playhead that moves backwards, or jumps further than a couple of frames,
+  // is either a seek or the symptom being hunted - the UI tick advances it by
+  // one frame at a time, so anything larger had another cause and the trace
+  // names it. The ordinary per-frame advance is not logged.
+  if (PlaybackTrace::enabled() && m_playing) {
+    const qint64 delta = v - m_playheadMs;
+    if (delta < 0 || delta > 120)
+      PlaybackTrace::instance().record(
+          "playhead.jump", QStringLiteral("%1 -> %2 ms (%3%4)")
+                               .arg(m_playheadMs)
+                               .arg(v)
+                               .arg(delta >= 0 ? QStringLiteral("+")
+                                               : QString())
+                               .arg(delta));
+  }
   m_playheadMs = v;
   emit playheadChanged();
 }
@@ -877,6 +926,13 @@ void Backend::setPlayheadMs(qint64 v) {
 void Backend::setPlaying(bool playing) {
   if (m_playing == playing)
     return;
+  CUTPRO_PLAYBACK_TRACE("playing",
+                        QStringLiteral("%1 -> %2 at playhead %3 ms")
+                            .arg(m_playing ? QStringLiteral("true")
+                                           : QStringLiteral("false"),
+                                 playing ? QStringLiteral("true")
+                                         : QStringLiteral("false"))
+                            .arg(m_playheadMs));
   m_playing = playing;
   emit playingChanged();
 }
@@ -901,7 +957,11 @@ bool Backend::newProject(const QString &name, const QString &location,
   m_transcriptCoverageMs.clear();
   m_transcript.clear();
   m_videoTrackCount = m_appSettings.value("defaultVideoTracks").toInt();
-  m_audioTrackCount = m_appSettings.value("defaultAudioTracks").toInt();
+  // A new sequence has no audio clips, so it opens with no audio lane. See the
+  // constructor: A1 arrives with the first audio clip or the A+ button.
+  m_audioTrackCount = 0;
+  m_minVideoTracks = m_videoTrackCount;
+  m_minAudioTracks = 0;
   m_mutedTracks.clear();
   m_trackStates.clear();
   m_markers.clear();
@@ -1100,7 +1160,74 @@ QString Backend::addClipEffect(const QString &clipId,
   emit timelineChanged();
   setSelectedClipId(clip.value("id").toString());
   emit effectControlsRequested();
+  // A Custom Blur does nothing until its region is placed, so hand the mask
+  // straight to the program monitor rather than making the user find the
+  // draw-mask button inside the Effect Controls tree first.
+  if (effectId == QStringLiteral("custom_blur"))
+    beginCustomBlurMaskEdit(clip.value("id").toString(), instanceId);
   return instanceId;
+}
+
+QString Backend::addTimelineEffect(const QString &effectId, qint64 startMs,
+                                   qint64 durationMs) {
+  const QVariantMap definition = EffectRegistry::definition(effectId);
+  if (definition.isEmpty()) {
+    setError(QStringLiteral("The selected effect is not available."));
+    return {};
+  }
+  // The lane sits over the picture, so it can only carry effects that act on
+  // the picture. An audio effect there would have nothing to process.
+  if (definition.value("mediaType") == QStringLiteral("audio")) {
+    setError(QStringLiteral(
+        "Audio effects go on an audio clip, not on the effect track."));
+    return {};
+  }
+  // A bar means "this effect, over this stretch". An effect ffmpeg cannot switch
+  // on and off along the timeline cannot honour that, and applying it to the
+  // whole clip instead would be the one thing the user did not ask for.
+  if (!TimelineEffectWindow::supportsWindowing(effectId)) {
+    setError(QStringLiteral("%1 cannot be limited to part of the timeline. "
+                            "Add it to the clip itself instead.")
+                 .arg(definition.value("name").toString()));
+    return {};
+  }
+  if (m_sequenceId.isEmpty())
+    createSequence();
+
+  QVariantList stack;
+  const QString instanceId = id("effect");
+  if (!EffectStack::append(&stack, definition, instanceId))
+    return {};
+
+  const qint64 start = qMax(0LL, startMs < 0 ? m_playheadMs : startMs);
+  // Five seconds is long enough to see and grab, short enough that trimming it
+  // to the stretch that actually needs the effect is a small move either way.
+  const qint64 span = durationMs > 0 ? durationMs : 5000;
+  const QString clipId = id("clip");
+  const QVariantMap clip{{"id", clipId},
+                         {"kind", QStringLiteral("effect")},
+                         {"track", QStringLiteral("F1")},
+                         {"mediaId", QString()},
+                         {"name", definition.value("name")},
+                         {"definitionId", definition.value("id")},
+                         {"startMs", start},
+                         {"durationMs", span},
+                         {"sourceInMs", 0},
+                         {"sourceDurationMs", 0},
+                         {"enabled", true},
+                         {"effectStack", stack}};
+
+  rememberState();
+  m_clips.append(clip);
+  markDirty();
+  clearError();
+  emit clipsChanged();
+  emit timelineChanged();
+  setSelectedClipId(clipId);
+  emit effectControlsRequested();
+  if (effectId == QStringLiteral("custom_blur"))
+    beginCustomBlurMaskEdit(clipId, instanceId);
+  return clipId;
 }
 
 bool Backend::removeClipEffect(const QString &clipId,
@@ -1466,6 +1593,22 @@ bool Backend::needsDeferredPreview(const QVariantMap &item) {
   return false;
 }
 
+// Backfill for a source that reaches the timeline without its artefacts: media
+// imported by an older build, restored from a project saved before the deferred
+// job covered every entry, or dropped while its own import job was still
+// queued. The clip draws its waveform from decoded windows in the meantime, so
+// this is about the instant sheet underneath them, not about correctness.
+void Backend::ensureMediaPreviews(const QString &mediaId) {
+  if (mediaId.isEmpty())
+    return;
+  const int index = mediaIndex(mediaId);
+  if (index < 0)
+    return;
+  const QVariantMap item = m_media.at(index).toMap();
+  if (needsDeferredPreview(item))
+    startDeferredMediaPreview(item);
+}
+
 void Backend::appendImportedMedia(const QVariantList &items) {
   if (items.isEmpty())
     return;
@@ -1486,12 +1629,11 @@ void Backend::appendImportedMedia(const QVariantList &items) {
     item[QStringLiteral("importedAt")] =
         QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
     m_media.append(item);
-    // Large media deliberately imports without generating previews so a
-    // multi-hour file never blocks the import; whatever is still missing - the
-    // poster, the timeline filmstrip or the waveform - is produced in the
-    // background now that the item is visible in the bin.
-    if (item.value(QStringLiteral("largeMedia")).toBool() &&
-        needsDeferredPreview(item))
+    // The import queue deliberately skips detailed previews so the bin appears
+    // instantly, which leaves every entry - not just the multi-hour ones -
+    // without the filmstrip and waveform the timeline draws from. Whatever is
+    // still missing is produced in the background now that the item is visible.
+    if (needsDeferredPreview(item))
       deferred.append(item);
   }
   markDirty();
@@ -1544,7 +1686,7 @@ bool Backend::removeMedia(const QString &mediaId) {
   for (int n = m_clips.size() - 1; n >= 0; --n)
     if (m_clips[n].toMap().value("mediaId") == mediaId)
       m_clips.removeAt(n);
-  pruneEmptyTracks();
+  pruneEmptyTracks(true);
   markDirty();
   emit mediaChanged();
   emit clipsChanged();
@@ -1605,6 +1747,7 @@ QString Backend::addClip(const QString &mediaId, qint64 start,
                 {"enabled", true}};
   ensureTrackExists(c.value("track").toString());
   m_clips.append(c);
+  ensureMediaPreviews(mediaId);
   markDirty();
   emit clipsChanged();
   emit timelineChanged();
@@ -1666,6 +1809,7 @@ QStringList Backend::addMediaToTimeline(const QString &mediaId, qint64 start,
   ensureTrackExists(primaryTrack);
   addedIds.append(clip.value("id").toString());
   m_clips.append(clip);
+  ensureMediaPreviews(mediaId);
 
   markDirty();
   {
@@ -1696,9 +1840,15 @@ bool Backend::beginTimelinePlacement(const QStringList &mediaIds, qint64 start,
     if (media.isEmpty())
       continue;
     const QString kind = media.value("kind").toString();
-    const QString destination = track.isEmpty()
-                                    ? TimelinePlacement::defaultTrackForKind(kind)
-                                    : TimelinePlacement::normalizedTrack(track);
+    // Per item, because a selection can mix kinds: the audio files in a mixed
+    // drop used to be dropped on the floor when the pointer was over a video
+    // lane. They land on the nearest lane that accepts them instead.
+    const QString requested = track.isEmpty()
+                                  ? TimelinePlacement::defaultTrackForKind(kind)
+                                  : TimelinePlacement::normalizedTrack(track);
+    const QString destination = TimelinePlacement::trackAcceptsKind(requested, kind)
+                                    ? requested
+                                    : compatibleTrackFor(kind, requested);
     if (!TimelinePlacement::trackAcceptsKind(destination, kind))
       continue;
     qint64 duration = media.value("durationMs").toLongLong();
@@ -1749,6 +1899,7 @@ void Backend::handleTimelinePlacementStep(const QVariantMap &request) {
   ensureTrackExists(destination);
   m_timelinePlacementAddedIds.append(clip.value("id").toString());
   m_clips.append(clip);
+  ensureMediaPreviews(request.value("mediaId").toString());
 }
 bool Backend::moveClip(const QString &clipId, qint64 start,
                        const QString &track) {
@@ -1778,7 +1929,8 @@ bool Backend::moveClip(const QString &clipId, qint64 start,
   c["track"] = destination;
   ensureTrackExists(c.value("track").toString());
   m_clips[i] = c;
-  pruneEmptyTracks();
+  // A move vacates the track it came from, so the emptied lane goes with it.
+  pruneEmptyTracks(true);
   markDirty();
   emit clipsChanged();
   emit timelineChanged();
@@ -1854,7 +2006,9 @@ bool Backend::moveClips(const QStringList &clipIds, qint64 deltaMs,
   m_audioTrackCount = requiredAudioTracks;
   for (int i = 0; i < indexes.size(); ++i)
     m_clips[indexes[i]] = updates[i];
-  pruneEmptyTracks();
+  // Same as moveClip: whatever lane these clips left is now empty, and an empty
+  // lane above the stack is not something to keep standing around.
+  pruneEmptyTracks(true);
   markDirty();
   emit clipsChanged();
   emit tracksChanged();
@@ -1896,13 +2050,19 @@ bool Backend::trimClipStart(const QString &clipId, qint64 requestedStart) {
   const qint64 oldStart = clip.value("startMs").toLongLong();
   const qint64 oldEnd = oldStart + clip.value("durationMs").toLongLong();
   const qint64 sourceIn = clip.value("sourceInMs").toLongLong();
-  const qint64 minimumStart = qMax<qint64>(0, oldStart - sourceIn);
+  // An effect-track item has no source footage behind it, so its head is not
+  // pinned by an in-point: the bar may be dragged out to the head of the
+  // sequence and back, which is how the user says when the effect starts.
+  const bool freeHead = clip.value("kind") == QStringLiteral("effect");
+  const qint64 minimumStart =
+      freeHead ? 0 : qMax<qint64>(0, oldStart - sourceIn);
   const qint64 newStart = qBound(minimumStart, requestedStart, oldEnd - 1);
   if (newStart == oldStart)
     return false;
   rememberState();
   clip["startMs"] = newStart;
-  clip["sourceInMs"] = sourceIn + newStart - oldStart;
+  if (!freeHead)
+    clip["sourceInMs"] = sourceIn + newStart - oldStart;
   clip["durationMs"] = oldEnd - newStart;
   m_clips[i] = clip;
   markDirty();
@@ -1919,6 +2079,21 @@ bool Backend::trimClipEnd(const QString &clipId, qint64 requestedEnd) {
     return false;
   const qint64 start = clip.value("startMs").toLongLong();
   const qint64 sourceIn = clip.value("sourceInMs").toLongLong();
+  // Nothing limits how long an effect stays on, so the tail is free. Twenty-four
+  // hours is not a real limit, only a stop against a runaway drag.
+  if (clip.value("kind") == QStringLiteral("effect")) {
+    const qint64 newEffectEnd = qBound<qint64>(start + 1, requestedEnd,
+                                               qint64(86400000));
+    if (newEffectEnd == start + clip.value("durationMs").toLongLong())
+      return false;
+    rememberState();
+    clip["durationMs"] = newEffectEnd - start;
+    m_clips[i] = clip;
+    markDirty();
+    emit clipsChanged();
+    emit timelineChanged();
+    return true;
+  }
   qint64 sourceDuration = clip.value("sourceDurationMs").toLongLong();
   if (sourceDuration <= 0) {
     const QVariantMap media = mediaById(clip.value("mediaId").toString());
@@ -2011,11 +2186,25 @@ Backend::expandedLinkedClipIds(const QStringList &clipIds) const {
 
 bool Backend::removeClips(const QStringList &clipIds) {
   const QStringList removalIds = expandedLinkedClipIds(clipIds);
+  // One pass to index the timeline, then a hash lookup per id. This used to call
+  // clipIndex() - a linear scan of m_clips - once per id, and check membership
+  // with QVector::contains, so deleting a subtitle track was two nested walks of
+  // 2581 elements before any work started.
+  QHash<QString, int> indexById;
+  indexById.reserve(m_clips.size());
+  for (int i = 0; i < m_clips.size(); ++i)
+    indexById.insert(m_clips.at(i).toMap().value(QStringLiteral("id")).toString(),
+                     i);
   QVector<int> indexes;
+  indexes.reserve(removalIds.size());
+  QSet<int> seen;
+  seen.reserve(removalIds.size());
   for (const auto &clipId : removalIds) {
-    const int index = clipIndex(clipId);
-    if (index >= 0 && !indexes.contains(index))
+    const int index = indexById.value(clipId, -1);
+    if (index >= 0 && !seen.contains(index)) {
+      seen.insert(index);
       indexes.append(index);
+    }
   }
   if (indexes.isEmpty())
     return false;
@@ -2030,7 +2219,13 @@ bool Backend::removeClips(const QStringList &clipIds) {
   std::sort(indexes.begin(), indexes.end(), std::greater<int>());
   for (const int index : indexes)
     m_clips.removeAt(index);
-  pruneEmptyTracks();
+  // Their animation channels go too, otherwise the project file keeps growing a
+  // curve for every clip that ever existed.
+  for (const QString &clipId : removalIds)
+    m_keyframeEngine.forgetClip(clipId);
+  // The reason this parameter exists: delete the last clip on a track and the
+  // track goes with it.
+  pruneEmptyTracks(true);
   markDirty();
   emit clipsChanged();
   emit timelineChanged();
@@ -2043,7 +2238,7 @@ bool Backend::removeClips(const QStringList &clipIds) {
   return true;
 }
 
-QString Backend::addTrack(const QString &kind) {
+QString Backend::addTrack(const QString &kind, bool sticky) {
   const bool video = kind.compare("video", Qt::CaseInsensitive) == 0;
   const bool audio = kind.compare("audio", Qt::CaseInsensitive) == 0;
   if (!video && !audio)
@@ -2058,6 +2253,11 @@ QString Backend::addTrack(const QString &kind) {
 
   rememberState();
   ++count;
+  // Only a track the user asked for by name gets a floor. The lane a clip drag
+  // opens up at the top of the stack is not one: it exists to catch that clip,
+  // so occupancy owns it and an aborted drag leaves nothing behind.
+  if (sticky)
+    (video ? m_minVideoTracks : m_minAudioTracks) = count;
   markDirty();
   emit tracksChanged();
   emit timelineChanged();
@@ -2071,7 +2271,8 @@ bool Backend::removeLastTrack(const QString &kind) {
     return false;
 
   int &count = video ? m_videoTrackCount : m_audioTrackCount;
-  if (count <= 1)
+  // V1 always exists; audio can go back to having no lane at all.
+  if (count <= (video ? 1 : 0))
     return false;
 
   const QString track = QString(video ? "V%1" : "A%1").arg(count);
@@ -2087,10 +2288,24 @@ bool Backend::removeLastTrack(const QString &kind) {
   m_mutedTracks.removeAll(track);
   m_trackStates.remove(track);
   --count;
+  (video ? m_minVideoTracks : m_minAudioTracks) = count;
   markDirty();
   emit tracksChanged();
   emit timelineChanged();
   return true;
+}
+
+QString Backend::trackForRow(int row) const {
+  return TimelinePlacement::trackForRow(row, m_videoTrackCount,
+                                        m_audioTrackCount);
+}
+
+QString Backend::compatibleTrackFor(const QString &kind,
+                                    const QString &requestedTrack) const {
+  const QString resolved = TimelinePlacement::nearestCompatibleTrack(
+      kind, requestedTrack, m_videoTrackCount, m_audioTrackCount);
+  return resolved.isEmpty() ? TimelinePlacement::defaultTrackForKind(kind)
+                            : resolved;
 }
 
 bool Backend::setTrackMuted(const QString &value, bool muted) {
@@ -2124,6 +2339,7 @@ bool Backend::setTrackMuted(const QString &value, bool muted) {
 QVariantList Backend::trackStates() const {
   QVariantList result;
   result.append(trackState(QStringLiteral("S1")));
+  result.append(trackState(QStringLiteral("F1")));
   for (int number = m_videoTrackCount; number >= 1; --number)
     result.append(trackState(QStringLiteral("V%1").arg(number)));
   for (int number = 1; number <= m_audioTrackCount; ++number)
@@ -2160,10 +2376,12 @@ bool Backend::trackTargeted(const QString &track) const {
 bool Backend::setTrackState(const QString &value, const QString &stateName,
                             bool enabled) {
   const QString track = value.trimmed().toUpper();
-  static const QRegularExpression pattern(QStringLiteral("^([VAS])(\\d+)$"));
+  static const QRegularExpression pattern(QStringLiteral("^([VASF])(\\d+)$"));
   const auto match = pattern.match(track);
-  if (!match.hasMatch() || (match.captured(1) == QStringLiteral("S") &&
-                            track != QStringLiteral("S1")))
+  if (!match.hasMatch() ||
+      ((match.captured(1) == QStringLiteral("S") ||
+        match.captured(1) == QStringLiteral("F")) &&
+       match.captured(2) != QStringLiteral("1")))
     return false;
   const int number = match.captured(2).toInt();
   if ((track.startsWith('V') && number > m_videoTrackCount) ||
@@ -2195,6 +2413,31 @@ qint64 Backend::snapTime(qint64 requestedMs, const QStringList &excludedClipIds,
                                   qMax<qint64>(0, thresholdMs), durationMs());
 }
 
+QVariantMap Backend::snapClipDrag(qint64 startMs, qint64 clipDurationMs,
+                                  const QStringList &excludedClipIds,
+                                  qint64 thresholdMs) const {
+  const qint64 requested = qMax<qint64>(0, startMs);
+  QVariantMap result{{QStringLiteral("snapped"), false},
+                     {QStringLiteral("startMs"), requested},
+                     {QStringLiteral("guideMs"), requested},
+                     {QStringLiteral("edge"), QString()},
+                     {QStringLiteral("target"), QString()}};
+  if (!m_snappingEnabled)
+    return result;
+  const TimelineEditor::SnapResult snap = TimelineEditor::snapClip(
+      requested, qMax<qint64>(0, clipDurationMs), m_clips, m_markers,
+      excludedClipIds, m_playheadMs, qMax<qint64>(0, thresholdMs),
+      durationMs());
+  if (!snap.snapped)
+    return result;
+  result[QStringLiteral("snapped")] = true;
+  result[QStringLiteral("startMs")] = qMax<qint64>(0, requested + snap.deltaMs);
+  result[QStringLiteral("guideMs")] = snap.guideMs;
+  result[QStringLiteral("edge")] = snap.edge;
+  result[QStringLiteral("target")] = snap.target;
+  return result;
+}
+
 bool Backend::rippleDeleteClips(const QStringList &clipIds) {
   const QStringList removalIds = expandedLinkedClipIds(clipIds);
   if (removalIds.isEmpty())
@@ -2217,7 +2460,7 @@ bool Backend::rippleDeleteClips(const QStringList &clipIds) {
   rememberState();
   const bool selectionRemoved = removalIds.contains(m_selectedClipId);
   m_clips = updated;
-  pruneEmptyTracks();
+  pruneEmptyTracks(true);
   markDirty();
   emit clipsChanged();
   emit timelineChanged();
@@ -2329,6 +2572,20 @@ void Backend::setSnappingEnabled(bool enabled) {
   emit timelineChanged();
 }
 
+void Backend::setEffectDragActive(bool active) {
+  if (m_effectDragActive == active)
+    return;
+  m_effectDragActive = active;
+  emit effectDragActiveChanged();
+}
+
+void Backend::setVideoFullScreen(bool active) {
+  if (m_videoFullScreen == active)
+    return;
+  m_videoFullScreen = active;
+  emit videoFullScreenChanged();
+}
+
 bool Backend::saveProject(const QString &path) {
   m_projectDatabaseSaveTimer.stop();
   QString target = normalizePath(path);
@@ -2343,8 +2600,11 @@ bool Backend::saveProject(const QString &path) {
   if (QFileInfo(target).suffix().isEmpty())
     target += ".cutpro.json";
   QDir().mkpath(QFileInfo(target).absolutePath());
+  // The one place the indented form is worth its cost: this is the file a user
+  // can open, diff and read.
+  const QByteArray snapshot = serializeState(true);
   QSaveFile f(target);
-  if (!f.open(QIODevice::WriteOnly) || f.write(serializeState()) < 0 ||
+  if (!f.open(QIODevice::WriteOnly) || f.write(snapshot) < 0 ||
       !f.commit()) {
     setError(QStringLiteral("Could not save project: ") + f.errorString());
     return false;
@@ -2363,7 +2623,7 @@ bool Backend::saveProject(const QString &path) {
     return false;
   m_projectDatabase.appendAction(
       m_projectId, m_sequenceId, QStringLiteral("project-save"),
-      QVariantMap{{"path", target}}, serializeState());
+      QVariantMap{{"path", target}}, snapshot);
   markDirty(false);
   emit projectChanged();
   return true;
@@ -2571,6 +2831,18 @@ QVariantMap Backend::probeMedia(const QString &path,
 void Backend::startDeferredMediaPreview(const QVariantMap &media) {
   if (media.isEmpty())
     return;
+  const QString mediaId = media.value(QStringLiteral("id")).toString();
+  // One job per source. The same file can be dropped on the timeline several
+  // times, and a second job would only rebuild what the first is already
+  // producing into the same cache entry.
+  if (!mediaId.isEmpty()) {
+    if (m_largeMediaPreviewMediaId == mediaId)
+      return;
+    for (const QVariant &pending : m_pendingLargeMediaPreviews) {
+      if (pending.toMap().value(QStringLiteral("id")).toString() == mediaId)
+        return;
+    }
+  }
   if (m_largeMediaPreviewWatcher.isRunning()) {
     // Bounded: importing a folder of a hundred long videos would otherwise
     // queue a hundred full media maps, and the newest entries are the ones the
@@ -2730,8 +3002,21 @@ bool Backend::startExportWithSettings(const QString &output,
   m_exportStandardError.clear();
   clearError();
   QString buildError;
+  // Hand each clip its animation channels so the rendered file follows the same
+  // curves the monitor shows. Attached to the clip rather than passed as a
+  // parallel argument because everything downstream already works clip by clip.
+  QVariantList exportClips = m_clips;
+  for (QVariant &value : exportClips) {
+    QVariantMap clip = value.toMap();
+    const QVariantMap channels =
+        m_keyframeEngine.channelsForClip(clip.value("id").toString());
+    if (!channels.isEmpty()) {
+      clip.insert(QStringLiteral("keyframes"), channels);
+      value = clip;
+    }
+  }
   const QStringList a = SequenceExportBuilder::build(
-      m_media, m_clips, m_mutedTracks, trackStates(), durationMs(),
+      m_media, exportClips, m_mutedTracks, trackStates(), durationMs(),
       m_colorSettings, exportSettings, target, &buildError);
   if (a.isEmpty()) {
     m_exportStatus = QStringLiteral("Export failed");
@@ -3284,6 +3569,29 @@ void Backend::rebuildSequenceTranscript() {
   if (!hasSequenceSources)
     return;
 
+  if (rebuilt.isEmpty()) {
+    // Nothing on the timeline carries a per-source transcript, so there is
+    // nothing to derive from - and a derivation from nothing must not be allowed
+    // to pass for a result. This ran on every clipsChanged, so importing an SRT
+    // and dropping it on the timeline destroyed the transcript with the very
+    // signal that consumed it: the segment list emptied while
+    // m_transcriptionStatus still read "Imported N subtitle segments".
+    //
+    // Only a transcript this function produced may be cleared by it. Its own
+    // segments carry the clip they were cut from; an imported SRT and a raw
+    // transcription result carry no clipId, so they survive a rebuild that has
+    // no sources to work with.
+    bool ownedByRebuild = false;
+    for (const QVariant &value : m_transcript) {
+      if (value.toMap().contains(QStringLiteral("clipId"))) {
+        ownedByRebuild = true;
+        break;
+      }
+    }
+    if (!ownedByRebuild)
+      return;
+  }
+
   if (rebuilt != m_transcript) {
     m_transcript = rebuilt;
     emit transcriptChanged();
@@ -3302,7 +3610,7 @@ int Backend::clipIndex(const QString &v) const {
       return i;
   return -1;
 }
-QByteArray Backend::serializeState() const {
+QJsonObject Backend::stateObject() const {
   QVariantMap sourceTranscripts;
   for (auto it = m_sourceTranscripts.cbegin(); it != m_sourceTranscripts.cend();
        ++it)
@@ -3325,6 +3633,8 @@ QByteArray Backend::serializeState() const {
                 {"sequenceName", m_sequenceName},
                 {"videoTrackCount", m_videoTrackCount},
                 {"audioTrackCount", m_audioTrackCount},
+                {"minVideoTracks", m_minVideoTracks},
+                {"minAudioTracks", m_minAudioTracks},
                 {"mutedTracks", QJsonArray::fromStringList(m_mutedTracks)},
                 {"trackStates", QJsonObject::fromVariantMap(m_trackStates)},
                 {"markers", QJsonArray::fromVariantList(m_markers)},
@@ -3333,12 +3643,21 @@ QByteArray Backend::serializeState() const {
                 {"colorSettings", QJsonObject::fromVariantMap(m_colorSettings)},
                 {"media", QJsonArray::fromVariantList(m_media)},
                 {"clips", QJsonArray::fromVariantList(m_clips)},
+                // Animation channels. They used to live only in memory, so every
+                // keyframe was lost on save - which made the stopwatch a
+                // session-only toy.
+                {"keyframes",
+                 QJsonArray::fromVariantList(m_keyframeEngine.serialize())},
                 {"transcript", QJsonArray::fromVariantList(m_transcript)},
                 {"transcriptLanguage", m_transcriptLanguage},
                 {"sourceTranscripts", QJsonObject::fromVariantMap(sourceTranscripts)},
                 {"sourceTranscriptLanguages", QJsonObject::fromVariantMap(sourceLanguages)},
                 {"transcriptCoverageMs", QJsonObject::fromVariantMap(transcriptCoverage)}};
-  return QJsonDocument(o).toJson(QJsonDocument::Indented);
+  return o;
+}
+QByteArray Backend::serializeState(bool pretty) const {
+  return QJsonDocument(stateObject())
+      .toJson(pretty ? QJsonDocument::Indented : QJsonDocument::Compact);
 }
 bool Backend::restoreState(const QByteArray &data, bool history) {
   QJsonParseError e;
@@ -3365,7 +3684,15 @@ bool Backend::restoreState(const QByteArray &data, bool history) {
   m_sequenceId = o.value("sequenceId").toString();
   m_sequenceName = o.value("sequenceName").toString("Sequence 01");
   m_videoTrackCount = qBound(1, o.value("videoTrackCount").toInt(1), 64);
-  m_audioTrackCount = qBound(1, o.value("audioTrackCount").toInt(1), 64);
+  // 0 is a valid saved audio count: projects without audio clips have no
+  // audio lane at all.
+  m_audioTrackCount = qBound(0, o.value("audioTrackCount").toInt(0), 64);
+  // Projects saved before the floors existed fall back to the counts they were
+  // saved with, so opening one does not silently delete its empty tracks.
+  m_minVideoTracks =
+      qBound(1, o.value("minVideoTracks").toInt(m_videoTrackCount), 64);
+  m_minAudioTracks =
+      qBound(0, o.value("minAudioTracks").toInt(m_audioTrackCount), 64);
   m_trackStates = o.value("trackStates").toObject().toVariantMap();
   m_markers = o.value("markers").toArray().toVariantList();
   m_snappingEnabled = o.value("snappingEnabled").toBool(true);
@@ -3393,6 +3720,7 @@ bool Backend::restoreState(const QByteArray &data, bool history) {
     value = media;
   }
   m_clips = o.value("clips").toArray().toVariantList();
+  m_keyframeEngine.restore(o.value("keyframes").toArray().toVariantList());
   const bool hasSavedTranscript = o.contains("transcript");
   const QVariantList savedTranscript =
       o.value("transcript").toArray().toVariantList();
@@ -3491,10 +3819,20 @@ bool Backend::restoreState(const QByteArray &data, bool history) {
   return true;
 }
 void Backend::rememberState() {
-  recordAction(QStringLiteral("edit"));
-  m_undo << serializeState();
-  if (m_undo.size() > 100)
+  // Serialised once, used twice. This used to call serializeState() here and
+  // again inside recordAction(), so every undoable edit built the entire project
+  // as JSON two separate times on the GUI thread.
+  const QByteArray snapshot = serializeState();
+  recordAction(QStringLiteral("edit"), {}, snapshot);
+  m_undo << snapshot;
+  qint64 bytes = 0;
+  for (const QByteArray &state : m_undo)
+    bytes += state.size();
+  while (m_undo.size() > 1 &&
+         (m_undo.size() > kMaxUndoStates || bytes > kMaxUndoBytes)) {
+    bytes -= m_undo.constFirst().size();
     m_undo.removeFirst();
+  }
   m_redo.clear();
   emit historyChanged();
 }
@@ -3506,11 +3844,33 @@ void Backend::markDirty(bool v) {
   m_dirty = v;
   emit dirtyChanged();
 }
-void Backend::recordAction(const QString &type, const QVariantMap &payload) {
+void Backend::recordAction(const QString &type, const QVariantMap &payload,
+                           const QByteArray &snapshot) {
   if (!m_projectDatabase.isOpen() && !persistProjectDatabase())
     return;
+  // The state column used to be filled on every single edit with a freshly
+  // serialised copy of the whole project. Nothing reads it - crash recovery in
+  // loadProject() comes from the normalised project tables, undo comes from
+  // m_undo in memory, and ProjectDatabase::actions() has no callers at all - yet
+  // with a subtitle track on the timeline it was multi-megabyte JSON, widened to
+  // UTF-16 and inserted synchronously. The tracer caught the whole chain at
+  // 2027 ms of "Not Responding" on one button press:
+  //   Backend::removeTranscriptFromTimeline -> removeClips -> rememberState
+  //     -> recordAction -> serializeState -> QJsonArray::fromVariantList
+  // The row is what makes the log a history, so it still goes in; the snapshot
+  // only rides along when a caller already had one to give and enough time has
+  // passed for another copy to be worth what it costs.
+  QByteArray state;
+  if (!snapshot.isEmpty()) {
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (m_lastActionSnapshotMs == 0 ||
+        now - m_lastActionSnapshotMs >= kActionSnapshotIntervalMs) {
+      state = snapshot;
+      m_lastActionSnapshotMs = now;
+    }
+  }
   m_projectDatabase.appendAction(m_projectId, m_sequenceId, type, payload,
-                                 serializeState());
+                                 state);
 }
 void Backend::setError(const QString &v) {
   if (m_lastError == v.trimmed())
@@ -3549,12 +3909,28 @@ void Backend::ensureTrackExists(const QString &track) {
   emit tracksChanged();
 }
 
-void Backend::pruneEmptyTracks() {
-  int highestVideoTrack = 1;
-  int highestAudioTrack = 1;
+void Backend::pruneEmptyTracks(bool releaseUserTracks) {
+  if (releaseUserTracks) {
+    // The edit that got here emptied a lane. Let the floors go: keeping them
+    // would leave a stack of tracks standing with nothing on them, which is what
+    // a user reads as "the track did not get removed".
+    m_minVideoTracks = 1;
+    m_minAudioTracks = 0;
+  }
+  // The floors are the tracks the user added by hand. Without them this
+  // function treats "empty" as "delete", so a lane created with V+ to receive a
+  // clip disappeared on the next unrelated edit and the drop that followed had
+  // nowhere to go but the track below.
+  int highestVideoTrack = qBound(1, m_minVideoTracks, 64);
+  // Audio starts at zero: with no audio clips the sequence has no audio lane,
+  // the way CapCut only shows one once something is on it. Video keeps V1.
+  int highestAudioTrack = qBound(0, m_minAudioTracks, 64);
   for (const auto &value : m_clips) {
     const QVariantMap clip = value.toMap();
-    if (clip.value("kind") == QStringLiteral("subtitle"))
+    const QString kind = clip.value("kind").toString();
+    // The overlay lanes are not part of the video/audio stack, so nothing on
+    // them may add or hold open a numbered track.
+    if (kind == QStringLiteral("subtitle") || kind == QStringLiteral("effect"))
       continue;
     const QString track =
         TimelinePlacement::normalizedTrack(clip.value("track").toString());
@@ -3569,6 +3945,12 @@ void Backend::pruneEmptyTracks() {
                              highestAudioTrack != m_audioTrackCount;
   m_videoTrackCount = highestVideoTrack;
   m_audioTrackCount = highestAudioTrack;
+  if (releaseUserTracks) {
+    // Occupancy is the new floor, so a later additive edit does not resurrect
+    // the tracks this call just took away.
+    m_minVideoTracks = m_videoTrackCount;
+    m_minAudioTracks = m_audioTrackCount;
+  }
 
   const auto trackStillExists = [this](const QString &track) {
     const QString normalized = track.trimmed().toUpper();
@@ -3577,7 +3959,8 @@ void Backend::pruneEmptyTracks() {
       return number >= 1 && number <= m_videoTrackCount;
     if (normalized.startsWith('A'))
       return number >= 1 && number <= m_audioTrackCount;
-    return normalized == QStringLiteral("S1");
+    return normalized == QStringLiteral("S1") ||
+           normalized == QStringLiteral("F1");
   };
 
   for (int i = m_mutedTracks.size() - 1; i >= 0; --i) {
@@ -3631,8 +4014,12 @@ bool Backend::persistProjectDatabase() {
     }
   }
 
-  const QVariantMap state =
-      QJsonDocument::fromJson(serializeState()).toVariant().toMap();
+  // Straight from the object. This used to be
+  // QJsonDocument::fromJson(serializeState()).toVariant().toMap(): write every
+  // clip out as JSON text, parse the text back, then convert the result to
+  // variants - three passes over the whole project, on the GUI thread, 250 ms
+  // after every edit.
+  const QVariantMap state = stateObject().toVariantMap();
   if (!m_projectDatabase.saveProject(state)) {
     setError(QStringLiteral("Could not update project SQLite database: ") +
              m_projectDatabase.lastError());

@@ -10,6 +10,8 @@
 #include <memory>
 
 #include "app/preview/native_video_preview_decoder.h"
+#include "app/preview/preview_audio_sink.h"
+#include "core/module_api.h"
 
 class QAudioSink;
 class QIODevice;
@@ -18,7 +20,7 @@ class QMediaDevices;
 // Decodes export-preview video and audio through the FFmpeg executable.
 // Video is streamed as raw RGB frames; audio is streamed as signed 16-bit PCM
 // and handed to Qt only for native device output. No Qt media decoder is used.
-class FfmpegPreviewDecoder final : public QObject {
+class CUTPRO_PREVIEW_API FfmpegPreviewDecoder final : public QObject {
   Q_OBJECT
 
 public:
@@ -37,6 +39,11 @@ public:
   QString error() const { return m_error; }
   QImage frame() const;
 
+  // Source position of the frame that is actually on screen, or -1 before the
+  // current session has produced one. The monitor drives its playhead from this
+  // instead of from a wall clock started when Play was pressed.
+  qint64 presentedSourceMs() const;
+
   // Opens the audio output device now, so that the first Play does not.
   //
   // The stall tracer caught the GUI thread inside startAudio() for 845 ms:
@@ -47,9 +54,12 @@ public:
   //
   // That is a synchronous RPC to the Windows audio service: enumerate the
   // endpoints, ask the default one what it supports, initialise a client on it.
-  // It costs what it costs, and it cannot be moved to a worker thread without
-  // making the device object live on a thread that is not the one using it. What
-  // it can be is paid once, at a moment when the user is not waiting on a button.
+  // It costs what it costs. Scoping it call by call showed which part costs it -
+  // QAudioSink::start(), 2038 ms with the window already up - so the sink now
+  // lives on PreviewAudioSink's own thread and this call only asks it to open.
+  // Enumeration and format negotiation stay here: neither ever crossed the
+  // 250 ms report threshold, and the platform device manager is a GUI-thread
+  // singleton.
   //
   // Idempotent, cheap after the first call, and safe to call when there is no
   // audio device at all.
@@ -94,9 +104,24 @@ private:
   qsizetype m_frameBytes = 0;
   quint64 m_revision = 0;
   QString m_error;
+  // Process-fallback bookkeeping for presentedSourceMs(). The raw pipe carries
+  // no timestamps, but the fps filter makes the mapping exact: frame i of the
+  // stream is the source frame at start + i * interval. Unused when the in-process
+  // decoder is compiled in, which reports its frames' own pts.
+  qint64 m_streamStartSourceMs = 0;
+  double m_streamFrameIntervalMs = 0.0;
+  qint64 m_streamFramesShown = -1;
   std::unique_ptr<QAudioSink> m_audioSink;
   QIODevice *m_audioDevice = nullptr;
   QTimer m_audioDrainTimer;
+  // The threaded output. Every write goes here unless it reports that starting a
+  // sink on its thread failed, in which case m_audioSink above still works and
+  // preview audio degrades to the old GUI-thread path instead of going silent.
+  PreviewAudioSink m_audioOut;
+  // Ceiling on PCM handed to the pump before the process pipe is left to apply
+  // backpressure. ffmpeg runs with -re, so this is only ever reached if the
+  // device stops consuming.
+  static constexpr qint64 kMaxQueuedAudioBytes = 48000 * 2 * 2 * 2;
   // Held only so its audioOutputsChanged signal can invalidate the cache below.
   // Without it, unplugging headphones mid-session would leave preview writing
   // into a sink attached to a device that no longer exists.

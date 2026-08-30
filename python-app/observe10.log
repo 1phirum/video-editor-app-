@@ -1,0 +1,698 @@
+16:22:21.784 CrashReporterHost: watching pid 8456 from pid 9120 | reports -> C:/Users/USER/AppData/Local/Antigravity/Cut Pro/crash-reports
+16:22:21.800 Cut Pro: native C++/Qt backend, coreVersion = 0.1.2 | built = Aug 30 2026 16:21:31 | executable = C:/premier-pro/python-app/dist/Cut Pro 2026/cutpro.exe
+16:22:21.959 GUI thread unresponsive for 400 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+16:22:21.959   the innermost frame has only been open 152 ms of the 400 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+16:22:21.995   GUI thread backtrace, innermost first (14 frames):
+16:22:21.995     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+16:22:21.995     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+16:22:21.995     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+16:22:21.995     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+16:22:21.995     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+16:22:21.995     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+16:22:21.995     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+16:22:21.995     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+16:22:21.995     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+16:22:21.995     #9  "cutpro.exe+0x2d3d"
+16:22:21.995     #10  "cutpro.exe+0x12ef"
+16:22:21.995     #11  "cutpro.exe+0x1406"
+16:22:21.995     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+16:22:21.995     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+16:22:22.385 GUI thread unresponsive for 827 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+16:22:22.385   the innermost frame has only been open 579 ms of the 827 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+16:22:22.385   GUI thread backtrace, innermost first (14 frames):
+16:22:22.385     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+16:22:22.385     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+16:22:22.385     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+16:22:22.385     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+16:22:22.385     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+16:22:22.385     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+16:22:22.385     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+16:22:22.385     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+16:22:22.385     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+16:22:22.385     #9  "cutpro.exe+0x2d3d"
+16:22:22.385     #10  "cutpro.exe+0x12ef"
+16:22:22.385     #11  "cutpro.exe+0x1406"
+16:22:22.385     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+16:22:22.385     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+16:22:23.261 GUI thread unresponsive for 1703 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+16:22:23.261   GUI thread backtrace, innermost first (14 frames):
+16:22:23.261     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+16:22:23.261     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+16:22:23.261     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+16:22:23.261     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+16:22:23.261     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+16:22:23.261     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+16:22:23.261     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+16:22:23.261     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+16:22:23.261     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+16:22:23.261     #9  "cutpro.exe+0x2d3d"
+16:22:23.261     #10  "cutpro.exe+0x12ef"
+16:22:23.261     #11  "cutpro.exe+0x1406"
+16:22:23.261     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+16:22:23.261     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+16:22:23.577 GUI thread STILL blocked after 2018 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)" - during launch, before any window exists: this delays startup but cannot show as "Not Responding".
+16:22:23.578   GUI thread backtrace, innermost first (29 frames):
+16:22:23.578     #0  "ntdll.dll!ZwQueryFullAttributesFile+0x14"
+16:22:23.578     #1  "KERNELBASE.dll!GetFileAttributesExW+0xbf"
+16:22:23.578     #2  "Qt6Core.dll+0x23f258 (nearest export: qAreNtfsPermissionChecksEnabled()+0x8bd8)"
+16:22:23.578     #3  "Qt6Core.dll!QFileInfo::size() const+0x6d"
+16:22:23.578     #4  "cutpro_settings.dll!AppSettings::cacheSizeBytes()+0x1c9"
+16:22:23.578     #5  "cutpro_backend.dll!Backend::mediaCacheSize() const+0x15"
+16:22:23.578     #6  "cutpro_backend.dll+0x79bc (nearest export: Backend::qt_static_metacall(QObject*, QMetaObject::Call, int, void**)+0x65f6)"
+16:22:23.578     #7  "Qt6Qml.dll+0x1056fe (nearest export: QV4::QObjectWrapper::wrap_slowPath(QV4::ExecutionEngine*, QObject*)+0x14de)"
+16:22:23.585     #8  "Qt6Qml.dll!QV4::QQmlTypeWrapper::lookupSingletonProperty(QV4::Lookup*, QV4::ExecutionEngine*, QV4::Value const&)+0x327"
+16:22:23.585     #9  "Qt6Qml.dll!QV4::QQmlTypeWrapper::virtualResolveLookupGetter(QV4::Object const*, QV4::ExecutionEngine*, QV4::Lookup*)+0x381"
+16:22:23.585     #10  "Qt6Qml.dll+0x1623f2 (nearest export: qt_v4DebuggerHook+0x4402)"
+16:22:23.585     #11  "Qt6Qml.dll+0x165c9f (nearest export: qt_v4DebuggerHook+0x7caf)"
+16:22:23.585     #12  "Qt6Qml.dll!QV4::ExecutableCompilationUnit::createNamedObjectsPerComponent(int)+0x82f"
+16:22:23.585     #13  "Qt6Qml.dll!QQmlJavaScriptExpression::evaluate(QV4::CallData*, bool*)+0x31d"
+16:22:23.585     #14  "Qt6Qml.dll!QQmlBinding::evaluate(bool*)+0xb7"
+16:22:23.585     #15  "Qt6Qml.dll!QQmlBinding::doUpdate(QQmlJavaScriptExpression::DeleteWatcher const&, QFlags<QQmlPropertyData::WriteFlag>, QV4::Scope&)+0x7e"
+16:22:23.585     #16  "Qt6Qml.dll!QQmlBinding::update(QFlags<QQmlPropertyData::WriteFlag>)+0x211"
+16:22:23.585     #17  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x161"
+16:22:23.585     #18  "Qt6Qml.dll!QQmlComponentPrivate::complete(QQmlEnginePrivate*, QQmlComponentPrivate::ConstructionState*)+0x74"
+16:22:23.585     #19  "Qt6Qml.dll!QQmlComponentPrivate::completeCreate()+0x2ae"
+16:22:23.585     #20  "Qt6Qml.dll!QQmlComponentPrivate::createWithProperties(QObject*, QMap<QString, QVariant> const&, QQmlContext*, QQmlComponentPrivate::CreateBehavior, bool)+0xc4"
+16:22:23.585     #21  "Qt6Qml.dll!QQmlComponent::create(QQmlContext*)+0x46"
+16:22:23.585     #22  "Qt6Qml.dll!QQmlApplicationEnginePrivate::finishLoad(QQmlComponent*)+0x92"
+16:22:23.585     #23  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+16:22:23.585     #24  "cutpro.exe+0x2d3d"
+16:22:23.585     #25  "cutpro.exe+0x12ef"
+16:22:23.585     #26  "cutpro.exe+0x1406"
+16:22:23.585     #27  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+16:22:23.585     #28  "ntdll.dll!RtlUserThreadStart+0x2c"
+16:22:23.629 Using Qt multimedia with FFmpeg version 7.1.3 LGPL version 2.1 or later
+16:23:39.148 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:39.148 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:40.386 monitor: source key  -> clip_e4f2cdb4abfd|C:/Users/USER/Downloads/Video/The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4|video|0|0|4652814|
+16:23:40.402 playback: session.stop decoder idle, picture at -1 ms from MonitorPanel.qml:1020 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1754
+16:23:40.402 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357e00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:40.402 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357e00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:40.624 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358600] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:40.624 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358600] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:41.846 playback: playing false -> true at playhead 0 ms [+1450 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:41.846 monitor: playing -> true at 0
+16:23:41.846 monitor: playback session at playhead 0 clip clip_e4f2cdb4abfd
+16:23:41.846 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 0 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:41.864 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:41.864 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:42.006 preview playback: first frame after 152 ms, at source 0 ms (requested 0 ms)
+16:23:42.006 playback: frame at source 0 ms, advanced 0 ms of media in -1 ms of wall clock
+16:23:42.051 playback: playhead is 0 ms AHEAD of the picture (playhead 83 ms, picture 83 ms)
+16:23:43.059 playback: playhead is 0 ms AHEAD of the picture (playhead 1083 ms, picture 1083 ms)
+16:23:43.317 playback: playing true -> false at playhead 1333 ms [+1465 ms] from MonitorPanel.qml:1854 (onClicked)
+16:23:43.317 monitor: playing -> false at 1333
+16:23:43.318 playback: session.stop decoder running, picture at 1333 ms [+0 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:23:43.950 playback: playing false -> true at playhead 1333 ms [+639 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:43.950 monitor: playing -> true at 1333
+16:23:43.950 monitor: playback session at playhead 1333 clip clip_e4f2cdb4abfd
+16:23:43.950 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 1333 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:43.973 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357880] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:43.974 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357880] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:44.050 preview playback: first frame after 91 ms, at source 1333 ms (requested 1333 ms)
+16:23:44.050 playback: frame at source 1333 ms, advanced 0 ms of media in 768 ms of wall clock
+16:23:44.058 playback: playhead is 0 ms AHEAD of the picture (playhead 1333 ms, picture 1333 ms)
+16:23:45.093 playback: playhead is 0 ms AHEAD of the picture (playhead 2416 ms, picture 2416 ms)
+16:23:45.221 playback: playing true -> false at playhead 2500 ms [+1261 ms] from MonitorPanel.qml:1854 (onClicked)
+16:23:45.222 monitor: playing -> false at 2500
+16:23:45.277 playback: session.stop decoder idle, picture at 2541 ms [+56 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:23:45.830 playback: playing false -> true at playhead 2541 ms [+558 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:45.830 monitor: playing -> true at 2541
+16:23:45.830 monitor: playback session at playhead 2541 clip clip_e4f2cdb4abfd
+16:23:45.830 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 2541 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:45.885 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357880] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:45.885 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357880] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:46.107 preview playback: first frame after 267 ms, at source 2541 ms (requested 2541 ms)
+16:23:46.107 playback: frame at source 2541 ms, advanced 0 ms of media in 908 ms of wall clock
+16:23:46.144 playback: playhead.jump 2541 -> 2666 ms (+125) [+307 ms] from MonitorPanel.qml:938 (onTriggered)
+16:23:46.145 playback: playhead is 0 ms AHEAD of the picture (playhead 2666 ms, picture 2666 ms)
+16:23:46.217 playback: playhead.jump 2666 -> 2791 ms (+125) [+73 ms] from MonitorPanel.qml:938 (onTriggered)
+16:23:47.167 playback: playhead is 0 ms AHEAD of the picture (playhead 3750 ms, picture 3750 ms)
+16:23:47.262 playback: playing true -> false at playhead 3791 ms [+1044 ms] from MonitorPanel.qml:1854 (onClicked)
+16:23:47.262 monitor: playing -> false at 3791
+16:23:47.315 playback: session.stop decoder idle, picture at 3833 ms [+54 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:23:48.235 playback: playing false -> true at playhead 3833 ms [+921 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:48.235 monitor: playing -> true at 3833
+16:23:48.235 monitor: playback session at playhead 3833 clip clip_e4f2cdb4abfd
+16:23:48.235 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 3833 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:48.253 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:48.253 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:48.379 preview playback: first frame after 140 ms, at source 3833 ms (requested 3833 ms)
+16:23:48.379 playback: frame at source 3833 ms, advanced 0 ms of media in 1149 ms of wall clock
+16:23:48.383 playback: playhead is 0 ms AHEAD of the picture (playhead 3833 ms, picture 3833 ms)
+16:23:48.433 playback: playhead.jump 3833 -> 3958 ms (+125) [+195 ms] from MonitorPanel.qml:938 (onTriggered)
+16:23:48.817 playback: playing true -> false at playhead 4333 ms [+383 ms] from MonitorPanel.qml:1854 (onClicked)
+16:23:48.817 monitor: playing -> false at 4333
+16:23:48.818 playback: session.stop decoder running, picture at 4333 ms [+1 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:23:49.595 playback: playing false -> true at playhead 4333 ms [+784 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:49.595 monitor: playing -> true at 4333
+16:23:49.595 monitor: playback session at playhead 4333 clip clip_e4f2cdb4abfd
+16:23:49.595 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 4333 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:49.653 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:49.654 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:49.846 preview playback: first frame after 241 ms, at source 4333 ms (requested 4333 ms)
+16:23:49.846 playback: frame at source 4333 ms, advanced 0 ms of media in 1069 ms of wall clock
+16:23:49.863 playback: playhead is 0 ms AHEAD of the picture (playhead 4416 ms, picture 4416 ms)
+16:23:50.867 playback: playhead is 0 ms AHEAD of the picture (playhead 5458 ms, picture 5458 ms)
+16:23:51.279 playback: playing true -> false at playhead 5875 ms [+1676 ms] from MonitorPanel.qml:1854 (onClicked)
+16:23:51.280 monitor: playing -> false at 5875
+16:23:51.281 playback: session.stop decoder running, picture at 5875 ms [+1 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:23:51.917 playback: playing false -> true at playhead 5875 ms [+636 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:51.917 monitor: playing -> true at 5875
+16:23:51.917 monitor: playback session at playhead 5875 clip clip_e4f2cdb4abfd
+16:23:51.917 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 5875 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:51.957 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:51.957 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:52.097 preview playback: first frame after 178 ms, at source 5875 ms (requested 5875 ms)
+16:23:52.098 playback: frame at source 5875 ms, advanced 0 ms of media in 852 ms of wall clock
+16:23:52.125 playback: playhead is 0 ms AHEAD of the picture (playhead 5958 ms, picture 5958 ms)
+16:23:52.682 playback: playing true -> false at playhead 6458 ms [+763 ms] from MonitorPanel.qml:1854 (onClicked)
+16:23:52.682 monitor: playing -> false at 6458
+16:23:52.718 playback: session.stop decoder idle, picture at 6541 ms [+37 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:23:53.318 playback: playing false -> true at playhead 6541 ms [+599 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:53.318 monitor: playing -> true at 6541
+16:23:53.318 monitor: playback session at playhead 6541 clip clip_e4f2cdb4abfd
+16:23:53.318 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 6541 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:53.355 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358080] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:53.355 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358080] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:53.515 preview playback: first frame after 194 ms, at source 6541 ms (requested 6541 ms)
+16:23:53.515 playback: frame at source 6541 ms, advanced 0 ms of media in 838 ms of wall clock
+16:23:53.527 playback: playhead is 0 ms AHEAD of the picture (playhead 6583 ms, picture 6583 ms)
+16:23:53.575 playback: playhead.jump 6583 -> 6708 ms (+125) [+256 ms] from MonitorPanel.qml:938 (onTriggered)
+16:23:53.711 playback: playing true -> false at playhead 6791 ms [+136 ms] from MonitorPanel.qml:1854 (onClicked)
+16:23:53.711 monitor: playing -> false at 6791
+16:23:53.748 playback: session.stop decoder idle, picture at 6833 ms [+37 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:23:54.123 playback: playing false -> true at playhead 6833 ms [+379 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:54.123 monitor: playing -> true at 6833
+16:23:54.123 monitor: playback session at playhead 6833 clip clip_e4f2cdb4abfd
+16:23:54.123 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 6833 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:54.172 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243575c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:54.172 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243575c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:54.289 playback: playing true -> false at playhead 6833 ms [+159 ms] from MonitorPanel.qml:1854 (onClicked)
+16:23:54.290 monitor: playing -> false at 6833
+16:23:54.290 playback: session.stop decoder running, picture at -1 ms [+0 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:23:54.842 playback: playing false -> true at playhead 6833 ms [+557 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:54.842 monitor: playing -> true at 6833
+16:23:54.842 monitor: playback session at playhead 6833 clip clip_e4f2cdb4abfd
+16:23:54.842 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 6833 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:54.878 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:54.879 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:55.033 preview playback: first frame after 183 ms, at source 6833 ms (requested 6833 ms)
+16:23:55.033 playback: frame at source 6833 ms, advanced 0 ms of media in 1337 ms of wall clock
+16:23:55.042 playback: playhead is 0 ms AHEAD of the picture (playhead 6875 ms, picture 6875 ms)
+16:23:55.576 playback: playing true -> false at playhead 7416 ms [+729 ms] from MonitorPanel.qml:1854 (onClicked)
+16:23:55.576 monitor: playing -> false at 7416
+16:23:55.621 playback: session.stop decoder idle, picture at 7458 ms [+43 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:23:55.937 playback: playing false -> true at playhead 7458 ms [+318 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:55.937 monitor: playing -> true at 7458
+16:23:55.937 monitor: playback session at playhead 7458 clip clip_e4f2cdb4abfd
+16:23:55.937 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 7458 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:55.986 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357880] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:55.987 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357880] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:56.141 preview playback: first frame after 199 ms, at source 7458 ms (requested 7458 ms)
+16:23:56.141 playback: frame at source 7458 ms, advanced 0 ms of media in 592 ms of wall clock
+16:23:56.206 playback: playhead.jump 7458 -> 7625 ms (+167) [+266 ms] from MonitorPanel.qml:938 (onTriggered)
+16:23:56.208 playback: playhead is 0 ms AHEAD of the picture (playhead 7625 ms, picture 7625 ms)
+16:23:56.395 playback: playing true -> false at playhead 7750 ms [+189 ms] from MonitorPanel.qml:1854 (onClicked)
+16:23:56.395 monitor: playing -> false at 7750
+16:23:56.466 playback: session.stop decoder idle, picture at 7791 ms [+70 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:23:56.879 playback: playing false -> true at playhead 7791 ms [+414 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:56.879 monitor: playing -> true at 7791
+16:23:56.879 monitor: playback session at playhead 7791 clip clip_e4f2cdb4abfd
+16:23:56.879 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 7791 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:56.923 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:56.923 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:57.083 preview playback: first frame after 200 ms, at source 7791 ms (requested 7791 ms)
+16:23:57.083 playback: frame at source 7791 ms, advanced 0 ms of media in 718 ms of wall clock
+16:23:57.144 playback: playhead.jump 7833 -> 7958 ms (+125) [+263 ms] from MonitorPanel.qml:938 (onTriggered)
+16:23:57.242 playback: playhead is 0 ms AHEAD of the picture (playhead 8041 ms, picture 8041 ms)
+16:23:57.581 playback: playing true -> false at playhead 8333 ms [+436 ms] from MonitorPanel.qml:1854 (onClicked)
+16:23:57.581 monitor: playing -> false at 8333
+16:23:57.628 playback: session.stop decoder idle, picture at 8375 ms [+46 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:23:58.201 playback: playing false -> true at playhead 8375 ms [+577 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:58.201 monitor: playing -> true at 8375
+16:23:58.201 monitor: playback session at playhead 8375 clip clip_e4f2cdb4abfd
+16:23:58.201 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 8375 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:58.247 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:58.247 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:23:58.423 preview playback: first frame after 215 ms, at source 8375 ms (requested 8375 ms)
+16:23:58.423 playback: frame at source 8375 ms, advanced 0 ms of media in 864 ms of wall clock
+16:23:58.458 playback: playhead.jump 8375 -> 8500 ms (+125) [+252 ms] from MonitorPanel.qml:938 (onTriggered)
+16:23:58.459 playback: playhead is 0 ms AHEAD of the picture (playhead 8500 ms, picture 8500 ms)
+16:23:58.936 playback: playing true -> false at playhead 8958 ms [+478 ms] from MonitorPanel.qml:1854 (onClicked)
+16:23:58.937 monitor: playing -> false at 8958
+16:23:58.983 playback: session.stop decoder idle, picture at 9000 ms [+47 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:23:59.856 playback: playing false -> true at playhead 9000 ms [+880 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:59.856 monitor: playing -> true at 9000
+16:23:59.856 monitor: playback session at playhead 9000 clip clip_e4f2cdb4abfd
+16:23:59.856 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 9000 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:23:59.899 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357b40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:23:59.900 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357b40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:24:00.089 preview playback: first frame after 223 ms, at source 9000 ms (requested 9000 ms)
+16:24:00.089 playback: frame at source 9000 ms, advanced 0 ms of media in 1164 ms of wall clock
+16:24:00.126 playback: playhead.jump 9000 -> 9166 ms (+166) [+262 ms] from MonitorPanel.qml:938 (onTriggered)
+16:24:00.128 playback: playhead is 0 ms AHEAD of the picture (playhead 9166 ms, picture 9166 ms)
+16:24:00.384 playback: playing true -> false at playhead 9375 ms [+258 ms] from MonitorPanel.qml:1854 (onClicked)
+16:24:00.384 monitor: playing -> false at 9375
+16:24:00.413 playback: session.stop decoder idle, picture at 9416 ms [+28 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:24:01.275 playback: playing false -> true at playhead 9416 ms [+862 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:01.275 monitor: playing -> true at 9416
+16:24:01.275 monitor: playback session at playhead 9416 clip clip_e4f2cdb4abfd
+16:24:01.275 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 9416 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:01.319 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358b40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:24:01.319 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358b40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:24:01.512 preview playback: first frame after 234 ms, at source 9416 ms (requested 9416 ms)
+16:24:01.512 playback: frame at source 9416 ms, advanced 0 ms of media in 1140 ms of wall clock
+16:24:01.535 playback: playhead is 0 ms AHEAD of the picture (playhead 9500 ms, picture 9500 ms)
+16:24:02.540 playback: playhead is 0 ms AHEAD of the picture (playhead 10541 ms, picture 10541 ms)
+16:24:03.546 playback: playhead is 0 ms AHEAD of the picture (playhead 11583 ms, picture 11583 ms)
+16:24:04.553 playback: playhead is 0 ms AHEAD of the picture (playhead 12583 ms, picture 12583 ms)
+16:24:05.561 playback: playhead is 0 ms AHEAD of the picture (playhead 13583 ms, picture 13583 ms)
+16:24:06.568 playback: playhead is 0 ms AHEAD of the picture (playhead 14583 ms, picture 14583 ms)
+16:24:07.571 playback: playhead is 1 ms AHEAD of the picture (playhead 15584 ms, picture 15583 ms)
+16:24:08.583 playback: playhead is 0 ms AHEAD of the picture (playhead 16583 ms, picture 16583 ms)
+16:24:09.584 playback: playhead is 0 ms AHEAD of the picture (playhead 17583 ms, picture 17583 ms)
+16:24:10.602 playback: playhead is 0 ms AHEAD of the picture (playhead 18625 ms, picture 18625 ms)
+16:24:11.607 playback: playhead is 0 ms AHEAD of the picture (playhead 19625 ms, picture 19625 ms)
+16:24:12.618 playback: playhead is 0 ms AHEAD of the picture (playhead 20625 ms, picture 20625 ms)
+16:24:13.644 playback: playhead is 0 ms AHEAD of the picture (playhead 21666 ms, picture 21666 ms)
+16:24:14.679 playback: playhead is 0 ms AHEAD of the picture (playhead 22708 ms, picture 22708 ms)
+16:24:15.705 playback: playhead is 0 ms AHEAD of the picture (playhead 23708 ms, picture 23708 ms)
+16:24:16.102 playback: playhead.jump 24000 -> 24125 ms (+125) [+14825 ms] from MonitorPanel.qml:938 (onTriggered)
+16:24:16.742 playback: playhead is 0 ms AHEAD of the picture (playhead 24750 ms, picture 24750 ms)
+16:24:17.752 playback: playhead is 1 ms AHEAD of the picture (playhead 25792 ms, picture 25791 ms)
+16:24:18.770 playback: playhead is 0 ms AHEAD of the picture (playhead 26791 ms, picture 26791 ms)
+16:24:19.783 playback: playhead is 0 ms AHEAD of the picture (playhead 27791 ms, picture 27791 ms)
+16:24:20.803 playback: playhead is 0 ms AHEAD of the picture (playhead 28833 ms, picture 28833 ms)
+16:24:21.806 playback: playhead is 0 ms AHEAD of the picture (playhead 29833 ms, picture 29833 ms)
+16:24:22.591 playback: playhead.jump 30500 -> 30625 ms (+125) [+6489 ms] from MonitorPanel.qml:938 (onTriggered)
+16:24:22.833 playback: playhead is 0 ms AHEAD of the picture (playhead 30833 ms, picture 30833 ms)
+16:24:23.835 playback: playhead is 0 ms AHEAD of the picture (playhead 31833 ms, picture 31833 ms)
+16:24:24.856 playback: playhead is 0 ms AHEAD of the picture (playhead 32875 ms, picture 32875 ms)
+16:24:25.876 playback: playhead is 0 ms AHEAD of the picture (playhead 33875 ms, picture 33875 ms)
+16:24:26.927 playback: playhead is 0 ms AHEAD of the picture (playhead 34958 ms, picture 34958 ms)
+16:24:27.934 playback: playhead is 0 ms AHEAD of the picture (playhead 35958 ms, picture 35958 ms)
+16:24:28.671 playback: playing true -> false at playhead 36666 ms [+6079 ms] from MonitorPanel.qml:1854 (onClicked)
+16:24:28.671 monitor: playing -> false at 36666
+16:24:28.721 playback: session.stop decoder idle, picture at 36708 ms [+50 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:24:29.190 playback: playing false -> true at playhead 36708 ms [+469 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:29.190 monitor: playing -> true at 36708
+16:24:29.190 monitor: playback session at playhead 36708 clip clip_e4f2cdb4abfd
+16:24:29.190 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 36708 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:29.219 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243575c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:24:29.219 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243575c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:24:29.437 preview playback: first frame after 243 ms, at source 36708 ms (requested 36708 ms)
+16:24:29.437 playback: frame at source 36708 ms, advanced 0 ms of media in 771 ms of wall clock
+16:24:29.441 playback: playhead is 0 ms AHEAD of the picture (playhead 36708 ms, picture 36708 ms)
+16:24:29.490 playback: playhead.jump 36708 -> 36916 ms (+208) [+299 ms] from MonitorPanel.qml:938 (onTriggered)
+16:24:30.067 playback: playing true -> false at playhead 37458 ms [+576 ms] from MonitorPanel.qml:1854 (onClicked)
+16:24:30.067 monitor: playing -> false at 37458
+16:24:30.110 playback: session.stop decoder idle, picture at 37500 ms [+43 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:24:30.534 playback: playing false -> true at playhead 37500 ms [+427 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:30.534 monitor: playing -> true at 37500
+16:24:30.534 monitor: playback session at playhead 37500 clip clip_e4f2cdb4abfd
+16:24:30.534 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 37500 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:30.593 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:24:30.593 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:24:30.702 preview playback: first frame after 162 ms, at source 37500 ms (requested 37500 ms)
+16:24:30.703 playback: frame at source 37500 ms, advanced 0 ms of media in 650 ms of wall clock
+16:24:30.750 playback: playhead is 0 ms AHEAD of the picture (playhead 37583 ms, picture 37583 ms)
+16:24:31.486 playback: playing true -> false at playhead 38291 ms [+947 ms] from MonitorPanel.qml:1854 (onClicked)
+16:24:31.486 monitor: playing -> false at 38291
+16:24:31.527 playback: session.stop decoder idle, picture at 38333 ms [+41 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:24:31.985 playback: playing false -> true at playhead 38333 ms [+459 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:31.985 monitor: playing -> true at 38333
+16:24:31.985 monitor: playback session at playhead 38333 clip clip_e4f2cdb4abfd
+16:24:31.985 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 38333 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:32.036 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:24:32.037 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:24:32.179 preview playback: first frame after 188 ms, at source 38333 ms (requested 38333 ms)
+16:24:32.180 playback: frame at source 38333 ms, advanced 0 ms of media in 712 ms of wall clock
+16:24:32.213 playback: playhead.jump 38333 -> 38458 ms (+125) [+225 ms] from MonitorPanel.qml:938 (onTriggered)
+16:24:32.215 playback: playhead is 0 ms AHEAD of the picture (playhead 38458 ms, picture 38458 ms)
+16:24:32.782 playback: playing true -> false at playhead 39000 ms [+569 ms] from MonitorPanel.qml:1854 (onClicked)
+16:24:32.784 monitor: playing -> false at 39000
+16:24:32.784 playback: session.stop decoder running, picture at 39000 ms [+0 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:24:33.371 playback: playing false -> true at playhead 39000 ms [+597 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:33.371 monitor: playing -> true at 39000
+16:24:33.371 monitor: playback session at playhead 39000 clip clip_e4f2cdb4abfd
+16:24:33.371 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 39000 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:33.428 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:24:33.430 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:24:33.654 preview playback: first frame after 269 ms, at source 39000 ms (requested 39000 ms)
+16:24:33.654 playback: frame at source 39000 ms, advanced 0 ms of media in 903 ms of wall clock
+16:24:33.700 playback: playhead.jump 39000 -> 39166 ms (+166) [+318 ms] from MonitorPanel.qml:938 (onTriggered)
+16:24:33.702 playback: playhead is 0 ms AHEAD of the picture (playhead 39166 ms, picture 39166 ms)
+16:24:34.320 playback: playing true -> false at playhead 39750 ms [+619 ms] from MonitorPanel.qml:1854 (onClicked)
+16:24:34.320 monitor: playing -> false at 39750
+16:24:34.361 playback: session.stop decoder idle, picture at 39791 ms [+41 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:24:34.886 playback: playing false -> true at playhead 39791 ms [+525 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:34.886 monitor: playing -> true at 39791
+16:24:34.886 monitor: playback session at playhead 39791 clip clip_e4f2cdb4abfd
+16:24:34.888 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 39791 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:34.962 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243575c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:24:34.963 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243575c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:24:35.157 preview playback: first frame after 263 ms, at source 39791 ms (requested 39791 ms)
+16:24:35.157 playback: frame at source 39791 ms, advanced 0 ms of media in 870 ms of wall clock
+16:24:35.167 playback: playhead is 0 ms AHEAD of the picture (playhead 39833 ms, picture 39833 ms)
+16:24:35.215 playback: playhead.jump 39833 -> 39958 ms (+125) [+327 ms] from MonitorPanel.qml:938 (onTriggered)
+16:24:35.304 playback: playing true -> false at playhead 40000 ms [+88 ms] from MonitorPanel.qml:1854 (onClicked)
+16:24:35.304 monitor: playing -> false at 40000
+16:24:35.369 playback: session.stop decoder idle, picture at 40041 ms [+64 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:24:38.217 playback: playing false -> true at playhead 4923 ms [+2857 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:38.217 monitor: playing -> true at 4923
+16:24:38.217 monitor: playback session at playhead 4923 clip clip_e4f2cdb4abfd
+16:24:38.217 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 4923 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:38.275 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243575c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:24:38.276 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243575c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:24:38.412 preview playback: first frame after 182 ms, at source 4958 ms (requested 4923 ms)
+16:24:38.412 playback: frame at source 4958 ms, advanced -35083 ms of media in 3141 ms of wall clock
+16:24:38.447 playback: playhead is 0 ms AHEAD of the picture (playhead 5041 ms, picture 5041 ms)
+16:24:39.451 playback: playhead is 0 ms AHEAD of the picture (playhead 6041 ms, picture 6041 ms)
+16:24:39.495 playback: playing true -> false at playhead 6041 ms [+1267 ms] from TimelinePanel.qml:171 (beginPlayheadScrub) <- TimelinePanel.qml:1396
+16:24:39.495 monitor: playing -> false at 6041
+16:24:39.560 playback: session.stop decoder idle, picture at 6083 ms [+66 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- TimelinePanel.qml:171 (beginPlayheadScrub) <- TimelinePanel.qml:1396
+16:24:39.849 playback: playing false -> true at playhead 8862 ms [+289 ms] from TimelinePanel.qml:185
+16:24:39.850 monitor: playing -> true at 8862
+16:24:39.850 monitor: playback session at playhead 8862 clip clip_e4f2cdb4abfd
+16:24:39.850 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 8862 ms, kind video [+1 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- TimelinePanel.qml:185
+16:24:39.902 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:24:39.902 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:24:40.098 preview playback: first frame after 244 ms, at source 8875 ms (requested 8862 ms)
+16:24:40.098 playback: frame at source 8875 ms, advanced 2792 ms of media in 638 ms of wall clock
+16:24:40.167 playback: playhead.jump 8958 -> 9083 ms (+125) [+316 ms] from MonitorPanel.qml:938 (onTriggered)
+16:24:40.490 playback: playhead is 0 ms AHEAD of the picture (playhead 9416 ms, picture 9416 ms)
+16:24:40.664 playback: playing true -> false at playhead 9541 ms [+496 ms] from MonitorPanel.qml:1854 (onClicked)
+16:24:40.664 monitor: playing -> false at 9541
+16:24:40.727 playback: session.stop decoder idle, picture at 9583 ms [+62 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:24:43.901 playback: playing false -> true at playhead 985 ms [+3174 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:43.901 monitor: playing -> true at 985
+16:24:43.901 monitor: playback session at playhead 985 clip clip_e4f2cdb4abfd
+16:24:43.901 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 985 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:43.963 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:24:43.965 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:24:44.144 preview playback: first frame after 240 ms, at source 1000 ms (requested 985 ms)
+16:24:44.144 playback: frame at source 1000 ms, advanced -8583 ms of media in 3499 ms of wall clock
+16:24:44.159 playback: playhead is 0 ms AHEAD of the picture (playhead 1041 ms, picture 1041 ms)
+16:24:44.224 playback: playhead.jump 1041 -> 1166 ms (+125) [+321 ms] from MonitorPanel.qml:938 (onTriggered)
+16:24:45.210 playback: playhead is 0 ms AHEAD of the picture (playhead 2166 ms, picture 2166 ms)
+16:24:45.248 playback: playing true -> false at playhead 2166 ms [+1023 ms] from MonitorPanel.qml:1854 (onClicked)
+16:24:45.248 monitor: playing -> false at 2166
+16:24:45.294 playback: session.stop decoder idle, picture at 2208 ms [+48 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:24:45.968 playback: playing false -> true at playhead 2208 ms [+673 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:45.968 monitor: playing -> true at 2208
+16:24:45.968 monitor: playback session at playhead 2208 clip clip_e4f2cdb4abfd
+16:24:45.968 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 2208 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:46.027 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:24:46.028 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:24:46.249 preview playback: first frame after 278 ms, at source 2208 ms (requested 2208 ms)
+16:24:46.249 playback: frame at source 2208 ms, advanced 0 ms of media in 1013 ms of wall clock
+16:24:46.259 playback: playhead is 0 ms AHEAD of the picture (playhead 2250 ms, picture 2250 ms)
+16:24:46.307 playback: playhead.jump 2250 -> 2416 ms (+166) [+338 ms] from MonitorPanel.qml:938 (onTriggered)
+16:24:46.953 playback: playing true -> false at playhead 3000 ms [+645 ms] from MonitorPanel.qml:1854 (onClicked)
+16:24:46.953 monitor: playing -> false at 3000
+16:24:47.023 playback: session.stop decoder idle, picture at 3041 ms [+69 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:24:55.051 playback: playing false -> true at playhead 3041 ms [+8030 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:55.051 monitor: playing -> true at 3041
+16:24:55.051 monitor: playback session at playhead 3041 clip clip_e4f2cdb4abfd
+16:24:55.051 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 3041 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:55.105 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:24:55.106 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:24:55.354 preview playback: first frame after 299 ms, at source 3041 ms (requested 3041 ms)
+16:24:55.354 playback: frame at source 3041 ms, advanced 0 ms of media in 8432 ms of wall clock
+16:24:55.370 playback: playhead is 0 ms AHEAD of the picture (playhead 3083 ms, picture 3083 ms)
+16:24:55.427 playback: playhead.jump 3083 -> 3291 ms (+208) [+373 ms] from MonitorPanel.qml:938 (onTriggered)
+16:24:56.409 playback: playhead is 0 ms AHEAD of the picture (playhead 4250 ms, picture 4250 ms)
+16:24:57.457 playback: playhead is 0 ms AHEAD of the picture (playhead 5291 ms, picture 5291 ms)
+16:24:57.920 playback: playing true -> false at playhead 5750 ms [+2493 ms] from MonitorPanel.qml:1854 (onClicked)
+16:24:57.920 monitor: playing -> false at 5750
+16:24:57.921 playback: session.stop decoder running, picture at 5750 ms [+0 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:24:58.399 playback: playing false -> true at playhead 5750 ms [+481 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:58.399 monitor: playing -> true at 5750
+16:24:58.399 monitor: playback session at playhead 5750 clip clip_e4f2cdb4abfd
+16:24:58.399 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 5750 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:24:58.452 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:24:58.453 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:24:58.617 preview playback: first frame after 212 ms, at source 5750 ms (requested 5750 ms)
+16:24:58.617 playback: frame at source 5750 ms, advanced 0 ms of media in 737 ms of wall clock
+16:24:58.656 playback: playhead.jump 5750 -> 5875 ms (+125) [+254 ms] from MonitorPanel.qml:938 (onTriggered)
+16:24:58.658 playback: playhead is 0 ms AHEAD of the picture (playhead 5875 ms, picture 5875 ms)
+16:24:59.668 playback: playhead is 0 ms AHEAD of the picture (playhead 6875 ms, picture 6875 ms)
+16:25:00.668 playback: playhead is 0 ms AHEAD of the picture (playhead 7875 ms, picture 7875 ms)
+16:25:01.058 playback: playing true -> false at playhead 8208 ms [+2401 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:01.058 monitor: playing -> false at 8208
+16:25:01.118 playback: session.stop decoder idle, picture at 8250 ms [+59 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:01.633 playback: playing false -> true at playhead 8250 ms [+515 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:01.633 monitor: playing -> true at 8250
+16:25:01.633 monitor: playback session at playhead 8250 clip clip_e4f2cdb4abfd
+16:25:01.633 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 8250 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:01.689 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358080] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:01.691 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358080] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:01.928 preview playback: first frame after 290 ms, at source 8250 ms (requested 8250 ms)
+16:25:01.928 playback: frame at source 8250 ms, advanced 0 ms of media in 901 ms of wall clock
+16:25:01.950 playback: playhead.jump 8250 -> 8375 ms (+125) [+315 ms] from MonitorPanel.qml:938 (onTriggered)
+16:25:01.951 playback: playhead is 0 ms AHEAD of the picture (playhead 8375 ms, picture 8375 ms)
+16:25:02.384 playback: playing true -> false at playhead 8833 ms [+434 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:02.384 monitor: playing -> false at 8833
+16:25:02.442 playback: session.stop decoder idle, picture at 8875 ms [+58 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:03.209 playback: playing false -> true at playhead 8875 ms [+766 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:03.209 monitor: playing -> true at 8875
+16:25:03.209 monitor: playback session at playhead 8875 clip clip_e4f2cdb4abfd
+16:25:03.209 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 8875 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:03.249 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358b40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:03.250 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358b40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:03.470 preview playback: first frame after 257 ms, at source 8875 ms (requested 8875 ms)
+16:25:03.470 playback: frame at source 8875 ms, advanced 0 ms of media in 1090 ms of wall clock
+16:25:03.484 playback: playhead is 0 ms AHEAD of the picture (playhead 8916 ms, picture 8916 ms)
+16:25:03.532 playback: playhead.jump 8916 -> 9084 ms (+168) [+321 ms] from MonitorPanel.qml:938 (onTriggered)
+16:25:04.051 playback: playing true -> false at playhead 9583 ms [+519 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:04.052 monitor: playing -> false at 9583
+16:25:04.112 playback: session.stop decoder idle, picture at 9625 ms [+61 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:04.975 playback: playing false -> true at playhead 9625 ms [+861 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:04.975 monitor: playing -> true at 9625
+16:25:04.975 monitor: playback session at playhead 9625 clip clip_e4f2cdb4abfd
+16:25:04.975 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 9625 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:05.029 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243575c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:05.031 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243575c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:05.286 preview playback: first frame after 307 ms, at source 9625 ms (requested 9625 ms)
+16:25:05.286 playback: frame at source 9625 ms, advanced 0 ms of media in 1234 ms of wall clock
+16:25:05.291 playback: playhead is 1 ms AHEAD of the picture (playhead 9626 ms, picture 9625 ms)
+16:25:05.340 playback: playhead.jump 9626 -> 9833 ms (+207) [+365 ms] from MonitorPanel.qml:938 (onTriggered)
+16:25:05.767 playback: playing true -> false at playhead 10250 ms [+427 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:05.768 monitor: playing -> false at 10250
+16:25:05.837 playback: session.stop decoder idle, picture at 10291 ms [+69 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:06.552 playback: playing false -> true at playhead 10291 ms [+716 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:06.552 monitor: playing -> true at 10291
+16:25:06.552 monitor: playback session at playhead 10291 clip clip_e4f2cdb4abfd
+16:25:06.552 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 10291 ms, kind video [+1 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:06.611 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357b40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:06.612 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357b40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:06.900 preview playback: first frame after 342 ms, at source 10291 ms (requested 10291 ms)
+16:25:06.900 playback: frame at source 10291 ms, advanced 0 ms of media in 1139 ms of wall clock
+16:25:06.921 playback: playhead is 0 ms AHEAD of the picture (playhead 10333 ms, picture 10333 ms)
+16:25:06.965 playback: playhead.jump 10333 -> 10541 ms (+208) [+411 ms] from MonitorPanel.qml:938 (onTriggered)
+16:25:07.926 playback: playhead is 0 ms AHEAD of the picture (playhead 11541 ms, picture 11541 ms)
+16:25:08.138 playback: playing true -> false at playhead 11708 ms [+1172 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:08.138 monitor: playing -> false at 11708
+16:25:08.222 playback: session.stop decoder idle, picture at 11750 ms [+83 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:08.757 playback: playing false -> true at playhead 11750 ms [+540 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:08.757 monitor: playing -> true at 11750
+16:25:08.757 monitor: playback session at playhead 11750 clip clip_e4f2cdb4abfd
+16:25:08.757 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 11750 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:08.800 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:08.801 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:08.972 preview playback: first frame after 205 ms, at source 11750 ms (requested 11750 ms)
+16:25:08.972 playback: frame at source 11750 ms, advanced 0 ms of media in 843 ms of wall clock
+16:25:08.994 playback: playhead is 0 ms AHEAD of the picture (playhead 11833 ms, picture 11833 ms)
+16:25:09.294 playback: playing true -> false at playhead 12166 ms [+530 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:09.294 monitor: playing -> false at 12166
+16:25:09.294 playback: session.stop decoder running, picture at 12166 ms [+0 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:10.010 playback: playing false -> true at playhead 12166 ms [+717 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:10.010 monitor: playing -> true at 12166
+16:25:10.010 monitor: playback session at playhead 12166 clip clip_e4f2cdb4abfd
+16:25:10.010 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 12166 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:10.064 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:10.066 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:10.240 preview playback: first frame after 225 ms, at source 12166 ms (requested 12166 ms)
+16:25:10.240 playback: frame at source 12166 ms, advanced 0 ms of media in 964 ms of wall clock
+16:25:10.260 playback: playhead is 0 ms AHEAD of the picture (playhead 12250 ms, picture 12250 ms)
+16:25:10.757 playback: playing true -> false at playhead 12708 ms [+744 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:10.757 monitor: playing -> false at 12708
+16:25:10.819 playback: session.stop decoder idle, picture at 12791 ms [+62 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:11.541 playback: playing false -> true at playhead 12791 ms [+725 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:11.541 monitor: playing -> true at 12791
+16:25:11.541 monitor: playback session at playhead 12791 clip clip_e4f2cdb4abfd
+16:25:11.541 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 12791 ms, kind video [+1 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:11.611 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:11.612 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:11.801 preview playback: first frame after 252 ms, at source 12791 ms (requested 12791 ms)
+16:25:11.801 playback: frame at source 12791 ms, advanced 0 ms of media in 1045 ms of wall clock
+16:25:11.808 playback: playhead is 1 ms AHEAD of the picture (playhead 12792 ms, picture 12791 ms)
+16:25:11.857 playback: playhead.jump 12792 -> 12958 ms (+166) [+310 ms] from MonitorPanel.qml:938 (onTriggered)
+16:25:12.526 playback: playing true -> false at playhead 13625 ms [+670 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:12.527 monitor: playing -> false at 13625
+16:25:12.527 playback: session.stop decoder running, picture at 13625 ms [+0 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:13.298 playback: playing false -> true at playhead 13625 ms [+772 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:13.298 monitor: playing -> true at 13625
+16:25:13.298 monitor: playback session at playhead 13625 clip clip_e4f2cdb4abfd
+16:25:13.298 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 13625 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:13.359 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358080] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:13.359 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358080] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:13.575 preview playback: first frame after 271 ms, at source 13625 ms (requested 13625 ms)
+16:25:13.575 playback: frame at source 13625 ms, advanced 0 ms of media in 1065 ms of wall clock
+16:25:13.615 playback: playhead.jump 13625 -> 13791 ms (+166) [+314 ms] from MonitorPanel.qml:938 (onTriggered)
+16:25:13.616 playback: playhead is 0 ms AHEAD of the picture (playhead 13791 ms, picture 13791 ms)
+16:25:14.222 playback: playing true -> false at playhead 14334 ms [+607 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:14.223 monitor: playing -> false at 14334
+16:25:14.271 playback: session.stop decoder idle, picture at 14416 ms [+49 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:15.200 playback: playing false -> true at playhead 14416 ms [+932 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:15.200 monitor: playing -> true at 14416
+16:25:15.200 monitor: playback session at playhead 14416 clip clip_e4f2cdb4abfd
+16:25:15.200 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 14416 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:15.255 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:15.255 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:15.464 preview playback: first frame after 257 ms, at source 14416 ms (requested 14416 ms)
+16:25:15.464 playback: frame at source 14416 ms, advanced 0 ms of media in 1245 ms of wall clock
+16:25:15.465 playback: playhead is 0 ms AHEAD of the picture (playhead 14416 ms, picture 14416 ms)
+16:25:15.515 playback: playhead.jump 14416 -> 14583 ms (+167) [+310 ms] from MonitorPanel.qml:938 (onTriggered)
+16:25:16.509 playback: playhead is 0 ms AHEAD of the picture (playhead 15583 ms, picture 15583 ms)
+16:25:17.088 playback: playing true -> false at playhead 16166 ms [+1572 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:17.088 monitor: playing -> false at 16166
+16:25:17.088 playback: session.stop decoder running, picture at 16166 ms [+0 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:17.801 playback: playing false -> true at playhead 16166 ms [+713 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:17.801 monitor: playing -> true at 16166
+16:25:17.801 monitor: playback session at playhead 16166 clip clip_e4f2cdb4abfd
+16:25:17.801 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 16166 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:17.861 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357b40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:17.862 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357b40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:18.138 preview playback: first frame after 333 ms, at source 16166 ms (requested 16166 ms)
+16:25:18.138 playback: frame at source 16166 ms, advanced 0 ms of media in 1078 ms of wall clock
+16:25:18.166 playback: playhead is 0 ms AHEAD of the picture (playhead 16250 ms, picture 16250 ms)
+16:25:18.239 playback: playhead.jump 16250 -> 16458 ms (+208) [+436 ms] from MonitorPanel.qml:938 (onTriggered)
+16:25:19.201 playback: playhead is 0 ms AHEAD of the picture (playhead 17416 ms, picture 17416 ms)
+16:25:19.931 playback: playing true -> false at playhead 18125 ms [+1692 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:19.932 monitor: playing -> false at 18125
+16:25:19.983 playback: session.stop decoder idle, picture at 18166 ms [+51 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:21.348 playback: playing false -> true at playhead 18166 ms [+1366 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:21.348 monitor: playing -> true at 18166
+16:25:21.348 monitor: playback session at playhead 18166 clip clip_e4f2cdb4abfd
+16:25:21.348 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 18166 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:21.380 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243575c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:21.381 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243575c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:21.501 preview playback: first frame after 149 ms, at source 18166 ms (requested 18166 ms)
+16:25:21.501 playback: frame at source 18166 ms, advanced 0 ms of media in 1575 ms of wall clock
+16:25:21.506 playback: playhead is 0 ms AHEAD of the picture (playhead 18166 ms, picture 18166 ms)
+16:25:21.556 playback: playhead.jump 18166 -> 18291 ms (+125) [+205 ms] from MonitorPanel.qml:938 (onTriggered)
+16:25:22.515 playback: playhead is 0 ms AHEAD of the picture (playhead 19250 ms, picture 19250 ms)
+16:25:23.150 playback: playing true -> false at playhead 19833 ms [+1594 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:23.150 monitor: playing -> false at 19833
+16:25:23.204 playback: session.stop decoder idle, picture at 19875 ms [+55 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:23.743 playback: playing false -> true at playhead 19875 ms [+537 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:23.743 monitor: playing -> true at 19875
+16:25:23.743 monitor: playback session at playhead 19875 clip clip_e4f2cdb4abfd
+16:25:23.743 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 19875 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:23.766 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:23.766 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358e00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:23.924 preview playback: first frame after 178 ms, at source 19875 ms (requested 19875 ms)
+16:25:23.924 playback: frame at source 19875 ms, advanced 0 ms of media in 794 ms of wall clock
+16:25:23.950 playback: playhead is 0 ms AHEAD of the picture (playhead 19958 ms, picture 19958 ms)
+16:25:24.000 playback: playhead.jump 19958 -> 20083 ms (+125) [+255 ms] from MonitorPanel.qml:938 (onTriggered)
+16:25:24.383 playback: playing true -> false at playhead 20416 ms [+384 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:24.383 monitor: playing -> false at 20416
+16:25:24.415 playback: session.stop decoder idle, picture at 20458 ms [+30 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:24.945 playback: playing false -> true at playhead 20458 ms [+533 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:24.945 monitor: playing -> true at 20458
+16:25:24.945 monitor: playback session at playhead 20458 clip clip_e4f2cdb4abfd
+16:25:24.945 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 20458 ms, kind video [+1 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:25.010 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:25.011 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:25.243 preview playback: first frame after 290 ms, at source 20458 ms (requested 20458 ms)
+16:25:25.243 playback: frame at source 20458 ms, advanced 0 ms of media in 872 ms of wall clock
+16:25:25.266 playback: playhead is 0 ms AHEAD of the picture (playhead 20541 ms, picture 20541 ms)
+16:25:25.314 playback: playhead.jump 20541 -> 20666 ms (+125) [+364 ms] from MonitorPanel.qml:938 (onTriggered)
+16:25:26.327 playback: playhead.jump 21541 -> 21666 ms (+125) [+1012 ms] from MonitorPanel.qml:938 (onTriggered)
+16:25:26.332 playback: playhead is 0 ms AHEAD of the picture (playhead 21666 ms, picture 21666 ms)
+16:25:27.374 playback: playhead is 0 ms AHEAD of the picture (playhead 22708 ms, picture 22708 ms)
+16:25:28.421 playback: playhead is 0 ms AHEAD of the picture (playhead 23791 ms, picture 23791 ms)
+16:25:29.440 playback: playhead is 0 ms AHEAD of the picture (playhead 24791 ms, picture 24791 ms)
+16:25:30.440 playback: playhead is 0 ms AHEAD of the picture (playhead 25791 ms, picture 25791 ms)
+16:25:31.443 playback: playhead is 0 ms AHEAD of the picture (playhead 26791 ms, picture 26791 ms)
+16:25:32.483 playback: playhead is 0 ms AHEAD of the picture (playhead 27833 ms, picture 27833 ms)
+16:25:33.508 playback: playhead is 0 ms AHEAD of the picture (playhead 28875 ms, picture 28875 ms)
+16:25:34.192 playback: playing true -> false at playhead 29500 ms [+7864 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:34.192 monitor: playing -> false at 29500
+16:25:34.235 playback: session.stop decoder idle, picture at 29541 ms [+44 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:34.836 playback: playing false -> true at playhead 29541 ms [+609 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:34.836 monitor: playing -> true at 29541
+16:25:34.836 monitor: playback session at playhead 29541 clip clip_e4f2cdb4abfd
+16:25:34.836 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 29541 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:34.888 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357880] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:34.889 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424357880] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:35.034 preview playback: first frame after 186 ms, at source 29541 ms (requested 29541 ms)
+16:25:35.034 playback: frame at source 29541 ms, advanced 0 ms of media in 870 ms of wall clock
+16:25:35.059 playback: playhead is 0 ms AHEAD of the picture (playhead 29625 ms, picture 29625 ms)
+16:25:35.423 playback: playing true -> false at playhead 30000 ms [+577 ms] from MonitorPanel.qml:1854 (onClicked)
+16:25:35.424 monitor: playing -> false at 30000
+16:25:35.462 playback: session.stop decoder idle, picture at 30041 ms [+39 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:25:47.097 playback: playing false -> true at playhead 30041 ms [+11636 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:47.097 monitor: playing -> true at 30041
+16:25:47.097 monitor: playback session at playhead 30041 clip clip_e4f2cdb4abfd
+16:25:47.097 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 30041 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:25:47.138 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358b40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:25:47.139 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358b40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:25:47.296 preview playback: first frame after 192 ms, at source 30041 ms (requested 30041 ms)
+16:25:47.296 playback: frame at source 30041 ms, advanced 0 ms of media in 11880 ms of wall clock
+16:25:47.318 playback: playhead is 0 ms AHEAD of the picture (playhead 30125 ms, picture 30125 ms)
+16:25:48.325 playback: playhead is 0 ms AHEAD of the picture (playhead 31166 ms, picture 31166 ms)
+16:25:49.357 playback: playhead is 0 ms AHEAD of the picture (playhead 32208 ms, picture 32208 ms)
+16:25:50.390 playback: playhead is 0 ms AHEAD of the picture (playhead 33250 ms, picture 33250 ms)
+16:25:51.408 playback: playhead is 0 ms AHEAD of the picture (playhead 34250 ms, picture 34250 ms)
+16:25:52.435 playback: playhead is 0 ms AHEAD of the picture (playhead 35291 ms, picture 35291 ms)
+16:25:53.442 playback: playhead is 0 ms AHEAD of the picture (playhead 36291 ms, picture 36291 ms)
+16:25:54.449 playback: playhead is 0 ms AHEAD of the picture (playhead 37291 ms, picture 37291 ms)
+16:25:55.499 playback: playhead is 0 ms AHEAD of the picture (playhead 38375 ms, picture 38375 ms)
+16:25:56.515 playback: playhead is 1 ms AHEAD of the picture (playhead 39376 ms, picture 39375 ms)
+16:25:57.564 playback: playhead is 0 ms AHEAD of the picture (playhead 40416 ms, picture 40416 ms)
+16:25:58.609 playback: playhead is 1 ms AHEAD of the picture (playhead 41459 ms, picture 41458 ms)
+16:25:59.624 playback: playhead is 0 ms AHEAD of the picture (playhead 42500 ms, picture 42500 ms)
+16:26:00.630 playback: playhead is 0 ms AHEAD of the picture (playhead 43500 ms, picture 43500 ms)
+16:26:01.651 playback: playhead is 0 ms AHEAD of the picture (playhead 44500 ms, picture 44500 ms)
+16:26:01.817 playback: playhead.jump 44541 -> 44666 ms (+125) [+14717 ms] from MonitorPanel.qml:938 (onTriggered)
+16:26:02.293 playback: playhead.jump 45041 -> 45166 ms (+125) [+475 ms] from MonitorPanel.qml:938 (onTriggered)
+16:26:02.709 playback: playhead is 0 ms AHEAD of the picture (playhead 45583 ms, picture 45583 ms)
+16:26:03.748 playback: playhead is 0 ms AHEAD of the picture (playhead 46625 ms, picture 46625 ms)
+16:26:04.771 playback: playhead is 0 ms AHEAD of the picture (playhead 47625 ms, picture 47625 ms)
+16:26:05.780 playback: playhead is 0 ms AHEAD of the picture (playhead 48625 ms, picture 48625 ms)
+16:26:06.823 playback: playhead is 0 ms AHEAD of the picture (playhead 49666 ms, picture 49666 ms)
+16:26:07.881 playback: playhead is 0 ms AHEAD of the picture (playhead 50750 ms, picture 50750 ms)
+16:26:08.917 playback: playhead is 0 ms AHEAD of the picture (playhead 51791 ms, picture 51791 ms)
+16:26:09.931 playback: playhead is 0 ms AHEAD of the picture (playhead 52791 ms, picture 52791 ms)
+16:26:10.939 playback: playhead is 0 ms AHEAD of the picture (playhead 53791 ms, picture 53791 ms)
+16:26:11.947 playback: playhead is 0 ms AHEAD of the picture (playhead 54791 ms, picture 54791 ms)
+16:26:12.953 playback: playhead is 0 ms AHEAD of the picture (playhead 55791 ms, picture 55791 ms)
+16:26:13.260 playback: playing true -> false at playhead 56125 ms [+10966 ms] from MonitorPanel.qml:1854 (onClicked)
+16:26:13.260 monitor: playing -> false at 56125
+16:26:13.260 playback: session.stop decoder running, picture at 56125 ms [+0 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:26:13.904 playback: playing false -> true at playhead 56125 ms [+650 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:26:13.904 monitor: playing -> true at 56125
+16:26:13.904 monitor: playback session at playhead 56125 clip clip_e4f2cdb4abfd
+16:26:13.904 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 56125 ms, kind video [+1 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:26:13.963 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358080] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:26:13.964 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c424358080] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:26:14.118 preview playback: first frame after 202 ms, at source 56125 ms (requested 56125 ms)
+16:26:14.118 playback: frame at source 56125 ms, advanced 0 ms of media in 870 ms of wall clock
+16:26:14.131 playback: playhead is 0 ms AHEAD of the picture (playhead 56166 ms, picture 56166 ms)
+16:26:14.180 playback: playhead.jump 56166 -> 56291 ms (+125) [+268 ms] from MonitorPanel.qml:938 (onTriggered)
+16:26:14.567 playback: playing true -> false at playhead 56625 ms [+386 ms] from MonitorPanel.qml:1854 (onClicked)
+16:26:14.567 monitor: playing -> false at 56625
+16:26:14.620 playback: session.stop decoder idle, picture at 56666 ms [+53 ms] from MonitorPanel.qml:989 (onPlayingChanged) <- MonitorPanel.qml:1854 (onClicked)
+16:26:15.105 playback: playing false -> true at playhead 56666 ms [+489 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:26:15.111 monitor: playing -> true at 56666
+16:26:15.111 monitor: playback session at playhead 56666 clip clip_e4f2cdb4abfd
+16:26:15.111 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 56666 ms, kind video [+0 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1856 (onClicked)
+16:26:15.145 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:26:15.146 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4243588c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:26:15.262 preview playback: first frame after 144 ms, at source 56666 ms (requested 56666 ms)
+16:26:15.262 playback: frame at source 56666 ms, advanced 0 ms of media in 710 ms of wall clock
+16:26:15.272 playback: playhead is 0 ms AHEAD of the picture (playhead 56708 ms, picture 56708 ms)
+16:26:16.290 playback: session.stop decoder running, picture at 57750 ms [+1178 ms] from MonitorPanel.qml:1046 (onDestruction)

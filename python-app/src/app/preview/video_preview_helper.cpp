@@ -119,6 +119,11 @@ void VideoPreviewHelper::resolve(bool force) {
         nextSubtitle = clip;
       continue;
     }
+    // An effect bar carries no picture of its own. Its edges still count toward
+    // nextBoundary above, so the preview refreshes when the effect starts or
+    // ends, but it can never be the clip that gets decoded.
+    if (kind == QStringLiteral("effect"))
+      continue;
     if (kind == QStringLiteral("audio"))
       nextAudioClips.append(clip);
     if (!m_customPreviewClipId.isEmpty())

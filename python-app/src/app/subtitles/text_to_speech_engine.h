@@ -5,7 +5,9 @@
 #include <QObject>
 #include <QVariantList>
 
-class TextToSpeechEngine final : public QObject {
+#include "core/module_api.h"
+
+class CUTPRO_SUBTITLES_API TextToSpeechEngine final : public QObject {
   Q_OBJECT
   Q_PROPERTY(bool inProgress READ inProgress NOTIFY stateChanged)
   Q_PROPERTY(double progress READ progress NOTIFY stateChanged)

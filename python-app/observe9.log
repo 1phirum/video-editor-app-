@@ -1,0 +1,344 @@
+16:08:29.444 CrashReporterHost: watching pid 22764 from pid 10084 | reports -> C:/Users/USER/AppData/Local/Antigravity/Cut Pro/crash-reports
+16:08:29.455 Cut Pro: native C++/Qt backend, coreVersion = 0.1.2 | built = Aug 30 2026 16:01:52 | executable = C:/premier-pro/python-app/dist/Cut Pro 2026/cutpro.exe
+16:08:29.840 GUI thread unresponsive for 434 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+16:08:29.874   GUI thread backtrace, innermost first (14 frames):
+16:08:29.874     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+16:08:29.874     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+16:08:29.874     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+16:08:29.874     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+16:08:29.875     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+16:08:29.875     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+16:08:29.875     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+16:08:29.875     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+16:08:29.875     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+16:08:29.875     #9  "cutpro.exe+0x2d21"
+16:08:29.875     #10  "cutpro.exe+0x12ef"
+16:08:29.875     #11  "cutpro.exe+0x1406"
+16:08:29.875     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+16:08:29.875     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+16:08:30.307 GUI thread unresponsive for 901 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+16:08:30.307   GUI thread backtrace, innermost first (14 frames):
+16:08:30.307     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+16:08:30.307     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+16:08:30.307     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+16:08:30.307     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+16:08:30.307     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+16:08:30.307     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+16:08:30.307     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+16:08:30.307     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+16:08:30.307     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+16:08:30.307     #9  "cutpro.exe+0x2d21"
+16:08:30.307     #10  "cutpro.exe+0x12ef"
+16:08:30.308     #11  "cutpro.exe+0x1406"
+16:08:30.308     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+16:08:30.308     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+16:08:30.914 Using Qt multimedia with FFmpeg version 7.1.3 LGPL version 2.1 or later
+16:08:31.242 GUI thread unresponsive for 1836 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+16:08:31.324   GUI thread backtrace, innermost first (23 frames):
+16:08:31.325     #0  "win32u.dll!NtUserSystemParametersInfo+0x14"
+16:08:31.325     #1  "USER32.dll!OffsetRect+0x1a6"
+16:08:31.325     #2  "UxTheme.dll!Ordinal45+0x38"
+16:08:31.326     #3  "UxTheme.dll!GetThemeTextMetrics+0x60c"
+16:08:31.326     #4  "USER32.dll!SystemParametersInfoW+0x5a"
+16:08:31.326     #5  "qwindows.dll+0x57a94 (nearest export: qt_plugin_instance+0x55df4)"
+16:08:31.326     #6  "Qt6Gui.dll!QStyleHints::useHoverEffects() const+0x8b"
+16:08:31.326     #7  "Qt6QuickTemplates2.dll!QQuickControlPrivate::calcHoverEnabled(QQuickItem const*)+0xe7"
+16:08:31.326     #8  "Qt6QuickTemplates2.dll!QQuickControl::componentComplete()+0x12c"
+16:08:31.326     #9  "Qt6QuickTemplates2.dll!QQuickPane::componentComplete()+0x12"
+16:08:31.326     #10  "Qt6QuickTemplates2.dll!non-virtual thunk to QQuickScrollView::componentComplete()+0x18"
+16:08:31.326     #11  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+16:08:31.326     #12  "Qt6Qml.dll!QQmlComponentPrivate::complete(QQmlEnginePrivate*, QQmlComponentPrivate::ConstructionState*)+0x74"
+16:08:31.327     #13  "Qt6Qml.dll!QQmlComponentPrivate::completeCreate()+0x2ae"
+16:08:31.327     #14  "Qt6Qml.dll!QQmlComponentPrivate::createWithProperties(QObject*, QMap<QString, QVariant> const&, QQmlContext*, QQmlComponentPrivate::CreateBehavior, bool)+0xc4"
+16:08:31.327     #15  "Qt6Qml.dll!QQmlComponent::create(QQmlContext*)+0x46"
+16:08:31.327     #16  "Qt6Qml.dll!QQmlApplicationEnginePrivate::finishLoad(QQmlComponent*)+0x92"
+16:08:31.327     #17  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+16:08:31.328     #18  "cutpro.exe+0x2d21"
+16:08:31.328     #19  "cutpro.exe+0x12ef"
+16:08:31.328     #20  "cutpro.exe+0x1406"
+16:08:31.328     #21  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+16:08:31.328     #22  "ntdll.dll!RtlUserThreadStart+0x2c"
+16:08:31.445 GUI thread STILL blocked after 2038 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)" - during launch, before any window exists: this delays startup but cannot show as "Not Responding".
+16:08:31.496   GUI thread backtrace, innermost first (36 frames):
+16:08:31.496     #0  "igd9trinity64.dll+0x212d00"
+16:08:31.496     #1  "igd9trinity64.dll+0xef0671"
+16:08:31.496     #2  "igd9trinity64.dll+0xef144c"
+16:08:31.496     #3  "igd9trinity64.dll+0xe79e42"
+16:08:31.496     #4  "igd9trinity64.dll+0xe149fe"
+16:08:31.496     #5  "igd9trinity64.dll+0xe1570f"
+16:08:31.496     #6  "igdumdim64.dll+0xf0647"
+16:08:31.496     #7  "igdumdim64.dll+0xef1bc"
+16:08:31.496     #8  "d3d9.dll+0x6d1fd (nearest export: D3DPERF_EndEvent+0x298d)"
+16:08:31.496     #9  "d3d9.dll+0x6cc4d (nearest export: D3DPERF_EndEvent+0x23dd)"
+16:08:31.496     #10  "d3d9.dll+0x7b6a"
+16:08:31.496     #11  "d3d9.dll+0x5a1e"
+16:08:31.496     #12  "d3d9.dll+0x50ef"
+16:08:31.496     #13  "d3d9.dll!Direct3DCreate9Ex+0x15b"
+16:08:31.496     #14  "d3d9.dll!Direct3DCreate9+0x1e"
+16:08:31.497     #15  "qwindows.dll+0x3c4ae (nearest export: qt_plugin_instance+0x3a80e)"
+16:08:31.497     #16  "qwindows.dll+0x6ad2a (nearest export: qt_plugin_instance+0x6908a)"
+16:08:31.497     #17  "qwindows.dll+0xdac88 (nearest export: qt_plugin_instance+0xd8fe8)"
+16:08:31.497     #18  "qwindows.dll+0x6afcc (nearest export: qt_plugin_instance+0x6932c)"
+16:08:31.497     #19  "qwindows.dll+0x1c44a (nearest export: qt_plugin_instance+0x1a7aa)"
+16:08:31.497     #20  "Qt6Gui.dll!QWindowPrivate::create(bool)+0x186"
+16:08:31.497     #21  "Qt6Gui.dll!QWindowPrivate::setVisible(bool)+0x9b"
+16:08:31.497     #22  "Qt6Quick.dll!QQuickWindowQmlImpl::componentComplete()+0x7a"
+16:08:31.497     #23  "Qt6QuickTemplates2.dll!QQuickApplicationWindow::componentComplete()+0x7a"
+16:08:31.497     #24  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+16:08:31.497     #25  "Qt6Qml.dll!QQmlComponentPrivate::complete(QQmlEnginePrivate*, QQmlComponentPrivate::ConstructionState*)+0x74"
+16:08:31.497     #26  "Qt6Qml.dll!QQmlComponentPrivate::completeCreate()+0x2ae"
+16:08:31.497     #27  "Qt6Qml.dll!QQmlComponentPrivate::createWithProperties(QObject*, QMap<QString, QVariant> const&, QQmlContext*, QQmlComponentPrivate::CreateBehavior, bool)+0xc4"
+16:08:31.497     #28  "Qt6Qml.dll!QQmlComponent::create(QQmlContext*)+0x46"
+16:08:31.497     #29  "Qt6Qml.dll!QQmlApplicationEnginePrivate::finishLoad(QQmlComponent*)+0x92"
+16:08:31.497     #30  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+16:08:31.497     #31  "cutpro.exe+0x2d21"
+16:08:31.497     #32  "cutpro.exe+0x12ef"
+16:08:31.497     #33  "cutpro.exe+0x1406"
+16:08:31.497     #34  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+16:08:31.497     #35  "ntdll.dll!RtlUserThreadStart+0x2c"
+16:08:40.687 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:40.687 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:42.093 monitor: source key  -> clip_afea85de603d|C:/Users/USER/Downloads/Video/The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4|video|0|0|4652814|
+16:08:42.157 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336919c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:42.157 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336919c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:42.458 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336911c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:42.458 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336911c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:43.366 monitor: playing -> true at 0
+16:08:43.366 monitor: playback session at playhead 0 clip clip_afea85de603d
+16:08:43.426 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336921c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:43.427 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336921c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:43.650 preview playback: first frame after 274 ms, at source 0 ms (requested 0 ms)
+16:08:44.938 monitor: playing -> false at 1291
+16:08:45.647 monitor: playing -> true at 1333
+16:08:45.647 monitor: playback session at playhead 1333 clip clip_afea85de603d
+16:08:45.699 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733690c40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:45.700 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733690c40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:45.853 preview playback: first frame after 202 ms, at source 1333 ms (requested 1333 ms)
+16:08:46.840 monitor: playing -> false at 2375
+16:08:47.702 monitor: playing -> true at 2416
+16:08:47.702 monitor: playback session at playhead 2416 clip clip_afea85de603d
+16:08:47.724 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:47.725 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:47.874 preview playback: first frame after 168 ms, at source 2416 ms (requested 2416 ms)
+16:08:48.380 monitor: playing -> false at 3000
+16:08:49.169 monitor: playing -> true at 3041
+16:08:49.169 monitor: playback session at playhead 3041 clip clip_afea85de603d
+16:08:49.202 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336921c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:49.203 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336921c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:49.396 preview playback: first frame after 222 ms, at source 3041 ms (requested 3041 ms)
+16:08:50.089 monitor: playing -> false at 3833
+16:08:51.608 monitor: playing -> true at 3875
+16:08:51.608 monitor: playback session at playhead 3875 clip clip_afea85de603d
+16:08:51.660 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691c80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:51.661 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691c80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:51.872 preview playback: first frame after 258 ms, at source 3875 ms (requested 3875 ms)
+16:08:53.346 monitor: playing -> false at 5500
+16:08:54.085 monitor: playing -> true at 5500
+16:08:54.085 monitor: playback session at playhead 5500 clip clip_afea85de603d
+16:08:54.144 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336921c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:54.145 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336921c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:54.303 preview playback: first frame after 212 ms, at source 5500 ms (requested 5500 ms)
+16:08:54.721 monitor: playing -> false at 5958
+16:08:55.171 monitor: playing -> true at 6000
+16:08:55.171 monitor: playback session at playhead 6000 clip clip_afea85de603d
+16:08:55.232 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:55.233 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:55.428 preview playback: first frame after 250 ms, at source 6000 ms (requested 6000 ms)
+16:08:55.481 monitor: playing -> false at 6000
+16:08:55.752 monitor: playing -> true at 6166
+16:08:55.752 monitor: playback session at playhead 6166 clip clip_afea85de603d
+16:08:55.812 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733692480] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:55.812 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733692480] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:55.928 monitor: playing -> false at 6166
+16:08:56.553 monitor: playing -> true at 6166
+16:08:56.553 monitor: playback session at playhead 6166 clip clip_afea85de603d
+16:08:56.622 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:56.623 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:56.768 preview playback: first frame after 211 ms, at source 6166 ms (requested 6166 ms)
+16:08:57.332 monitor: playing -> false at 6791
+16:08:58.107 monitor: playing -> true at 6791
+16:08:58.107 monitor: playback session at playhead 6791 clip clip_afea85de603d
+16:08:58.151 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:58.152 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:58.340 preview playback: first frame after 231 ms, at source 6791 ms (requested 6791 ms)
+16:08:58.806 monitor: playing -> false at 7333
+16:08:59.549 monitor: playing -> true at 7375
+16:08:59.549 monitor: playback session at playhead 7375 clip clip_afea85de603d
+16:08:59.601 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:08:59.602 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:08:59.737 preview playback: first frame after 182 ms, at source 7375 ms (requested 7375 ms)
+16:09:00.906 monitor: playing -> false at 8625
+16:09:01.540 monitor: playing -> true at 8625
+16:09:01.540 monitor: playback session at playhead 8625 clip clip_afea85de603d
+16:09:01.574 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:01.574 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:01.747 preview playback: first frame after 193 ms, at source 8625 ms (requested 8625 ms)
+16:09:02.086 monitor: playing -> false at 9041
+16:09:02.489 monitor: playing -> true at 9083
+16:09:02.489 monitor: playback session at playhead 9083 clip clip_afea85de603d
+16:09:02.547 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:02.548 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:02.837 preview playback: first frame after 344 ms, at source 9083 ms (requested 9083 ms)
+16:09:02.889 monitor: playing -> false at 9166
+16:09:03.132 monitor: playing -> true at 9333
+16:09:03.132 monitor: playback session at playhead 9333 clip clip_afea85de603d
+16:09:03.183 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733692480] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:03.183 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733692480] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:03.324 monitor: playing -> false at 9333
+16:09:03.357 preview playback: first frame after 222 ms, at source 9333 ms (requested 9333 ms)
+16:09:03.483 monitor: playing -> true at 9333
+16:09:03.483 monitor: playback session at playhead 9333 clip clip_afea85de603d
+16:09:03.536 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733690f00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:03.536 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733690f00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:03.660 monitor: playing -> false at 9333
+16:09:03.910 monitor: playing -> true at 9333
+16:09:03.910 monitor: playback session at playhead 9333 clip clip_afea85de603d
+16:09:03.958 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:03.959 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:04.230 preview playback: first frame after 314 ms, at source 9333 ms (requested 9333 ms)
+16:09:04.629 monitor: playing -> false at 9916
+16:09:04.768 monitor: playing -> true at 9916
+16:09:04.768 monitor: playback session at playhead 9916 clip clip_afea85de603d
+16:09:04.790 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:04.791 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:04.898 monitor: playing -> false at 9916
+16:09:05.026 monitor: playing -> true at 9916
+16:09:05.026 monitor: playback session at playhead 9916 clip clip_afea85de603d
+16:09:05.068 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733692480] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:05.069 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733692480] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:05.251 monitor: playing -> false at 9916
+16:09:05.679 monitor: playing -> true at 9916
+16:09:05.679 monitor: playback session at playhead 9916 clip clip_afea85de603d
+16:09:05.741 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:05.743 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:05.963 preview playback: first frame after 280 ms, at source 9916 ms (requested 9916 ms)
+16:09:09.423 monitor: playing -> false at 13500
+16:09:09.867 monitor: playing -> true at 13541
+16:09:09.867 monitor: playback session at playhead 13541 clip clip_afea85de603d
+16:09:09.926 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691c80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:09.927 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691c80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:10.154 preview playback: first frame after 279 ms, at source 13541 ms (requested 13541 ms)
+16:09:10.602 monitor: playing -> false at 14125
+16:09:11.168 monitor: playing -> true at 14125
+16:09:11.168 monitor: playback session at playhead 14125 clip clip_afea85de603d
+16:09:11.223 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733692480] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:11.224 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733692480] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:11.456 preview playback: first frame after 283 ms, at source 14125 ms (requested 14125 ms)
+16:09:11.864 monitor: playing -> false at 14625
+16:09:12.453 monitor: playing -> true at 14666
+16:09:12.460 monitor: playback session at playhead 14666 clip clip_afea85de603d
+16:09:12.487 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733690c40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:12.487 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733690c40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:12.669 preview playback: first frame after 206 ms, at source 14666 ms (requested 14666 ms)
+16:09:13.495 monitor: playing -> false at 15583
+16:09:14.347 monitor: playing -> true at 15625
+16:09:14.347 monitor: playback session at playhead 15625 clip clip_afea85de603d
+16:09:14.412 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691c80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:14.414 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691c80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:14.677 preview playback: first frame after 324 ms, at source 15625 ms (requested 15625 ms)
+16:09:15.006 monitor: playing -> false at 16083
+16:09:15.716 monitor: playing -> true at 16125
+16:09:15.716 monitor: playback session at playhead 16125 clip clip_afea85de603d
+16:09:15.738 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:15.738 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:15.938 preview playback: first frame after 218 ms, at source 16125 ms (requested 16125 ms)
+16:09:16.294 monitor: playing -> false at 16626
+16:09:16.901 monitor: playing -> true at 16625
+16:09:16.901 monitor: playback session at playhead 16625 clip clip_afea85de603d
+16:09:16.953 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:16.954 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:17.214 preview playback: first frame after 307 ms, at source 16625 ms (requested 16625 ms)
+16:09:20.402 monitor: playing -> false at 20000
+16:09:21.346 monitor: playing -> true at 20000
+16:09:21.346 monitor: playback session at playhead 20000 clip clip_afea85de603d
+16:09:21.403 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:21.405 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:21.623 preview playback: first frame after 272 ms, at source 20000 ms (requested 20000 ms)
+16:09:22.640 monitor: playing -> false at 21125
+16:09:23.451 monitor: playing -> true at 21166
+16:09:23.451 monitor: playback session at playhead 21166 clip clip_afea85de603d
+16:09:23.505 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:09:23.506 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:09:23.774 preview playback: first frame after 318 ms, at source 21166 ms (requested 21166 ms)
+16:10:41.656 Retrying to obtain clipboard.
+16:12:15.234 monitor: playing -> false at 192791
+16:12:15.857 monitor: playing -> true at 192791
+16:12:15.857 monitor: playback session at playhead 192791 clip clip_afea85de603d
+16:12:15.912 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691f40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:12:15.913 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691f40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:12:16.045 preview playback: first frame after 183 ms, at source 192791 ms (requested 192791 ms)
+16:12:16.564 monitor: playing -> false at 193333
+16:12:17.042 monitor: playing -> true at 193375
+16:12:17.042 monitor: playback session at playhead 193375 clip clip_afea85de603d
+16:12:17.096 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733690c40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:12:17.097 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733690c40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:12:17.269 preview playback: first frame after 222 ms, at source 193375 ms (requested 193375 ms)
+16:12:17.524 monitor: playing -> false at 193708
+16:12:17.886 monitor: playing -> true at 193750
+16:12:17.886 monitor: playback session at playhead 193750 clip clip_afea85de603d
+16:12:17.921 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:12:17.922 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336909c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:12:18.066 preview playback: first frame after 170 ms, at source 193750 ms (requested 193750 ms)
+16:12:18.100 monitor: playing -> false at 193750
+16:12:18.277 monitor: playing -> true at 193875
+16:12:18.277 monitor: playback session at playhead 193875 clip clip_afea85de603d
+16:12:18.300 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691c80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:12:18.300 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691c80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:12:18.438 preview playback: first frame after 158 ms, at source 193875 ms (requested 193875 ms)
+16:12:18.454 monitor: playing -> false at 193875
+16:12:18.903 monitor: playing -> true at 193958
+16:12:18.903 monitor: playback session at playhead 193958 clip clip_afea85de603d
+16:12:18.931 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733690c40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:12:18.931 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733690c40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:12:19.080 preview playback: first frame after 173 ms, at source 193958 ms (requested 193958 ms)
+16:12:19.566 monitor: playing -> false at 194541
+16:12:20.056 monitor: playing -> true at 194541
+16:12:20.056 monitor: playback session at playhead 194541 clip clip_afea85de603d
+16:12:20.106 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733692480] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:12:20.107 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733692480] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:12:20.280 preview playback: first frame after 219 ms, at source 194541 ms (requested 194541 ms)
+16:12:20.488 monitor: playing -> false at 194875
+16:12:20.895 monitor: playing -> true at 194875
+16:12:20.895 monitor: playback session at playhead 194875 clip clip_afea85de603d
+16:12:20.958 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733690c40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:12:20.959 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733690c40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:12:21.149 preview playback: first frame after 247 ms, at source 194875 ms (requested 194875 ms)
+16:12:21.337 monitor: playing -> false at 195166
+16:12:21.671 monitor: playing -> true at 195166
+16:12:21.671 monitor: playback session at playhead 195166 clip clip_afea85de603d
+16:12:21.693 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691c80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:12:21.693 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691c80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:12:21.851 monitor: playing -> false at 195166
+16:12:21.854 preview playback: first frame after 179 ms, at source 195166 ms (requested 195166 ms)
+16:12:22.029 monitor: playing -> true at 195166
+16:12:22.029 monitor: playback session at playhead 195166 clip clip_afea85de603d
+16:12:22.053 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:12:22.053 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:12:22.187 monitor: playing -> false at 195166
+16:12:22.221 preview playback: first frame after 189 ms, at source 195166 ms (requested 195166 ms)
+16:12:22.822 monitor: playing -> true at 195166
+16:12:22.822 monitor: playback session at playhead 195166 clip clip_afea85de603d
+16:12:22.857 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:12:22.858 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:12:23.107 preview playback: first frame after 280 ms, at source 195166 ms (requested 195166 ms)
+16:12:23.496 monitor: playing -> false at 195708
+16:12:24.383 monitor: playing -> true at 195750
+16:12:24.383 monitor: playback session at playhead 195750 clip clip_afea85de603d
+16:12:24.446 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336921c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:12:24.447 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000247336921c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:12:24.716 preview playback: first frame after 322 ms, at source 195750 ms (requested 195750 ms)
+16:12:25.900 monitor: source key clip_afea85de603d|C:/Users/USER/Downloads/Video/The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4|video|0|0|4652814| -> 
+16:12:25.997 monitor: playing -> false at 4652814
+16:12:27.558 monitor: source key  -> clip_afea85de603d|C:/Users/USER/Downloads/Video/The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4|video|0|0|4652814|
+16:12:28.479 monitor: playing -> true at 0
+16:12:28.479 monitor: playback session at playhead 0 clip clip_afea85de603d
+16:12:28.531 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:12:28.532 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691700] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:12:28.684 preview playback: first frame after 198 ms, at source 0 ms (requested 0 ms)
+16:12:29.216 monitor: playing -> false at 583
+16:12:29.763 monitor: playing -> true at 583
+16:12:29.763 monitor: playback session at playhead 583 clip clip_afea85de603d
+16:12:29.799 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691c80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+16:12:29.801 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024733691c80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+16:12:29.907 preview playback: first frame after 139 ms, at source 583 ms (requested 583 ms)
+16:12:36.360 monitor: playing -> false at 7049

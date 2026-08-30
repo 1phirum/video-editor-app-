@@ -12,6 +12,8 @@
 #include <atomic>
 #include <thread>
 
+#include "core/module_api.h"
+
 // Newest-wins frame service for scrubbing.
 //
 // A drag on the timeline emits a position every few milliseconds. Decoding all
@@ -30,7 +32,7 @@
 //    exact one replaces it when it arrives;
 //  - the container stays open between requests (DecodeSessionCache), so the
 //    second frame of a source costs a seek instead of a header parse.
-class ScrubFrameService final : public QObject {
+class CUTPRO_PREVIEW_API ScrubFrameService final : public QObject {
   Q_OBJECT
 
 public:

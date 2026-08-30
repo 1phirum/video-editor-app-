@@ -22,15 +22,9 @@ SettingsPage {
                 onValueModified: root.settingChanged("defaultVideoTracks", value)
             }
         }
-        SettingsRow {
-            label: "Default audio tracks"
-            SettingsSpinBox {
-                from: 1
-                to: 16
-                value: Number(root.settings.defaultAudioTracks || 1)
-                onValueModified: root.settingChanged("defaultAudioTracks", value)
-            }
-        }
+        // Audio lanes are content-driven (CapCut-style): a sequence has no
+        // audio track until an audio clip or the timeline's A+ button creates
+        // one, so there is no "default audio tracks" count to configure.
         SettingsRow {
             label: "Track height"
             LumetriSlider {
