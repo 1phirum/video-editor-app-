@@ -24,11 +24,15 @@ QVariantMap Backend::activeColorClip() const {
       break;
     }
   }
-  for (const auto &value : m_clips) {
-    const QVariantMap clip = value.toMap();
+  // Only the picture clips can win here, and the cache already knows which
+  // indexes those are. Walking all of m_clips instead meant a subtitle track
+  // made this scan twenty thousand entries long - and colorSettingsChanged
+  // fires on every cue boundary while playing, so it ran that often.
+  ensureClipCaches();
+  for (const int index : m_cachedVideoClips) {
+    const QVariantMap clip = m_clips.at(index).toMap();
     const QString track = clip.value("track").toString();
-    if ((!track.startsWith('V')) ||
-        clip.value("enabled", true).toBool() == false || !trackVisible(track) ||
+    if (clip.value("enabled", true).toBool() == false || !trackVisible(track) ||
         (hasSoloVideoTrack && !trackSolo(track)) ||
         m_playheadMs < clip.value("startMs").toLongLong() ||
         m_playheadMs >= clip.value("startMs").toLongLong() +

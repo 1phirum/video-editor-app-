@@ -46,11 +46,24 @@ private:
   void setState(double progress, const QString &status);
   void finish(bool success, const QVariantList &outputs,
               const QString &error = QString());
+  // Complete lines only, and each line exactly once. The old reader appended to a
+  // buffer and re-scanned the whole thing on every readyRead, so a run that prints
+  // one line per cue re-read its own output tens of thousands of times.
+  void consumeStdout();
+  void handleWorkerLine(const QByteArray &line);
+  // The result is a file the worker names on stdout, not a line of stdout. A
+  // twenty-thousand-cue manifest is megabytes of JSON, which is not something to
+  // carry through a pipe and then search for.
+  QVariantList readManifest(QString *error) const;
 
   QProcess m_process;
   QString m_outputPath;
   QString m_status;
-  QByteArray m_stdout;
+  // Only the bytes after the last newline seen so far.
+  QByteArray m_stdoutTail;
+  // The last JSON object the worker printed: its final verdict.
+  QByteArray m_resultLine;
+  QString m_manifestPath;
   double m_progress = 0.0;
   QString m_requestPath;
   bool m_cancelRequested = false;

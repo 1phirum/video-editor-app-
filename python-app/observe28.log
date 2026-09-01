@@ -1,0 +1,181 @@
+11:16:42.737 GUI turn monitor on, budget 20 ms - every event-loop turn longer than this is reported with its marked scope (CUTPRO_TURN_BUDGET_MS=0 turns it off)
+11:16:43.174 GUI thread unresponsive for 438 ms, "stalled somewhere unmarked": "no marked scope"
+11:16:43.616 GUI thread unresponsive for 880 ms, "stalled somewhere unmarked": "no marked scope"
+11:16:43.700   GUI thread backtrace, innermost first (13 frames):
+11:16:43.700     #0  "ntdll.dll!NtCreateUserProcess+0x14"
+11:16:43.700     #1  "KERNELBASE.dll+0x80305 (nearest export: CreateProcessInternalW+0x2c25)"
+11:16:43.700     #2  "KERNELBASE.dll!CreateProcessW+0x66"
+11:16:43.700     #3  "KERNEL32.DLL!CreateProcessW+0x54"
+11:16:43.700     #4  "Qt6Core.dll!QProcess::qt_metacall(QMetaObject::Call, int, void**)+0xdab"
+11:16:43.700     #5  "Qt6Core.dll+0x2d7ac9 (nearest export: QProcessEnvironment::systemEnvironment()+0x1589)"
+11:16:43.700     #6  "Qt6Core.dll!QProcess::startDetached(QString const&, QList<QString> const&, QString const&, long long*)+0x124"
+11:16:43.700     #7  "cutpro_diagnostics.dll!CrashReporterHost::start()+0x707"
+11:16:43.700     #8  "cutpro.exe+0x27ab"
+11:16:43.700     #9  "cutpro.exe+0x12ef"
+11:16:43.700     #10  "cutpro.exe+0x1406"
+11:16:43.700     #11  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+11:16:43.700     #12  "ntdll.dll!RtlUserThreadStart+0x2c"
+11:16:43.784 CrashReporterHost: watching pid 11788 from pid 27556 | reports -> C:/Users/USER/AppData/Local/Antigravity/Cut Pro/crash-reports
+11:16:43.810 Cut Pro: native C++/Qt backend, coreVersion = 0.1.2 | built = Sep  1 2026 11:12:47 | executable = C:/premier-pro/python-app/dist/Cut Pro 2026/cutpro.exe
+11:16:44.502 GUI thread unresponsive for 1766 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+11:16:44.502   the innermost frame has only been open 680 ms of the 1766 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+11:16:44.519   GUI thread backtrace, innermost first (14 frames):
+11:16:44.519     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+11:16:44.519     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+11:16:44.519     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+11:16:44.519     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+11:16:44.519     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+11:16:44.519     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+11:16:44.519     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+11:16:44.519     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+11:16:44.519     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+11:16:44.519     #9  "cutpro.exe+0x2d8e"
+11:16:44.519     #10  "cutpro.exe+0x12ef"
+11:16:44.519     #11  "cutpro.exe+0x1406"
+11:16:44.519     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+11:16:44.519     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+11:16:44.765 GUI thread STILL blocked after 2029 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)" - during launch, before any window exists: this delays startup but cannot show as "Not Responding".
+11:16:44.765   the innermost frame has only been open 943 ms of the 2029 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+11:16:44.766   GUI thread backtrace, innermost first (14 frames):
+11:16:44.766     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+11:16:44.766     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+11:16:44.766     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+11:16:44.766     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+11:16:44.766     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+11:16:44.766     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+11:16:44.766     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+11:16:44.766     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+11:16:44.766     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+11:16:44.766     #9  "cutpro.exe+0x2d8e"
+11:16:44.766     #10  "cutpro.exe+0x12ef"
+11:16:44.766     #11  "cutpro.exe+0x1406"
+11:16:44.766     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+11:16:44.766     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+11:16:46.799 GUI thread STILL blocked after 4064 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)" - during launch, before any window exists: this delays startup but cannot show as "Not Responding".
+11:16:46.799   the innermost frame has only been open 2978 ms of the 4064 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+11:16:46.834   GUI thread backtrace, innermost first (48 frames):
+11:16:46.834     #0  "Qt6Qml.dll+0x35d680 (nearest export: QQmlLocale::registerStringLocaleCompare(QV4::ExecutionEngine*)+0x793b0)"
+11:16:46.834     #1  "Qt6Qml.dll+0x28aaf4 (nearest export: QQmlVMEMetaObject::metaCall(QObject*, QMetaObject::Call, int, void**)+0x1354)"
+11:16:46.834     #2  "Qt6Qml.dll!QQmlNotifier::notify(QQmlData*, int)+0x85c"
+11:16:46.834     #3  "Qt6Qml.dll!QQmlObjectCreator::setPropertyValue(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0xdaa"
+11:16:46.834     #4  "Qt6Qml.dll!QQmlObjectCreator::setPropertyBinding(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x107"
+11:16:46.834     #5  "Qt6Qml.dll!QQmlObjectCreator::setupBindings(QFlags<QQmlObjectCreator::BindingMode>)+0x53e"
+11:16:46.834     #6  "Qt6Qml.dll!QQmlObjectCreator::populateInstance(int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x230"
+11:16:46.834     #7  "Qt6Qml.dll!QQmlObjectCreator::createInstance(int, QObject*, bool)+0x4ca"
+11:16:46.834     #8  "Qt6Qml.dll!QQmlObjectCreator::populateDeferredInstance(QObject*, int, int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x4c1"
+11:16:46.834     #9  "Qt6Qml.dll!QQmlObjectCreator::createInstance(int, QObject*, bool)+0xbf4"
+11:16:46.834     #10  "Qt6Qml.dll!QQmlObjectCreator::setPropertyBinding(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x19b"
+11:16:46.834     #11  "Qt6Qml.dll!QQmlObjectCreator::setupBindings(QFlags<QQmlObjectCreator::BindingMode>)+0x53e"
+11:16:46.834     #12  "Qt6Qml.dll!QQmlObjectCreator::populateInstance(int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x230"
+11:16:46.834     #13  "Qt6Qml.dll!QQmlObjectCreator::createInstance(int, QObject*, bool)+0x4ca"
+11:16:46.834     #14  "Qt6Qml.dll!QQmlObjectCreator::setPropertyBinding(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x19b"
+11:16:46.834     #15  "Qt6Qml.dll!QQmlObjectCreator::setupBindings(QFlags<QQmlObjectCreator::BindingMode>)+0x53e"
+11:16:46.834     #16  "Qt6Qml.dll!QQmlObjectCreator::populateInstance(int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x230"
+11:16:46.834     #17  "Qt6Qml.dll!QQmlObjectCreator::createInstance(int, QObject*, bool)+0x4ca"
+11:16:46.834     #18  "Qt6Qml.dll!QQmlObjectCreator::setPropertyBinding(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x19b"
+11:16:46.834     #19  "Qt6Qml.dll!QQmlObjectCreator::setupBindings(QFlags<QQmlObjectCreator::BindingMode>)+0x53e"
+11:16:46.834     #20  "Qt6Qml.dll!QQmlObjectCreator::populateInstance(int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x230"
+11:16:46.834     #21  "Qt6Qml.dll!QQmlObjectCreator::createInstance(int, QObject*, bool)+0x4ca"
+11:16:46.834     #22  "Qt6Qml.dll!QQmlObjectCreator::setPropertyBinding(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x19b"
+11:16:46.834     #23  "Qt6Qml.dll!QQmlObjectCreator::setupBindings(QFlags<QQmlObjectCreator::BindingMode>)+0x53e"
+11:16:46.834     #24  "Qt6Qml.dll!QQmlObjectCreator::populateInstance(int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x230"
+11:16:46.834     #25  "Qt6Qml.dll!QQmlObjectCreator::createInstance(int, QObject*, bool)+0x4ca"
+11:16:46.834     #26  "Qt6Qml.dll!QQmlObjectCreator::populateDeferredInstance(QObject*, int, int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x4c1"
+11:16:46.834     #27  "Qt6Qml.dll!QQmlObjectCreator::createInstance(int, QObject*, bool)+0xbf4"
+11:16:46.834     #28  "Qt6Qml.dll!QQmlObjectCreator::setPropertyBinding(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x19b"
+11:16:46.834     #29  "Qt6Qml.dll!QQmlObjectCreator::setupBindings(QFlags<QQmlObjectCreator::BindingMode>)+0x53e"
+11:16:46.834     #30  "Qt6Qml.dll!QQmlObjectCreator::populateInstance(int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x230"
+11:16:46.834     #31  "Qt6Qml.dll!QQmlObjectCreator::createInstance(int, QObject*, bool)+0x4ca"
+11:16:46.834     #32  "Qt6Qml.dll!QQmlObjectCreator::setPropertyBinding(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x19b"
+11:16:46.834     #33  "Qt6Qml.dll!QQmlObjectCreator::setupBindings(QFlags<QQmlObjectCreator::BindingMode>)+0x53e"
+11:16:46.834     #34  "Qt6Qml.dll!QQmlObjectCreator::populateInstance(int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x230"
+11:16:46.834     #35  "Qt6Qml.dll!QQmlObjectCreator::createInstance(int, QObject*, bool)+0x4ca"
+11:16:46.834     #36  "Qt6Qml.dll!QQmlObjectCreator::populateDeferredInstance(QObject*, int, int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x4c1"
+11:16:46.834     #37  "Qt6Qml.dll!QQmlIncubatorPrivate::incubate(QQmlInstantiationInterrupt&)+0x5bd"
+11:16:46.834     #38  "Qt6Qml.dll!QQmlEnginePrivate::incubate(QQmlIncubator&, QQmlRefPointer<QQmlContextData> const&)+0x246"
+11:16:46.834     #39  "Qt6Qml.dll!QQmlComponent::create(QQmlIncubator&, QQmlContext*, QQmlContext*)+0x2d8"
+11:16:46.834     #40  "Qt6Quick.dll!QQuickLoader::QQuickLoader(QQuickItem*)+0x613"
+11:16:46.834     #41  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+11:16:46.834     #42  "Qt6Qml.dll!QQmlIncubatorPrivate::incubate(QQmlInstantiationInterrupt&)+0x4b8"
+11:16:46.834     #43  "Qt6Qml.dll!QQmlEnginePrivate::incubate(QQmlIncubator&, QQmlRefPointer<QQmlContextData> const&)+0x246"
+11:16:46.834     #44  "Qt6Qml.dll!QQmlComponent::create(QQmlIncubator&, QQmlContext*, QQmlContext*)+0x2d8"
+11:16:46.834     #45  "Qt6Quick.dll!QQuickLoader::QQuickLoader(QQuickItem*)+0x613"
+11:16:46.834     #46  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+11:16:46.834     #47  "Qt6Qml.dll!QQmlComponentPrivate::complete(QQmlEnginePrivate*, QQmlComponentPrivate::ConstructionState*)+0x74"
+11:16:46.865 Using Qt multimedia with FFmpeg version 7.1.3 LGPL version 2.1 or later
+11:16:48.375 GUI turn 39 ms (budget 20 ms, ~1 frames of 30 fps lost): "no marked scope"""
+11:17:01.905 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000251afef7f00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:17:01.905 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000251afef7f00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:17:05.304 monitor: source key  -> clip_b4269232171a|D:/capcut/At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4|video|0|0|35744891|
+11:17:05.320 playback: session.stop decoder idle, picture at -1 ms, published -1 ms from MonitorPanel.qml:1166 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1766
+11:17:05.620 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000251afef7980] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:17:05.620 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000251afef7980] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:17:06.116 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000251afef76c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:17:06.116 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000251afef76c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:17:06.158 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000251afef7c40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:17:06.158 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000251afef7c40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:17:06.316 playback: still.publish 1920 px wide, playback picture was 0 px at -1 ms [+1000 ms] from C++
+11:17:06.641 playback: playing false -> true at playhead 0 ms [+327 ms] from MonitorPanel.qml:588 (startPlayback) <- MonitorPanel.qml:2139 (onClicked)
+11:17:06.641 monitor: playing -> true at 0
+11:17:06.641 monitor: playback session at playhead 0 clip clip_b4269232171a
+11:17:06.649 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 0 ms, kind video [+2 ms] from MonitorPanel.qml:727 (startProcessPlayback) <- MonitorPanel.qml:1071 (onPlayingChanged) <- MonitorPanel.qml:588 (startPlayback) <- MonitorPanel.qml:2139 (onClicked)
+11:17:07.176 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000251afef7f00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:17:07.176 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000251afef7f00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:17:07.491 [h264 @ 00000251afec9580] Late SEI
+11:17:07.491 [h264 @ 00000251afec9580]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+11:17:07.491 [h264 @ 00000251afec9580] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+11:17:07.743 preview playback: first frame after 1061 ms, at source 0 ms (requested 0 ms)
+11:17:07.743 playback: frame at source 0 ms, advanced 0 ms of media in -1 ms of wall clock
+11:17:07.763 playback: playhead is 17 ms AHEAD of the picture (playhead 17 ms, picture 0 ms)
+11:17:07.888 preview cost: frame is 19 ms against a 9 ms budget at 60 fps - lowering the preview to 1350 px
+11:17:08.025 preview cost: frame is 17 ms against a 9 ms budget at 60 fps - lowering the preview to 1000 px
+11:17:08.198 preview cost: frame is 20 ms and the picture is already at 960 px - pacing the preview at 30 fps instead of 60
+11:17:08.797 playback: playhead is 6 ms AHEAD of the picture (playhead 939 ms, picture 933 ms)
+11:17:09.804 playback: playhead is 7 ms AHEAD of the picture (playhead 1823 ms, picture 1816 ms)
+11:17:10.825 playback: playhead is 16 ms AHEAD of the picture (playhead 2716 ms, picture 2700 ms)
+11:17:11.872 playback: playhead is 14 ms AHEAD of the picture (playhead 3580 ms, picture 3566 ms)
+11:17:12.158 playback: playing true -> false at playhead 3807 ms [+5509 ms] from MonitorPanel.qml:2137 (onClicked)
+11:17:12.158 monitor: playing -> false at 3807
+11:17:12.158 playback: session.stop decoder running, picture at 3816 ms, published 3816 ms [+0 ms] from MonitorPanel.qml:1096 (onPlayingChanged) <- MonitorPanel.qml:2137 (onClicked)
+11:17:23.174 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+11016 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:26.427 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+3255 ms] from C++
+11:17:26.459 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+28 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:27.817 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+1358 ms] from C++
+11:17:27.908 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+89 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:29.052 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+1149 ms] from C++
+11:17:29.141 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+92 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:32.574 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+3436 ms] from C++
+11:17:32.684 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+96 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:33.090 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+411 ms] from C++
+11:17:33.188 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+97 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:34.220 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+1028 ms] from C++
+11:17:34.315 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+95 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:34.883 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+568 ms] from C++
+11:17:34.982 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+99 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:35.699 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+716 ms] from C++
+11:17:35.784 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+90 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:36.321 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+532 ms] from C++
+11:17:36.415 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+92 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:37.398 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+983 ms] from C++
+11:17:37.487 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+92 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:38.152 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+660 ms] from C++
+11:17:38.235 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+89 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:38.660 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+424 ms] from C++
+11:17:38.767 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+108 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:39.021 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+250 ms] from C++
+11:17:39.116 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+93 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:39.411 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+292 ms] from C++
+11:17:39.499 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+88 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:39.933 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+438 ms] from C++
+11:17:40.032 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+95 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:46.400 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+6372 ms] from C++
+11:17:46.502 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+102 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:17:56.820 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000251afef6ec0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:17:56.820 [mov,mp4,m4a,3gp,3g2,mj2 @ 00000251afef6ec0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:17:58.190 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+11691 ms] from C++
+11:17:58.289 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+91 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:18:02.960 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+4671 ms] from C++
+11:18:03.065 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+103 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:18:04.765 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+1698 ms] from C++
+11:18:04.858 playback: still.publish 1920 px wide, playback picture was 1920 px at 3816 ms [+93 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:18:09.454 playback: session.stop decoder idle, picture at 3816 ms, published 3816 ms [+4596 ms] from MonitorPanel.qml:1192 (onDestruction)

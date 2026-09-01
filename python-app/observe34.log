@@ -1,0 +1,67 @@
+12:49:50.150 GUI turn monitor on, budget 20 ms - every event-loop turn longer than this is reported with its marked scope (CUTPRO_TURN_BUDGET_MS=0 turns it off)
+12:49:50.245 CrashReporterHost: watching pid 19716 from pid 6120 | reports -> C:/Users/USER/AppData/Local/Antigravity/Cut Pro/crash-reports
+12:49:50.266 Cut Pro: native C++/Qt backend, coreVersion = 0.1.2 | built = Sep  1 2026 11:12:47 | executable = C:/premier-pro/python-app/dist/Cut Pro 2026/cutpro.exe
+12:49:50.583 GUI thread unresponsive for 425 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+12:49:50.583   the innermost frame has only been open 305 ms of the 425 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+12:49:51.019 GUI thread unresponsive for 861 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+12:49:51.123   GUI thread backtrace, innermost first (14 frames):
+12:49:51.123     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+12:49:51.123     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+12:49:51.123     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+12:49:51.123     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+12:49:51.123     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+12:49:51.123     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+12:49:51.123     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+12:49:51.123     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+12:49:51.123     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+12:49:51.123     #9  "cutpro.exe+0x2d8e"
+12:49:51.123     #10  "cutpro.exe+0x12ef"
+12:49:51.123     #11  "cutpro.exe+0x1406"
+12:49:51.123     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+12:49:51.123     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+12:49:51.941 GUI thread unresponsive for 1783 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+12:49:51.942   GUI thread backtrace, innermost first (14 frames):
+12:49:51.942     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+12:49:51.942     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+12:49:51.942     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+12:49:51.942     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+12:49:51.942     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+12:49:51.942     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+12:49:51.942     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+12:49:51.942     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+12:49:51.942     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+12:49:51.942     #9  "cutpro.exe+0x2d8e"
+12:49:51.942     #10  "cutpro.exe+0x12ef"
+12:49:51.942     #11  "cutpro.exe+0x1406"
+12:49:51.942     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+12:49:51.942     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+12:49:52.190 GUI thread STILL blocked after 2031 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)" - during launch, before any window exists: this delays startup but cannot show as "Not Responding".
+12:49:52.191   GUI thread backtrace, innermost first (14 frames):
+12:49:52.191     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+12:49:52.191     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+12:49:52.191     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+12:49:52.191     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+12:49:52.191     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+12:49:52.191     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+12:49:52.191     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+12:49:52.192     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+12:49:52.192     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+12:49:52.192     #9  "cutpro.exe+0x2d8e"
+12:49:52.192     #10  "cutpro.exe+0x12ef"
+12:49:52.192     #11  "cutpro.exe+0x1406"
+12:49:52.192     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+12:49:52.192     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+12:49:53.264 Using Qt multimedia with FFmpeg version 7.1.3 LGPL version 2.1 or later
+12:49:54.237 GUI turn 24 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+12:50:08.458 monitor: source key  -> clip_1cc405db3a57|D:/USER/Pictures/ps_ebvisacard-eng.jpg|image|0|0|5000|
+12:50:08.458 playback: session.stop decoder idle, picture at -1 ms, published -1 ms from MonitorPanel.qml:1189 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1766
+12:50:08.843 GUI thread unresponsive for 422 ms, "churning through": "ClipEffectControlsPanel.rebuildRows"
+12:50:08.843   the innermost frame has only been open 314 ms of the 422 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+12:50:21.494 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002548a3659c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:50:21.496 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002548a3659c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:50:21.815 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002548a366740] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:50:21.815 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002548a366740] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:50:21.829 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002548a366f40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:50:21.830 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002548a366f40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:50:22.006 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002548a366a00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:50:22.006 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002548a366a00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.

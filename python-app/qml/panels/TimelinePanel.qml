@@ -110,10 +110,15 @@ Rectangle {
         var wanted = Backend.videoTrackCount + Backend.audioTrackCount
                      + subtitleTrackCount + effectTrackCount
         var found = 0
-        for (var i = 0; i < Backend.clips.length && found < wanted; ++i) {
-            var clip = Backend.clips[i]
-            var key = clip.kind === "subtitle"
-                      ? "S1" : String(clip.track || "").toUpperCase()
+        // Cues all land on S1, so hasSubtitleClips answers for the whole lane
+        // and the scan itself only has to cover the real clips.
+        if (Backend.hasSubtitleClips) {
+            map["S1"] = true
+            ++found
+        }
+        var clips = Backend.mediaClips
+        for (var i = 0; i < clips.length && found < wanted; ++i) {
+            var key = String(clips[i].track || "").toUpperCase()
             if (key !== "" && map[key] === undefined) {
                 map[key] = true
                 ++found
@@ -249,13 +254,9 @@ Rectangle {
         id: subtitleContextMenu
         parent: Overlay.overlay
         onSettingsRequested: (subtitleId) => {
-            for (var i = 0; i < Backend.clips.length; ++i) {
-                var clip = Backend.clips[i]
-                if (clip.id === subtitleId) {
-                    subtitleSettingsPopup.subtitleText = clip.text || ""
-                    break
-                }
-            }
+            var clip = Backend.clipById(String(subtitleId))
+            if (clip.id !== undefined)
+                subtitleSettingsPopup.subtitleText = clip.text || ""
             subtitleSettingsPopup.open()
         }
     }
@@ -278,6 +279,25 @@ Rectangle {
         onVocalRemovalRequested: clipId => {
             var ids = root.isClipSelected(clipId) ? root.selectedClipIds.slice(0) : [clipId]
             root.startVocalRemovalBatch(ids)
+        }
+        onExtractAudioRequested: clipId => {
+            var ids = root.isClipSelected(clipId)
+                ? root.selectedClipIds.slice(0) : [clipId]
+            var added = Backend.extractClipAudio(ids)
+            // Select what was created, the way a drop does: the new lane is what
+            // the next action - a move, a level, a delete - is aimed at.
+            if (added && added.length > 0) {
+                root.selectedClipIds = added
+                root.selectedClipId = added[0]
+            }
+        }
+        onRestoreAudioRequested: clipId => {
+            var ids = root.isClipSelected(clipId)
+                ? root.selectedClipIds.slice(0) : [clipId]
+            if (Backend.restoreClipAudio(ids)) {
+                root.selectedClipIds = []
+                root.selectedClipId = ""
+            }
         }
     }
 
@@ -316,12 +336,8 @@ Rectangle {
         if (!job) return
         vocalRemovalCurrentId = jobId
         var started = false
-        for (var j = 0; j < Backend.clips.length; ++j) {
-            if (String(Backend.clips[j].id) === String(jobId)) {
-                started = Backend.setClipEffectSetting(jobId, "vocalRemoval", true)
-                break
-            }
-        }
+        if (Backend.clipById(String(jobId)).id !== undefined)
+            started = Backend.setClipEffectSetting(jobId, "vocalRemoval", true)
         if (!started) {
             var failed = vocalRemovalJobs.slice()
             for (var k = 0; k < failed.length; ++k)
@@ -338,15 +354,13 @@ Rectangle {
     function startVocalRemovalBatch(ids) {
         var jobs = []
         for (var i = 0; i < ids.length; ++i) {
-            for (var j = 0; j < Backend.clips.length; ++j) {
-                var clip = Backend.clips[j]
-                if (String(clip.id) !== String(ids[i]) || clip.kind === "subtitle") continue
-                var media = mediaForId(clip.mediaId)
-                if (!media || Number(media.channels || 0) <= 0) continue
-                jobs.push({ id: clip.id, name: media.name || clip.name || clip.id,
-                            status: "Queued", detail: "", durationMs: Number(media.durationMs || clip.durationMs || 0),
-                            thumbnailUrl: media.thumbnailUrl || "" })
-            }
+            var clip = Backend.clipById(String(ids[i]))
+            if (clip.id === undefined || clip.kind === "subtitle") continue
+            var media = mediaForId(clip.mediaId)
+            if (!media || Number(media.channels || 0) <= 0) continue
+            jobs.push({ id: clip.id, name: media.name || clip.name || clip.id,
+                        status: "Queued", detail: "", durationMs: Number(media.durationMs || clip.durationMs || 0),
+                        thumbnailUrl: media.thumbnailUrl || "" })
         }
         vocalRemovalJobs = jobs
         var queue = []
@@ -534,11 +548,8 @@ Rectangle {
     }
 
     function mediaForId(mediaId) {
-        for (var i = 0; i < Backend.media.length; ++i) {
-            if (Backend.media[i].id === mediaId)
-                return Backend.media[i]
-        }
-        return null
+        var media = Backend.mediaById(String(mediaId || ""))
+        return media && media.id ? media : null
     }
 
     function toggleVisible(track) {
@@ -553,10 +564,10 @@ Rectangle {
         if (!clip)
             return
         var next = []
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var candidate = Backend.clips[i]
-            if (candidate.kind === "subtitle" && clip.kind !== "subtitle")
-                continue
+        // Only a subtitle selection has any business walking the cues.
+        var clips = clip.kind === "subtitle" ? Backend.clips : Backend.mediaClips
+        for (var i = 0; i < clips.length; ++i) {
+            var candidate = clips[i]
             if ((allTracks && root.trackState(candidate.track).targeted)
                     || candidate.track === clip.track) {
                 if (candidate.startMs >= clip.startMs)
@@ -569,9 +580,10 @@ Rectangle {
 
     function razorAt(ms) {
         var didSplit = false
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var clip = Backend.clips[i]
-            if (clip.kind === "subtitle" || root.trackLocked(clip.track)
+        var clips = Backend.mediaClips
+        for (var i = 0; i < clips.length; ++i) {
+            var clip = clips[i]
+            if (root.trackLocked(clip.track)
                     || root.trackState(clip.track).targeted === false)
                 continue
             if (ms > clip.startMs && ms < clip.startMs + clip.durationMs) {
@@ -591,10 +603,9 @@ Rectangle {
         var top = Math.min(marqueeStart.y, marqueeEnd.y)
         var bottom = Math.max(marqueeStart.y, marqueeEnd.y)
         var next = []
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var clip = Backend.clips[i]
-            if (clip.kind === "subtitle")
-                continue
+        var clips = Backend.mediaClips
+        for (var i = 0; i < clips.length; ++i) {
+            var clip = clips[i]
             var clipLeft = Number(clip.startMs) / 1000 * root.pps
             var clipRight = clipLeft + Math.max(18,
                             Number(clip.durationMs) / 1000 * root.pps)
@@ -626,8 +637,9 @@ Rectangle {
                            / root.pps * 1000
         var draggedEnd = draggedStart + Number(dragged.durationMs || 0)
         var toleranceMs = Math.max(2, 2000 / Math.max(1, root.pps))
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var other = Backend.clips[i]
+        var clips = dragged.kind === "subtitle" ? Backend.clips : Backend.mediaClips
+        for (var i = 0; i < clips.length; ++i) {
+            var other = clips[i]
             if (other.id === dragged.id || other.track !== dragged.track
                     || other.enabled === false)
                 continue
@@ -646,9 +658,10 @@ Rectangle {
     function clipAtPlayhead() {
         var result = null
         var resultRank = -1
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var clip = Backend.clips[i]
-            if (clip.enabled === false || clip.kind === "subtitle"
+        var clips = Backend.mediaClips
+        for (var i = 0; i < clips.length; ++i) {
+            var clip = clips[i]
+            if (clip.enabled === false
                     || root.trackState(clip.track).targeted === false
                     || Backend.playheadMs < clip.startMs
                     || Backend.playheadMs >= clip.startMs + clip.durationMs)
@@ -665,9 +678,10 @@ Rectangle {
     }
 
     function editingClip() {
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            if (Backend.clips[i].id === selectedClipId)
-                return Backend.clips[i]
+        if (selectedClipId !== "") {
+            var selected = Backend.clipById(String(selectedClipId))
+            if (selected.id !== undefined)
+                return selected
         }
         return clipAtPlayhead()
     }
@@ -741,19 +755,24 @@ Rectangle {
     }
 
     function linkedClipIds(id) {
-        var selected = null
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            if (Backend.clips[i].id === id) {
-                selected = Backend.clips[i]
-                break
-            }
-        }
-        if (!selected || !selected.linkGroupId)
+        var selected = Backend.clipById(String(id))
+        if (selected.id === undefined || !selected.linkGroupId)
+            return [id]
+        // Extracted audio is an independent clip, so a group left behind by an
+        // older build's Extract Audio must not drag its partner into the
+        // selection - that is what made moving or deleting one act on both.
+        if (selected.separateAudio === true
+                || selected.linkedRole === "audio")
             return [id]
         var linked = []
-        for (var j = 0; j < Backend.clips.length; ++j) {
-            if (Backend.clips[j].linkGroupId === selected.linkGroupId)
-                linked.push(Backend.clips[j].id)
+        var clips = Backend.mediaClips
+        for (var j = 0; j < clips.length; ++j) {
+            if (clips[j].linkGroupId === selected.linkGroupId) {
+                if (clips[j].separateAudio === true
+                        || clips[j].linkedRole === "audio")
+                    return [id]
+                linked.push(clips[j].id)
+            }
         }
         return linked.length > 0 ? linked : [id]
     }
@@ -765,10 +784,11 @@ Rectangle {
         var range = (modifiers & Qt.ShiftModifier) !== 0
 
         if (range && selectedClipIds.length > 0) {
-            var anchor = Backend.clips.findIndex(function(item) {
+            var clips = Backend.clips
+            var anchor = clips.findIndex(function(item) {
                 return item.id === selectedClipIds[0]
             })
-            var target = Backend.clips.findIndex(function(item) {
+            var target = clips.findIndex(function(item) {
                 return item.id === id
             })
             if (anchor >= 0 && target >= 0) {
@@ -776,7 +796,7 @@ Rectangle {
                 var last = Math.max(anchor, target)
                 next = []
                 for (var i = first; i <= last; ++i)
-                    next.push(Backend.clips[i].id)
+                    next.push(clips[i].id)
             }
         } else if (additive) {
             var index = next.indexOf(id)
@@ -848,12 +868,8 @@ Rectangle {
         function onClipsChanged() {
             var valid = []
             for (var i = 0; i < root.selectedClipIds.length; ++i) {
-                for (var j = 0; j < Backend.clips.length; ++j) {
-                    if (Backend.clips[j].id === root.selectedClipIds[i]) {
-                        valid.push(root.selectedClipIds[i])
-                        break
-                    }
-                }
+                if (Backend.clipById(String(root.selectedClipIds[i])).id !== undefined)
+                    valid.push(root.selectedClipIds[i])
             }
             root.selectedClipIds = valid
             root.selectedClipId = valid.length > 0 ? valid[valid.length - 1] : ""
@@ -1660,11 +1676,7 @@ Rectangle {
                                    ? 0 : root.trackY(mediaDropArea.targetTrack))
 
                             function timelineHasMedia() {
-                                for (var i = 0; i < Backend.clips.length; ++i) {
-                                    if (Backend.clips[i].kind !== "subtitle")
-                                        return true
-                                }
-                                return false
+                                return Backend.mediaClips.length > 0
                             }
 
                             function updateTarget(event) {
@@ -2388,10 +2400,14 @@ Rectangle {
                                             return
                                         var point = mapToItem(clipLayer, mouse.x, mouse.y)
                                         var requested = Math.round(point.x / root.pps * 1000)
-                                        // An effect bar has no source footage
-                                        // behind it, so its head is free: it can be
-                                        // pulled back to the head of the sequence.
-                                        var minimum = clipItem.modelData.kind === "effect"
+                                        // An effect bar, image still and
+                                        // subtitle have no source footage, so
+                                        // the head is free: it can be pulled
+                                        // back to the head of the sequence.
+                                        var freeHead = clipItem.modelData.kind === "effect"
+                                                       || clipItem.modelData.kind === "image"
+                                                       || clipItem.modelData.kind === "subtitle"
+                                        var minimum = freeHead
                                                       ? 0
                                                       : Math.max(0,
                                                                clipItem.modelData.startMs
@@ -2457,10 +2473,15 @@ Rectangle {
                                             return
                                         var point = mapToItem(clipLayer, mouse.x, mouse.y)
                                         var requested = Math.round(point.x / root.pps * 1000)
-                                        // Nothing runs out at the end of an effect
-                                        // bar, so the tail is free. The 24 h stop is
-                                        // the same one the backend applies.
-                                        var maximum = clipItem.modelData.kind === "effect"
+                                        // Nothing runs out at the tail of an
+                                        // effect bar, an image still or a
+                                        // subtitle, so the tail is free. The
+                                        // 24 h stop is the same one the backend
+                                        // applies.
+                                        var freeTail = clipItem.modelData.kind === "effect"
+                                                       || clipItem.modelData.kind === "image"
+                                                       || clipItem.modelData.kind === "subtitle"
+                                        var maximum = freeTail
                                                       ? 86400000
                                                       : clipItem.modelData.startMs
                                                         + clipItem.sourceDurationMs

@@ -1,10 +1,12 @@
 #include "app/subtitles/subtitle_io.h"
 #include "app/subtitles/khmer_support.h"
+#include "app/preview/gui_thread_watchdog.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QRegularExpression>
 #include <QSaveFile>
 #include <QTextStream>
+#include <QVector>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
@@ -106,6 +108,7 @@ QString formatTtmlTime(double seconds) {
 } // namespace
 
 QVariantList SubtitleIO::readSrt(const QString &path, QString *error) {
+  CUTPRO_GUI_SCOPE("SubtitleIO::readSrt");
   QFile file(path);
   // No QIODevice::Text: we handle CRLF/CR stripping manually below so the
   // raw byte stream is preserved for correct UTF-8 decoding of Khmer/CJK text.
@@ -123,8 +126,13 @@ QVariantList SubtitleIO::readSrt(const QString &path, QString *error) {
   double end = -1.0;
   const auto flush = [&]() {
     if (start >= 0.0 && end > start && !textLines.isEmpty()) {
+      // Compiled once. This used to be built inside the lambda, so a 19,831-cue
+      // track paid for 19,831 regex compilations during the import - most of the
+      // GUI stall the watchdog reported inside readSrt was this line.
+      static const QRegularExpression tags(
+          QStringLiteral("</?[a-zA-Z][^>]*>"));
       QString text = textLines.join('\n').trimmed();
-      text.remove(QRegularExpression(QStringLiteral("</?[a-zA-Z][^>]*>")));
+      text.remove(tags);
       text = text.normalized(QString::NormalizationForm_C);
       if (!text.isEmpty())
         result.append(QVariantMap{{"start", start}, {"end", end}, {"text", text}});
@@ -132,24 +140,29 @@ QVariantList SubtitleIO::readSrt(const QString &path, QString *error) {
     textLines.clear();
     start = end = -1.0;
   };
-  for (QString line : data.split('\n')) {
-    if (line.startsWith(QChar(0xFEFF)))
-      line.remove(0, 1);
-    const QString trimmed = line.trimmed();
+  // Split into views, not strings. A five-hour caption file is ~80,000 lines,
+  // and the QStringList version allocated a QString for every one of them (plus
+  // a second copy per iteration, since the loop variable was by value) before
+  // throwing almost all of them away.
+  const QList<QStringView> lines = QStringView{data}.split(QLatin1Char('\n'));
+  for (QStringView raw : lines) {
+    if (raw.startsWith(QChar(0xFEFF)))
+      raw = raw.mid(1);
+    const QStringView trimmed = raw.trimmed();
     if (trimmed.isEmpty()) {
       flush();
       continue;
     }
-    if (trimmed.contains("-->")) {
-      const auto times = trimmed.split("-->");
+    if (trimmed.contains(QLatin1String("-->"))) {
+      const auto times = trimmed.split(QStringView(u"-->"));
       if (times.size() == 2) {
-        start = parseTime(times[0]);
-        end = parseTime(times[1]);
+        start = parseTime(times[0].toString());
+        end = parseTime(times[1].toString());
       }
       continue;
     }
     if (start >= 0.0)
-      textLines << trimmed;
+      textLines << trimmed.toString();
   }
   flush();
   if (result.isEmpty() && error)
@@ -203,6 +216,7 @@ bool SubtitleIO::writeSrt(const QString &path, const QVariantList &segments,
 
 QVariantList SubtitleIO::readTtml(const QString &path, QString *error,
                                   QString *language) {
+  CUTPRO_GUI_SCOPE("SubtitleIO::readTtml");
   QFile file(path);
   if (!file.open(QIODevice::ReadOnly)) {
     if (error)
@@ -298,9 +312,10 @@ QVariantList SubtitleIO::readTtml(const QString &path, QString *error,
       if (begin < 0 || end <= begin)
         continue;
       // Collapse the runs of spaces and newlines XML indentation leaves behind,
-      // but keep the hard breaks <br/> asked for.
-      text.replace(QRegularExpression(QStringLiteral("[ \\t]+")),
-                   QStringLiteral(" "));
+      // but keep the hard breaks <br/> asked for. Compiled once, for the same
+      // reason as the tag regex in readSrt.
+      static const QRegularExpression blanks(QStringLiteral("[ \\t]+"));
+      text.replace(blanks, QStringLiteral(" "));
       text = text.trimmed().normalized(QString::NormalizationForm_C);
       if (text.isEmpty())
         continue;
@@ -334,14 +349,28 @@ QVariantList SubtitleIO::readTtml(const QString &path, QString *error,
 }
 
 int SubtitleIO::deoverlap(QVariantList &segments) {
-  int trimmed = 0;
-  for (int i = 0; i + 1 < segments.size(); ++i) {
-    QVariantMap cue = segments[i].toMap();
-    const qint64 startMs = msFromSeconds(cue.value(QStringLiteral("start")).toDouble());
-    const qint64 endMs = msFromSeconds(cue.value(QStringLiteral("end")).toDouble());
-    const qint64 nextMs = msFromSeconds(
-        segments[i + 1].toMap().value(QStringLiteral("start")).toDouble());
+  CUTPRO_GUI_SCOPE("SubtitleIO::deoverlap");
+  const int count = segments.size();
+  if (count < 2)
+    return 0;
 
+  static const QString kStart = QStringLiteral("start");
+  static const QString kEnd = QStringLiteral("end");
+
+  // Edges first, as integers. The pair loop below used to build a QVariantMap
+  // for cue i and another for cue i+1 on every iteration, which meant every
+  // timestamp in the file was converted twice and every cue's map was copied
+  // twice - the shape the stall backtrace caught mid-_M_copy.
+  QVector<qint64> starts(count);
+  QVector<qint64> ends(count);
+  for (int i = 0; i < count; ++i) {
+    const QVariantMap cue = segments.at(i).toMap();
+    starts[i] = msFromSeconds(cue.value(kStart).toDouble());
+    ends[i] = msFromSeconds(cue.value(kEnd).toDouble());
+  }
+
+  int trimmed = 0;
+  for (int i = 0; i + 1 < count; ++i) {
     // Not strictly later: the next cue begins with this one or before it, which
     // is genuine simultaneous dialogue - two speakers in two regions - rather
     // than the next line of a scroll. Shortening this one would delete a
@@ -351,20 +380,21 @@ int SubtitleIO::deoverlap(QVariantList &segments) {
     // single such pair anywhere abandoned the entire pass: a five-hour track
     // with one repeated timestamp in it imported with all 12,000 of its
     // overlaps intact, and nothing said why.
-    if (nextMs <= startMs)
+    if (starts[i + 1] <= starts[i])
       continue;
 
     // Ends where the successor begins, or later: both are visible at the
     // boundary millisecond. Every pair in a YouTube track is in this state, and
     // it is what makes an imported file double-print its text and lay two clips
     // over the same instant of the timeline.
-    const qint64 limit = nextMs - kCueGapMs;
-    if (endMs <= limit)
+    const qint64 limit = starts[i + 1] - kCueGapMs;
+    if (ends[i] <= limit)
       continue;
     // Never shorter than a millisecond: readSrt requires end > start, so a cue
     // squeezed flat here would disappear on the next import rather than merely
     // being brief. Only reachable when two cues start a millisecond apart.
-    cue[QStringLiteral("end")] = qMax(startMs + 1, limit) / 1000.0;
+    QVariantMap cue = segments.at(i).toMap();
+    cue[kEnd] = qMax(starts[i] + 1, limit) / 1000.0;
     segments[i] = cue;
     ++trimmed;
   }

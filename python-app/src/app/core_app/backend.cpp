@@ -28,6 +28,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QDirIterator>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonArray>
@@ -435,15 +436,12 @@ Backend::Backend(QObject *parent)
     if (success) {
       const int index = clipIndex(clipId);
       if (index >= 0) {
-        const QVariantMap sourceClip = m_clips.at(index).toMap();
-        const QString linkGroupId = sourceClip.value("linkGroupId").toString();
-        for (int i = 0; i < m_clips.size(); ++i) {
+        // The replacement follows the sound: if this clip's audio has been
+        // extracted onto its own lane, that clip is what actually plays it.
+        QVector<int> touched = audioPeerIndexes(index);
+        touched.append(index);
+        for (const int i : touched) {
           QVariantMap clip = m_clips.at(i).toMap();
-          const bool sameClip = i == index;
-          const bool linked = !linkGroupId.isEmpty() &&
-                              clip.value("linkGroupId").toString() == linkGroupId;
-          if (!sameClip && !linked)
-            continue;
           QVariantMap effects = clip.value("effects").toMap();
           effects["vocalRemoval"] = true;
           effects["demucsPath"] = outputPath;
@@ -526,13 +524,31 @@ Backend::Backend(QObject *parent)
             beginTimedSpeechImport(outputs);
           });
   connect(this, &Backend::clipsChanged, this,
-          &Backend::rebuildSequenceTranscript);
+          &Backend::scheduleSequenceTranscriptRebuild);
   connect(this, &Backend::tracksChanged, this,
-          &Backend::rebuildSequenceTranscript);
+          &Backend::scheduleSequenceTranscriptRebuild);
   connect(&m_effectPreviewGenerator, &EffectPreviewGenerator::previewReady,
           this, &Backend::effectPreviewReady);
   connect(&m_previewDecoder, &FfmpegPreviewDecoder::frameReady, this,
           [this](quint64) {
+            // frameReady is queued from the decode thread, so a frame published
+            // just before stop() landed can still arrive here afterwards. It was
+            // never drawn, and letting it through would move the picture after
+            // the pause handler had already anchored the playhead onto the frame
+            // the user was looking at.
+            if (!m_previewDecoder.running())
+              return;
+            // Recorded here, on the GUI thread, because this is the moment the
+            // picture becomes the one QML draws. presentedSourceMs() on the
+            // decoder is the publish instant, one queued call earlier.
+            const qint64 shown = m_previewDecoder.presentedSourceMs();
+            if (shown != m_paintedSourceMs) {
+              m_previousPaintedSourceMs = m_paintedSourceMs;
+              m_paintedSourceMs = shown;
+              m_paintedWallMs = QDateTime::currentMSecsSinceEpoch();
+            }
+            m_paintedFrameWidth = m_previewDecoder.presentedWidth();
+
             // Counted here rather than taken from the decoder: two producers
             // feed this URL now, and a revision that ever repeats would let QML
             // serve a cached image for a new frame.
@@ -540,6 +556,7 @@ Backend::Backend(QObject *parent)
             m_previewFrameFromScrub = false;
             emit previewFrameChanged();
           });
+
   connect(&m_previewDecoder, &FfmpegPreviewDecoder::stateChanged, this,
           &Backend::previewStateChanged);
   connect(&m_previewDecoder, &FfmpegPreviewDecoder::errorChanged, this,
@@ -549,10 +566,22 @@ Backend::Backend(QObject *parent)
   // decode look the same to QML.
   connect(&m_scrubFrames, &ScrubFrameService::frameReady, this,
           [this](quint64) {
+            // A still landing while the monitor is paused replaces the picture
+            // playback left there. Same frame or not, same resolution or not,
+            // that repaint is what a "twitch on the freeze frame" is made of, so
+            // the trace names it with both sizes and the gap between them.
+            if (PlaybackTrace::enabled() && !m_playing)
+              PlaybackTrace::instance().record(
+                  "still.publish",
+                  QStringLiteral("%1 px wide, playback picture was %2 px at %3 ms")
+                      .arg(m_scrubFrames.frame().width())
+                      .arg(m_paintedFrameWidth)
+                      .arg(m_paintedSourceMs));
             ++m_previewFrameRevision;
             m_previewFrameFromScrub = true;
             emit previewFrameChanged();
           });
+
   connect(&m_scrubFrames, &ScrubFrameService::busyChanged, this,
           &Backend::previewStateChanged);
   connect(&m_scrubFrames, &ScrubFrameService::errorChanged, this,
@@ -566,6 +595,12 @@ Backend::Backend(QObject *parent)
   m_ttsImportTimer.setInterval(0);
   connect(&m_ttsImportTimer, &QTimer::timeout, this,
           &Backend::importNextTimedSpeechOutput);
+  m_transcriptRebuildTimer.setSingleShot(true);
+  // Long enough that a burst of edits pays for one rebuild, short enough that
+  // the Text panel is up to date before the user can look at it.
+  m_transcriptRebuildTimer.setInterval(120);
+  connect(&m_transcriptRebuildTimer, &QTimer::timeout, this,
+          &Backend::rebuildSequenceTranscript);
   connect(this, &Backend::clipsChanged, this, &Backend::colorSettingsChanged);
   connect(this, &Backend::clipsChanged, this, [this]() {
     if (m_selectedClipId.isEmpty())
@@ -676,8 +711,72 @@ void Backend::beginTimedSpeechImport(const QVariantList &outputs) {
   m_pendingTtsIndex = 0;
   m_pendingTtsAdded = 0;
   m_ttsImportActive = true;
+  buildSpeechLaneIndex();
+  m_ttsMediaByPath.clear();
+  // The whole import is known up front, so the two lists are grown once instead of
+  // reallocating and copying a 19831-entry spine on the way through.
+  m_media.reserve(m_media.size() + m_pendingTtsOutputs.size());
+  m_clips.reserve(m_clips.size() + m_pendingTtsOutputs.size());
   m_textToSpeechEngine.beginTimelineImport(m_pendingTtsOutputs.size());
+  m_ttsPublishedMediaCount = m_media.size();
+  m_ttsPublishedVideoTracks = m_videoTrackCount;
+  m_ttsPublishedAudioTracks = m_audioTrackCount;
+  m_ttsPublishClock.start();
   m_ttsImportTimer.start();
+}
+
+void Backend::buildSpeechLaneIndex() {
+  constexpr int kLaneCount = 64;
+  m_ttsLanes.assign(kLaneCount, SpeechLane{});
+  for (int number = 1; number <= kLaneCount; ++number) {
+    // Same rule the per-cue search used: a locked lane is off limits only while it
+    // is a lane the sequence actually has.
+    if (number <= m_audioTrackCount &&
+        trackLocked(QStringLiteral("A%1").arg(number)))
+      m_ttsLanes[number - 1].blocked = true;
+  }
+  // One pass over the timeline for all 64 lanes, and one QVariantMap conversion
+  // per clip rather than one per clip per cue per lane.
+  for (const QVariant &clipValue : m_clips) {
+    const QVariantMap clip = clipValue.toMap();
+    if (clip.value(QStringLiteral("enabled"), true).toBool() == false)
+      continue;
+    const QString track = clip.value(QStringLiteral("track")).toString();
+    if (track.size() < 2 || !track.startsWith(QLatin1Char('A')))
+      continue;
+    bool ok = false;
+    const int number = QStringView(track).mid(1).toInt(&ok);
+    if (!ok || number < 1 || number > kLaneCount)
+      continue;
+    const qint64 start = clip.value(QStringLiteral("startMs")).toLongLong();
+    const qint64 end =
+        start + clip.value(QStringLiteral("durationMs")).toLongLong();
+    if (end > start)
+      m_ttsLanes[number - 1].intervals.append({start, end});
+  }
+  for (SpeechLane &lane : m_ttsLanes)
+    std::sort(lane.intervals.begin(), lane.intervals.end());
+}
+
+QString Backend::reserveSpeechLane(qint64 startMs, qint64 endMs) {
+  for (int number = 1; number <= m_ttsLanes.size(); ++number) {
+    SpeechLane &lane = m_ttsLanes[number - 1];
+    if (lane.blocked)
+      continue;
+    // Cues arrive in ascending start order, so everything that ends at or before
+    // this cue begins is behind us for good.
+    while (lane.cursor < lane.intervals.size() &&
+           lane.intervals.at(lane.cursor).second <= startMs)
+      ++lane.cursor;
+    if (lane.appendedEndMs > startMs)
+      continue;
+    if (lane.cursor < lane.intervals.size() &&
+        lane.intervals.at(lane.cursor).first < endMs)
+      continue;
+    lane.appendedEndMs = endMs;
+    return QStringLiteral("A%1").arg(number);
+  }
+  return QStringLiteral("A64");
 }
 
 void Backend::importNextTimedSpeechOutput() {
@@ -685,6 +784,8 @@ void Backend::importNextTimedSpeechOutput() {
     return;
   if (m_textToSpeechEngine.importCancellationRequested()) {
     m_pendingTtsOutputs.clear();
+    m_ttsLanes.clear();
+    m_ttsMediaByPath.clear();
     m_ttsImportActive = false;
     pruneEmptyTracks();
     markDirty();
@@ -697,81 +798,74 @@ void Backend::importNextTimedSpeechOutput() {
     return;
   }
 
-  constexpr int batchSize = 2;
-  int processed = 0;
-  while (m_pendingTtsIndex < m_pendingTtsOutputs.size() &&
-         processed < batchSize) {
+  // A time budget, not a count. Two per event-loop turn meant 9916 turns and 9916
+  // rounds of signals for one generated voice track; a deadline places as many as
+  // fit in one frame's worth of GUI time and still hands the loop back before the
+  // window can miss a frame. At least one always goes through, so this terminates
+  // no matter how slow a single placement is.
+  constexpr qint64 kBudgetMs = 12;
+  QElapsedTimer budget;
+  budget.start();
+  while (m_pendingTtsIndex < m_pendingTtsOutputs.size()) {
     const QVariantMap output =
         m_pendingTtsOutputs.at(m_pendingTtsIndex++).toMap();
-    ++processed;
     const QString path = output.value("path").toString();
     const qint64 startMs =
         qMax<qint64>(0, output.value("startMs").toLongLong());
     const qint64 endMs = output.value("endMs").toLongLong();
     const qint64 durationMs = endMs - startMs;
-    if (path.isEmpty() || durationMs <= 0 || !QFileInfo::exists(path))
+    if (path.isEmpty() || durationMs <= 0)
       continue;
 
     const QFileInfo source(path);
-    QVariantMap media{{"path", source.absoluteFilePath()},
-                      {"name", source.fileName()},
-                      {"kind", QStringLiteral("audio")},
-                      {"sizeBytes", source.size()},
-                      {"durationMs", durationMs},
-                      {"width", 0},
-                      {"height", 0},
-                      {"frameRate", 0.0},
-                      {"sampleRate", 24000},
-                      {"channels", 1},
-                      {"thumbnailUrl", QString()},
-                      {"timelineThumbnailUrl", QString()},
-                      {"filmstripFrames", 0},
-                      {"filmstripFrameWidth", 0},
-                      {"filmstripFrameHeight", 0},
-                      {"waveformUrl", QString()}};
-    const QString mediaId = id("media");
-    media["id"] = mediaId;
-    media["importedAt"] =
-        QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-    media["generatedBy"] = QStringLiteral("text_to_speech");
-    media["excludeFromTranscript"] = true;
-    media["hiddenInProjectPanel"] = true;
-    media["ttsSubtitleIndex"] = output.value("index");
-    media["ttsStartMs"] = startMs;
-    media["ttsEndMs"] = endMs;
-    m_media.append(media);
-
-    QString destination;
-    for (int number = 1; number <= 64 && destination.isEmpty(); ++number) {
-      const QString candidate = QStringLiteral("A%1").arg(number);
-      if (trackLocked(candidate) && number <= m_audioTrackCount)
+    const QString absolute = source.absoluteFilePath();
+    QString mediaId = m_ttsMediaByPath.value(absolute);
+    if (mediaId.isEmpty()) {
+      // Statted once per distinct file rather than once per cue. Cue tracks
+      // repeat themselves, and a stat per cue is twenty thousand trips to the
+      // filesystem on the GUI thread to re-answer a question the worker already
+      // audited before it wrote the manifest.
+      if (!source.isFile())
         continue;
-      bool occupied = false;
-      for (const QVariant &clipValue : m_clips) {
-        const QVariantMap clip = clipValue.toMap();
-        if (clip.value("track").toString() != candidate ||
-            clip.value("enabled", true).toBool() == false)
-          continue;
-        const qint64 clipStart = clip.value("startMs").toLongLong();
-        const qint64 clipEnd =
-            clipStart + clip.value("durationMs").toLongLong();
-        if (startMs < clipEnd && endMs > clipStart) {
-          occupied = true;
-          break;
-        }
-      }
-      if (!occupied)
-        destination = candidate;
+      QVariantMap media{{"path", absolute},
+                        {"name", source.fileName()},
+                        {"kind", QStringLiteral("audio")},
+                        {"sizeBytes", source.size()},
+                        {"durationMs", durationMs},
+                        {"width", 0},
+                        {"height", 0},
+                        {"frameRate", 0.0},
+                        {"sampleRate", 24000},
+                        {"channels", 1},
+                        {"thumbnailUrl", QString()},
+                        {"timelineThumbnailUrl", QString()},
+                        {"filmstripFrames", 0},
+                        {"filmstripFrameWidth", 0},
+                        {"filmstripFrameHeight", 0},
+                        {"waveformUrl", QString()}};
+      mediaId = id("media");
+      media["id"] = mediaId;
+      media["importedAt"] =
+          QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+      media["generatedBy"] = QStringLiteral("text_to_speech");
+      media["excludeFromTranscript"] = true;
+      media["hiddenInProjectPanel"] = true;
+      media["ttsSubtitleIndex"] = output.value("index");
+      media["ttsStartMs"] = startMs;
+      media["ttsEndMs"] = endMs;
+      m_media.append(media);
+      m_ttsMediaByPath.insert(absolute, mediaId);
     }
-    if (destination.isEmpty())
-      destination = QStringLiteral("A64");
+
+    const QString destination = reserveSpeechLane(startMs, endMs);
     ensureTrackExists(destination);
 
-    const qint64 sourceDurationMs =
-        qMax<qint64>(1, media.value("durationMs").toLongLong());
+    // From the cue, not from the file: this is the span the clip occupies, and it
+    // is what the old code put here too.
+    const qint64 sourceDurationMs = qMax<qint64>(1, durationMs);
     m_clips.append(QVariantMap{{"id", id("clip")},
                                {"mediaId", mediaId},
-                               {"name", media.value("name")},
+                               {"name", source.fileName()},
                                {"kind", QStringLiteral("audio")},
                                {"track", destination},
                                {"startMs", startMs},
@@ -784,24 +878,43 @@ void Backend::importNextTimedSpeechOutput() {
                                {"ttsSubtitleIndex", output.value("index")},
                                {"subtitleText", output.value("text")}});
     ++m_pendingTtsAdded;
+    if (budget.elapsed() >= kBudgetMs)
+      break;
   }
 
   m_textToSpeechEngine.updateTimelineImport(m_pendingTtsIndex,
                                              m_pendingTtsOutputs.size());
   if (m_pendingTtsIndex < m_pendingTtsOutputs.size()) {
-    // Publish only this small batch, then yield to Qt. Timeline delegates and
-    // waveform/layout bindings never have to create the full batch in one
-    // blocking GUI-thread pass.
-    emit mediaChanged();
-    emit clipsChanged();
-    emit tracksChanged();
-    emit timelineChanged();
+    // Publish what has accumulated, at most a few times a second, then yield to
+    // Qt. What is published is only what actually changed: with identical cue text
+    // sharing one bin entry, most stretches of the import add no media entry and
+    // no track, and a notification nothing follows is pure cost.
+    constexpr qint64 kPublishIntervalMs = 150;
+    if (m_ttsPublishClock.elapsed() >= kPublishIntervalMs) {
+      m_ttsPublishClock.restart();
+      if (m_media.size() != m_ttsPublishedMediaCount) {
+        m_ttsPublishedMediaCount = m_media.size();
+        emit mediaChanged();
+      }
+      emit clipsChanged();
+      if (m_videoTrackCount != m_ttsPublishedVideoTracks ||
+          m_audioTrackCount != m_ttsPublishedAudioTracks) {
+        m_ttsPublishedVideoTracks = m_videoTrackCount;
+        m_ttsPublishedAudioTracks = m_audioTrackCount;
+        emit tracksChanged();
+      }
+      emit timelineChanged();
+    }
     m_ttsImportTimer.start();
     return;
   }
+  // The final turn falls through to the unconditional emits below, which publish
+  // the finished timeline whether or not this last turn added anything.
 
   const int added = m_pendingTtsAdded;
   m_pendingTtsOutputs.clear();
+  m_ttsLanes.clear();
+  m_ttsMediaByPath.clear();
   m_ttsImportActive = false;
   if (added == 0) {
     if (!m_undo.isEmpty()) {
@@ -830,45 +943,177 @@ QString Backend::coreVersion() const {
   return QString::fromLatin1(core::kVersion);
 }
 qint64 Backend::durationMs() const {
+  ensureClipCaches();
+  return m_cachedDurationMs;
+}
+
+// One pass over m_clips answers every derived question QML asks about the
+// timeline. Guarded by a pin that shares m_clips' buffer: while the pin holds a
+// second reference the list cannot be mutated in place, so a differing data
+// pointer is a reliable "something changed" signal, and an identical one is a
+// reliable "nothing did".
+void Backend::ensureClipCaches() const {
+  if (m_clipCacheReady && m_clipCachePin.size() == m_clips.size() &&
+      m_clipCachePin.constData() == m_clips.constData())
+    return;
+  CUTPRO_GUI_SCOPE("Backend::ensureClipCaches");
+
+  static const QString kId = QStringLiteral("id");
+  static const QString kKind = QStringLiteral("kind");
+  static const QString kTrack = QStringLiteral("track");
+  static const QString kStartMs = QStringLiteral("startMs");
+  static const QString kDurationMs = QStringLiteral("durationMs");
+  static const QString kSubtitle = QStringLiteral("subtitle");
+  static const QString kEffect = QStringLiteral("effect");
+
+  m_clipCachePin = m_clips;
+  m_cachedClipIndex.clear();
+  m_cachedClipIndex.reserve(m_clips.size());
+  m_cachedTimelineEffects.clear();
+  m_cachedMediaClips.clear();
+  m_cachedVideoClips.clear();
+  m_cachedDurationMs = 0;
+  m_cachedHasSubtitleClips = false;
+  m_cachedHasRenderableClips = false;
+
   qint64 mediaEnd = 0;
   qint64 overlayEnd = 0;
-  for (const auto &v : m_clips) {
-    auto c = v.toMap();
-    const qint64 end =
-        c.value("startMs").toLongLong() + c.value("durationMs").toLongLong();
-    const QString kind = c.value("kind").toString();
+  for (int i = 0; i < m_clips.size(); ++i) {
+    const QVariantMap clip = m_clips.at(i).toMap();
+    const auto idIt = clip.constFind(kId);
+    if (idIt != clip.constEnd()) {
+      // First occurrence wins, matching the linear scan clipIndex() used to do.
+      const QString clipId = idIt->toString();
+      if (!m_cachedClipIndex.contains(clipId))
+        m_cachedClipIndex.insert(clipId, i);
+    }
+
+    const auto kindIt = clip.constFind(kKind);
+    const QString kind =
+        kindIt == clip.constEnd() ? QString() : kindIt->toString();
+    const bool isSubtitle = kind == kSubtitle;
+    const bool isEffect = kind == kEffect;
+
+    const qint64 end = clip.value(kStartMs).toLongLong() +
+                       clip.value(kDurationMs).toLongLong();
     // Subtitles and effect bars ride over the picture; on their own they are not
     // something to render, so they only set the length when nothing else does.
-    if (kind == "subtitle" || kind == "effect")
+    if (isSubtitle || isEffect)
       overlayEnd = std::max(overlayEnd, end);
     else
       mediaEnd = std::max(mediaEnd, end);
+
+    if (isSubtitle)
+      m_cachedHasSubtitleClips = true;
+    else
+      m_cachedMediaClips.append(m_clips.at(i));
+    if (isEffect)
+      m_cachedTimelineEffects.append(m_clips.at(i));
+    if (!isSubtitle && !isEffect)
+      m_cachedHasRenderableClips = true;
+    if (clip.value(kTrack).toString().startsWith(QLatin1Char('V')))
+      m_cachedVideoClips.append(i);
   }
-  return mediaEnd > 0 ? mediaEnd : overlayEnd;
+  m_cachedDurationMs = mediaEnd > 0 ? mediaEnd : overlayEnd;
+  m_clipCacheReady = true;
 }
 
 bool Backend::hasSubtitleClips() const {
-  return std::any_of(m_clips.cbegin(), m_clips.cend(), [](const auto &value) {
-    return value.toMap().value("kind") == "subtitle";
-  });
+  ensureClipCaches();
+  return m_cachedHasSubtitleClips;
+}
+
+void Backend::ensureMediaCaches() const {
+  if (m_mediaCacheReady && m_mediaCachePin.size() == m_media.size() &&
+      m_mediaCachePin.constData() == m_media.constData())
+    return;
+  CUTPRO_GUI_SCOPE("Backend::ensureMediaCaches");
+
+  static const QString kId = QStringLiteral("id");
+  static const QString kKind = QStringLiteral("kind");
+  static const QString kPath = QStringLiteral("path");
+  static const QString kExclude = QStringLiteral("excludeFromTranscript");
+  static const QString kGeneratedBy = QStringLiteral("generatedBy");
+  static const QString kVideo = QStringLiteral("video");
+  static const QString kAudio = QStringLiteral("audio");
+  static const QString kTextToSpeech = QStringLiteral("text_to_speech");
+  static const QString kGeneratedSpeechDir = QStringLiteral("/generated-speech/");
+  static const QString kHidden = QStringLiteral("hiddenInProjectPanel");
+
+  m_mediaCachePin = m_media;
+  m_cachedMediaIndex.clear();
+  m_cachedMediaIndex.reserve(m_media.size());
+  m_cachedTranscribableMedia.clear();
+  m_cachedVisibleMedia.clear();
+  m_cachedTranscribableIds.clear();
+
+  for (int i = 0; i < m_media.size(); ++i) {
+    const QVariantMap entry = m_media.at(i).toMap();
+    const auto idIt = entry.constFind(kId);
+    const QString mediaId = idIt == entry.constEnd() ? QString() : idIt->toString();
+    if (!mediaId.isEmpty() && !m_cachedMediaIndex.contains(mediaId))
+      // First occurrence wins, matching the linear scan mediaIndex() used to do.
+      m_cachedMediaIndex.insert(mediaId, i);
+
+    const QString generatedBy = entry.value(kGeneratedBy).toString();
+    if (!entry.value(kHidden).toBool() && generatedBy != kTextToSpeech)
+      m_cachedVisibleMedia.append(m_media.at(i));
+
+    const QString kind = entry.value(kKind).toString();
+    if (kind != kVideo && kind != kAudio)
+      continue;
+    if (entry.value(kExclude).toBool())
+      continue;
+    if (generatedBy == kTextToSpeech)
+      continue;
+    // Checked last: it is the only test that has to touch the path string.
+    if (QDir::fromNativeSeparators(entry.value(kPath).toString())
+            .contains(kGeneratedSpeechDir, Qt::CaseInsensitive))
+      continue;
+    m_cachedTranscribableMedia.append(m_media.at(i));
+    if (!mediaId.isEmpty())
+      m_cachedTranscribableIds.insert(mediaId);
+  }
+  m_mediaCacheReady = true;
+}
+
+QVariantList Backend::transcribableMedia() const {
+  ensureMediaCaches();
+  return m_cachedTranscribableMedia;
+}
+
+QVariantList Backend::visibleMedia() const {
+  ensureMediaCaches();
+  return m_cachedVisibleMedia;
+}
+
+bool Backend::isTranscribableMedia(const QString &mediaId) const {
+  if (mediaId.isEmpty())
+    return false;
+  ensureMediaCaches();
+  return m_cachedTranscribableIds.contains(mediaId);
 }
 
 QVariantList Backend::timelineEffects() const {
-  QVariantList result;
-  for (const auto &value : m_clips) {
-    if (value.toMap().value("kind") == QStringLiteral("effect"))
-      result.append(value);
-  }
-  return result;
+  ensureClipCaches();
+  return m_cachedTimelineEffects;
+}
+
+QVariantList Backend::mediaClips() const {
+  ensureClipCaches();
+  return m_cachedMediaClips;
+}
+
+QVariantMap Backend::clipById(const QString &id) const {
+  const int index = clipIndex(id);
+  return index < 0 ? QVariantMap{} : m_clips.at(index).toMap();
 }
 
 bool Backend::canExport() const {
-  return hasSequence() &&
-         std::any_of(m_clips.cbegin(), m_clips.cend(), [](const auto &value) {
-           const QString kind = value.toMap().value("kind").toString();
-           return kind != QStringLiteral("subtitle") &&
-                  kind != QStringLiteral("effect");
-         });
+  if (!hasSequence())
+    return false;
+  ensureClipCaches();
+  return m_cachedHasRenderableClips;
 }
 void Backend::setProjectName(const QString &v) {
   const auto n = v.trimmed();
@@ -1051,14 +1296,10 @@ bool Backend::startDemucsForClip(const QString &clipId) {
   QDir().mkpath(m_demucsOutputDir);
   const QString cached = QDir(m_demucsOutputDir).filePath("no_vocals.wav");
   if (QFileInfo::exists(cached)) {
-    const QString linkGroupId = clip.value("linkGroupId").toString();
-    for (int i = 0; i < m_clips.size(); ++i) {
+    QVector<int> touched = audioPeerIndexes(index);
+    touched.append(index);
+    for (const int i : touched) {
       QVariantMap updated = m_clips.at(i).toMap();
-      const bool sameClip = i == index;
-      const bool linked = !linkGroupId.isEmpty() &&
-                          updated.value("linkGroupId").toString() == linkGroupId;
-      if (!sameClip && !linked)
-        continue;
       QVariantMap effects = updated.value("effects").toMap();
       effects["vocalRemoval"] = true;
       effects["demucsPath"] = cached;
@@ -1127,15 +1368,15 @@ QString Backend::addClipEffect(const QString &clipId,
   QVariantMap clip = m_clips.at(index).toMap();
   if (definition.value("mediaType") == QStringLiteral("audio") &&
       clip.value("separateAudio").toBool()) {
-    const QString linkGroupId = clip.value("linkGroupId").toString();
-    for (int candidate = 0; candidate < m_clips.size(); ++candidate) {
-      const QVariantMap linked = m_clips.at(candidate).toMap();
-      if (linked.value("linkGroupId").toString() == linkGroupId &&
-          linked.value("linkedRole").toString() == QStringLiteral("audio")) {
-        index = candidate;
-        clip = linked;
-        break;
-      }
+    // This clip no longer carries its own sound, so an audio effect dropped on
+    // it belongs on the extracted clip that does.
+    for (const int candidate : audioPeerIndexes(index)) {
+      const QVariantMap peer = m_clips.at(candidate).toMap();
+      if (peer.value("kind").toString() != QStringLiteral("audio"))
+        continue;
+      index = candidate;
+      clip = peer;
+      break;
     }
   }
   const QVariantMap media = mediaById(clip.value("mediaId").toString());
@@ -1745,12 +1986,124 @@ QString Backend::addClip(const QString &mediaId, qint64 start,
                 {"sourceDurationMs", dur},
                 {"durationMs", dur},
                 {"enabled", true}};
+  // Same overlay default as the drop handler: an image on an upper video track
+  // comes in at half size as a picture-in-picture, a V1 image stays full-frame.
+  if (k == QStringLiteral("image")) {
+    bool laneOk = false;
+    const int lane = destination.startsWith(QLatin1Char('V'), Qt::CaseInsensitive)
+                         ? destination.mid(1).toInt(&laneOk)
+                         : 0;
+    if (laneOk && lane >= 2) {
+      QVariantMap fx;
+      fx.insert(QStringLiteral("scale"), 50.0);
+      fx.insert(QStringLiteral("positionX"), 0.0);
+      fx.insert(QStringLiteral("positionY"), 0.0);
+      fx.insert(QStringLiteral("opacity"), 100.0);
+      c.insert(QStringLiteral("effects"), fx);
+    }
+  }
   ensureTrackExists(c.value("track").toString());
   m_clips.append(c);
   ensureMediaPreviews(mediaId);
   markDirty();
   emit clipsChanged();
   emit timelineChanged();
+  return c.value("id").toString();
+}
+
+QString Backend::addImageOverlay(const QString &pathOrMediaId, qint64 startMs) {
+  if (m_sequenceId.isEmpty())
+    createSequence();
+
+  // Accept either an already-imported media id or a filesystem path / file URL.
+  QString mediaId;
+  QVariantMap item = mediaById(pathOrMediaId);
+  if (!item.isEmpty()) {
+    mediaId = pathOrMediaId;
+  } else {
+    const QString path = normalizePath(pathOrMediaId);
+    const QString key = MediaPath::duplicateKey(path);
+    // Reuse the bin entry for this file if it is already imported.
+    for (int i = 0; i < m_media.size() && mediaId.isEmpty(); ++i) {
+      const QVariantMap mm = m_media.at(i).toMap();
+      if (!key.isEmpty() &&
+          MediaPath::duplicateKey(mm.value("path").toString()) == key) {
+        mediaId = mm.value("id").toString();
+        item = mm;
+      }
+    }
+    if (mediaId.isEmpty()) {
+      importMedia({path}, false);
+      for (int i = 0; i < m_media.size() && mediaId.isEmpty(); ++i) {
+        const QVariantMap mm = m_media.at(i).toMap();
+        if (!key.isEmpty() &&
+            MediaPath::duplicateKey(mm.value("path").toString()) == key) {
+          mediaId = mm.value("id").toString();
+          item = mm;
+        }
+      }
+    }
+  }
+  if (mediaId.isEmpty() || item.isEmpty()) {
+    setError(QStringLiteral("Could not add the overlay image."));
+    return {};
+  }
+
+  const QString kind = item.value("kind").toString();
+  if (kind != QStringLiteral("image") && kind != QStringLiteral("video")) {
+    setError(QStringLiteral("Only an image or video can be used as an overlay."));
+    return {};
+  }
+  // OVERLAY_PLACEMENT_MARKER
+
+  qint64 dur = item.value("durationMs").toLongLong();
+  if (dur <= 0)
+    dur = kind == QStringLiteral("image")
+              ? qMax<qint64>(
+                    1000,
+                    m_appSettings.value("defaultImageDurationMs").toLongLong())
+              : 1000;
+  qint64 start = qMax<qint64>(0, startMs < 0 ? m_playheadMs : startMs);
+
+  // Put the overlay on a fresh V track above everything, so it always
+  // composites on top and never collides with a clip already on the timeline.
+  int maxV = 0;
+  for (int i = 0; i < m_clips.size(); ++i) {
+    const QString t = m_clips.at(i).toMap().value("track").toString();
+    if (t.startsWith(QLatin1Char('V'))) {
+      bool ok = false;
+      const int n = t.mid(1).toInt(&ok);
+      if (ok)
+        maxV = qMax(maxV, n);
+    }
+  }
+  const QString destination = QStringLiteral("V%1").arg(maxV + 1);
+
+  rememberState();
+  const QVariantMap effects{{"scale", 35.0},
+                            {"positionX", 0.0},
+                            {"positionY", 0.0},
+                            {"opacity", 100.0}};
+  QVariantMap c{{"id", id("clip")},
+                {"mediaId", mediaId},
+                {"name", item.value("name")},
+                {"kind", kind},
+                {"track", destination},
+                {"startMs", start},
+                {"sourceInMs", 0},
+                {"sourceDurationMs", dur},
+                {"durationMs", dur},
+                {"overlay", true},
+                {"effects", effects},
+                {"enabled", true}};
+  ensureTrackExists(destination);
+  m_clips.append(c);
+  ensureMediaPreviews(mediaId);
+  markDirty();
+  emit clipsChanged();
+  emit tracksChanged();
+  emit timelineChanged();
+  setSelectedClipId(c.value("id").toString());
   return c.value("id").toString();
 }
 
@@ -1806,6 +2159,25 @@ QStringList Backend::addMediaToTimeline(const QString &mediaId, qint64 start,
   request["durationMs"] = duration;
   QVariantMap clip =
       LongMediaTimelineHandler::timelineClip(item, request, id("clip"));
+  // An image dropped on an upper video track is an overlay (a picture-in-
+  // picture over the track below), so it comes in at half size like CapCut
+  // rather than filling the frame. Stored on the clip so the program monitor
+  // and the export composite agree. A V1 image is a base/background and stays
+  // full-frame (no seeded scale).
+  if (mediaKind == QStringLiteral("image") && !clip.contains("effects")) {
+    bool laneOk = false;
+    const int lane = primaryTrack.startsWith(QLatin1Char('V'), Qt::CaseInsensitive)
+                         ? primaryTrack.mid(1).toInt(&laneOk)
+                         : 0;
+    if (laneOk && lane >= 2) {
+      QVariantMap fx;
+      fx.insert(QStringLiteral("scale"), 50.0);
+      fx.insert(QStringLiteral("positionX"), 0.0);
+      fx.insert(QStringLiteral("positionY"), 0.0);
+      fx.insert(QStringLiteral("opacity"), 100.0);
+      clip.insert(QStringLiteral("effects"), fx);
+    }
+  }
   ensureTrackExists(primaryTrack);
   addedIds.append(clip.value("id").toString());
   m_clips.append(clip);
@@ -2016,25 +2388,63 @@ bool Backend::moveClips(const QStringList &clipIds, qint64 deltaMs,
   return true;
 }
 bool Backend::splitClip(const QString &clipId, qint64 pos) {
-  int i = clipIndex(clipId);
-  if (i < 0)
+  const int index = clipIndex(clipId);
+  if (index < 0)
     return false;
-  auto c = m_clips[i].toMap();
-  if (trackLocked(c.value("track").toString()))
+  const QVariantMap target = m_clips.at(index).toMap();
+  if (trackLocked(target.value("track").toString()))
     return false;
-  qint64 rel = pos - c.value("startMs").toLongLong(),
-         dur = c.value("durationMs").toLongLong();
-  if (rel <= 0 || rel >= dur)
+  const qint64 relative = pos - target.value("startMs").toLongLong();
+  if (relative <= 0 || relative >= target.value("durationMs").toLongLong())
     return false;
+
+  // A linked pair is cut in one action. Cutting only the clip that was clicked
+  // would hand its link group to both halves, and from then on deleting either
+  // half would take the partner - and the partner's other half - with it.
+  // Extracted audio is not such a pair: it is an independent clip, so a cut on
+  // the video leaves it alone.
+  const QString group = isDetachedAudioGroup(
+                            target.value("linkGroupId").toString())
+                            ? QString()
+                            : target.value("linkGroupId").toString();
+  QVector<int> indexes{index};
+  if (!group.isEmpty()) {
+    for (int i = 0; i < m_clips.size(); ++i) {
+      if (i == index)
+        continue;
+      const QVariantMap clip = m_clips.at(i).toMap();
+      if (clip.value("linkGroupId").toString() != group)
+        continue;
+      const qint64 offset = pos - clip.value("startMs").toLongLong();
+      if (offset <= 0 || offset >= clip.value("durationMs").toLongLong())
+        continue;
+      if (trackLocked(clip.value("track").toString()))
+        continue;
+      indexes.append(i);
+    }
+  }
+
   rememberState();
-  auto r = c;
-  r["id"] = id("clip");
-  r["startMs"] = pos;
-  r["sourceInMs"] = c.value("sourceInMs").toLongLong() + rel;
-  r["durationMs"] = dur - rel;
-  c["durationMs"] = rel;
-  m_clips[i] = c;
-  m_clips.insert(i + 1, r);
+  // One new group for everything on the right of the cut, so each side is a pair
+  // of its own.
+  const QString tailGroup = group.isEmpty() ? QString() : id("link");
+  // Descending: an insert must not move an index that has still to be cut.
+  std::sort(indexes.begin(), indexes.end(), std::greater<int>());
+  for (const int i : indexes) {
+    QVariantMap head = m_clips.at(i).toMap();
+    const qint64 offset = pos - head.value("startMs").toLongLong();
+    const qint64 duration = head.value("durationMs").toLongLong();
+    QVariantMap tail = head;
+    tail["id"] = id("clip");
+    tail["startMs"] = pos;
+    tail["sourceInMs"] = head.value("sourceInMs").toLongLong() + offset;
+    tail["durationMs"] = duration - offset;
+    head["durationMs"] = offset;
+    if (!tailGroup.isEmpty())
+      tail["linkGroupId"] = tailGroup;
+    m_clips[i] = head;
+    m_clips.insert(i + 1, tail);
+  }
   markDirty();
   emit clipsChanged();
   emit timelineChanged();
@@ -2050,10 +2460,15 @@ bool Backend::trimClipStart(const QString &clipId, qint64 requestedStart) {
   const qint64 oldStart = clip.value("startMs").toLongLong();
   const qint64 oldEnd = oldStart + clip.value("durationMs").toLongLong();
   const qint64 sourceIn = clip.value("sourceInMs").toLongLong();
-  // An effect-track item has no source footage behind it, so its head is not
-  // pinned by an in-point: the bar may be dragged out to the head of the
-  // sequence and back, which is how the user says when the effect starts.
-  const bool freeHead = clip.value("kind") == QStringLiteral("effect");
+  // An effect bar, an image still and a subtitle all have no source footage
+  // behind them, so their head is not pinned by an in-point: the item may be
+  // dragged out to the head of the sequence and back. An image is one frame
+  // held for a duration and a caption is one string held for a duration, so
+  // both stretch freely the way CapCut and Premiere allow.
+  const QString trimKind = clip.value("kind").toString();
+  const bool freeHead = trimKind == QStringLiteral("effect") ||
+                        trimKind == QStringLiteral("image") ||
+                        trimKind == QStringLiteral("subtitle");
   const qint64 minimumStart =
       freeHead ? 0 : qMax<qint64>(0, oldStart - sourceIn);
   const qint64 newStart = qBound(minimumStart, requestedStart, oldEnd - 1);
@@ -2079,15 +2494,23 @@ bool Backend::trimClipEnd(const QString &clipId, qint64 requestedEnd) {
     return false;
   const qint64 start = clip.value("startMs").toLongLong();
   const qint64 sourceIn = clip.value("sourceInMs").toLongLong();
-  // Nothing limits how long an effect stays on, so the tail is free. Twenty-four
+  // Nothing runs out at the tail of an effect bar, an image still (looped on
+  // export) or a subtitle, so the tail is free for all three. Twenty-four
   // hours is not a real limit, only a stop against a runaway drag.
-  if (clip.value("kind") == QStringLiteral("effect")) {
+  const QString trimEndKind = clip.value("kind").toString();
+  if (trimEndKind == QStringLiteral("effect") ||
+      trimEndKind == QStringLiteral("image") ||
+      trimEndKind == QStringLiteral("subtitle")) {
     const qint64 newEffectEnd = qBound<qint64>(start + 1, requestedEnd,
                                                qint64(86400000));
     if (newEffectEnd == start + clip.value("durationMs").toLongLong())
       return false;
     rememberState();
     clip["durationMs"] = newEffectEnd - start;
+    // Keep the artificial source length in step so nothing downstream clamps
+    // the freshly stretched still back to its old default duration.
+    if (trimEndKind == QStringLiteral("image"))
+      clip["sourceDurationMs"] = newEffectEnd - start;
     m_clips[i] = clip;
     markDirty();
     emit clipsChanged();
@@ -2168,7 +2591,10 @@ Backend::expandedLinkedClipIds(const QStringList &clipIds) const {
     if (!requested.contains(clip.value("id").toString()))
       continue;
     const QString group = clip.value("linkGroupId").toString();
-    if (!group.isEmpty())
+    // Extracted audio is deliberately left out: deleting it must not delete the
+    // video it came from, and deleting the video must not take the sound the
+    // user moved onto its own lane.
+    if (!group.isEmpty() && !isDetachedAudioGroup(group))
       linkGroups.insert(group);
   }
 
@@ -2228,6 +2654,339 @@ bool Backend::removeClips(const QStringList &clipIds) {
   pruneEmptyTracks(true);
   markDirty();
   emit clipsChanged();
+  emit timelineChanged();
+  if (selectionRemoved) {
+    m_selectedClipId.clear();
+    emit selectionChanged();
+    m_selectionDetailNotify.schedule();
+    m_colorSettingsNotify.schedule();
+  }
+  return true;
+}
+
+namespace {
+// The intrinsic settings that act on sound rather than on the picture. When a
+// clip's audio moves to its own lane these move with it: a level or a filter set
+// before the extraction would otherwise stay on a clip that no longer carries
+// any audio, where nothing reads it and the change is silently lost.
+const QStringList &audioEffectSettingKeys() {
+  static const QStringList keys{QStringLiteral("volumeDb"),
+                                QStringLiteral("volumeBypass"),
+                                QStringLiteral("channelVolumeLeft"),
+                                QStringLiteral("channelVolumeRight"),
+                                QStringLiteral("balance"),
+                                QStringLiteral("pan"),
+                                QStringLiteral("noiseReduction"),
+                                QStringLiteral("highPassHz"),
+                                QStringLiteral("lowPassHz"),
+                                QStringLiteral("compressor")};
+  return keys;
+}
+
+// Splits an effect stack by what each instance acts on. The registry owns that
+// answer, so a new audio effect added there follows the sound without this
+// needing to know its name.
+void partitionAudioStack(const QVariantList &stack, QVariantList *audio,
+                         QVariantList *rest) {
+  for (const auto &value : stack) {
+    const QVariantMap instance = value.toMap();
+    const QVariantMap definition = EffectRegistry::definition(
+        instance.value(QStringLiteral("definitionId")).toString());
+    if (definition.value(QStringLiteral("mediaType")).toString() ==
+        QStringLiteral("audio"))
+      audio->append(instance);
+    else
+      rest->append(instance);
+  }
+}
+} // namespace
+
+QString Backend::freeAudioTrack(qint64 startMs, qint64 endMs) const {
+  const int lanes = qBound(0, m_audioTrackCount, 64);
+  for (int number = 1; number <= qMin(64, lanes + 1); ++number) {
+    const QString track = QStringLiteral("A%1").arg(number);
+    bool occupied = false;
+    for (const auto &value : m_clips) {
+      const QVariantMap clip = value.toMap();
+      if (clip.value(QStringLiteral("track")).toString().compare(
+              track, Qt::CaseInsensitive) != 0)
+        continue;
+      const qint64 clipStart = clip.value(QStringLiteral("startMs")).toLongLong();
+      const qint64 clipEnd =
+          clipStart + clip.value(QStringLiteral("durationMs")).toLongLong();
+      if (clipStart < endMs && clipEnd > startMs) {
+        occupied = true;
+        break;
+      }
+    }
+    if (!occupied)
+      return track;
+  }
+  return QStringLiteral("A%1").arg(qMin(64, lanes + 1));
+}
+
+bool Backend::isDetachedAudioGroup(const QString &group) const {
+  if (group.isEmpty())
+    return false;
+  for (const auto &value : m_clips) {
+    const QVariantMap clip = value.toMap();
+    if (clip.value(QStringLiteral("linkGroupId")).toString() != group)
+      continue;
+    if (clip.value(QStringLiteral("separateAudio")).toBool() ||
+        clip.value(QStringLiteral("linkedRole")).toString() ==
+            QStringLiteral("audio"))
+      return true;
+  }
+  return false;
+}
+
+QVector<int> Backend::audioPeerIndexes(int index) const {
+  QVector<int> peers;
+  if (index < 0 || index >= m_clips.size())
+    return peers;
+  const QVariantMap clip = m_clips.at(index).toMap();
+  const QString clipId = clip.value(QStringLiteral("id")).toString();
+  const QString extractedFrom =
+      clip.value(QStringLiteral("extractedFromClipId")).toString();
+  const QString group = clip.value(QStringLiteral("linkGroupId")).toString();
+  const bool detached = clip.value(QStringLiteral("separateAudio")).toBool();
+  for (int i = 0; i < m_clips.size(); ++i) {
+    if (i == index)
+      continue;
+    const QVariantMap other = m_clips.at(i).toMap();
+    // The audio this video clip's sound was moved into, or the video clip this
+    // audio came out of. Either direction is the same pair.
+    if (detached && other.value(QStringLiteral("extractedFromClipId"))
+                            .toString() == clipId) {
+      peers.append(i);
+      continue;
+    }
+    if (!extractedFrom.isEmpty() &&
+        other.value(QStringLiteral("id")).toString() == extractedFrom) {
+      peers.append(i);
+      continue;
+    }
+    // Pairs saved before extracted audio became independent.
+    if (!group.isEmpty() &&
+        other.value(QStringLiteral("linkGroupId")).toString() == group)
+      peers.append(i);
+  }
+  return peers;
+}
+
+QStringList Backend::extractClipAudio(const QStringList &clipIds) {
+  // Vet everything first: this command either extracts or reports why not, and
+  // half of a batch applied before an unusable clip is found would leave the
+  // timeline in a state the undo entry does not describe.
+  QVector<int> targets;
+  for (const QString &clipId : clipIds) {
+    const int index = clipIndex(clipId);
+    if (index < 0)
+      continue;
+    const QVariantMap clip = m_clips.at(index).toMap();
+    if (clip.value(QStringLiteral("kind")).toString() !=
+            QStringLiteral("video") ||
+        clip.value(QStringLiteral("separateAudio")).toBool())
+      continue;
+    if (mediaById(clip.value(QStringLiteral("mediaId")).toString())
+            .value(QStringLiteral("channels"))
+            .toInt() <= 0)
+      continue;
+    if (trackLocked(clip.value(QStringLiteral("track")).toString())) {
+      setError(QStringLiteral("Unlock the track before extracting its audio."));
+      return {};
+    }
+    targets.append(index);
+  }
+  if (targets.isEmpty()) {
+    setError(QStringLiteral(
+        "Select a video clip with an audio stream to extract."));
+    return {};
+  }
+
+  rememberState();
+  QStringList addedIds;
+  int highestLane = 0;
+  for (const int index : targets) {
+    QVariantMap video = m_clips.at(index).toMap();
+    const qint64 startMs = video.value(QStringLiteral("startMs")).toLongLong();
+    const qint64 durationMs =
+        qMax<qint64>(1, video.value(QStringLiteral("durationMs")).toLongLong());
+    // Appended clips are visible to this, so extracting two clips that overlap
+    // in time puts the second one on the next lane instead of on top of the
+    // first.
+    const QString track = freeAudioTrack(startMs, startMs + durationMs);
+    const QString sourceClipId = video.value(QStringLiteral("id")).toString();
+
+    QVariantMap videoEffects = video.value(QStringLiteral("effects")).toMap();
+    QVariantMap audioEffects;
+    for (const QString &key : audioEffectSettingKeys()) {
+      if (!videoEffects.contains(key))
+        continue;
+      audioEffects[key] = videoEffects.take(key);
+    }
+    // Vocal separation is mirrored onto the extracted clip by the Demucs
+    // handlers, so both keep it rather than the video losing the state its own
+    // Effect Controls shows.
+    for (const QString &key :
+         {QStringLiteral("vocalRemoval"), QStringLiteral("demucsPath")}) {
+      if (videoEffects.contains(key))
+        audioEffects[key] = videoEffects.value(key);
+    }
+    QVariantList audioStack;
+    QVariantList videoStack;
+    partitionAudioStack(video.value(QStringLiteral("effectStack")).toList(),
+                        &audioStack, &videoStack);
+
+    QVariantMap audio{
+        {QStringLiteral("id"), id("clip")},
+        {QStringLiteral("mediaId"), video.value(QStringLiteral("mediaId"))},
+        {QStringLiteral("name"), video.value(QStringLiteral("name"))},
+        {QStringLiteral("kind"), QStringLiteral("audio")},
+        {QStringLiteral("track"), track},
+        {QStringLiteral("startMs"), startMs},
+        {QStringLiteral("sourceInMs"), video.value(QStringLiteral("sourceInMs"))},
+        {QStringLiteral("sourceDurationMs"),
+         video.value(QStringLiteral("sourceDurationMs"))},
+        {QStringLiteral("durationMs"), durationMs},
+        {QStringLiteral("enabled"), video.value(QStringLiteral("enabled"), true)},
+        // Which clip it came out of, and nothing more. It is deliberately not a
+        // link group: extracted audio is an independent clip the way CapCut's
+        // detached audio is, so deleting or moving it leaves the video alone.
+        // This id only says where a "Restore Clip Audio" puts it back, and which
+        // A-track clip a sound setting on the video belongs to.
+        {QStringLiteral("extractedFromClipId"), sourceClipId}};
+    if (!audioEffects.isEmpty())
+      audio[QStringLiteral("effects")] = audioEffects;
+    if (!audioStack.isEmpty())
+      audio[QStringLiteral("effectStack")] = audioStack;
+
+    if (videoEffects.isEmpty())
+      video.remove(QStringLiteral("effects"));
+    else
+      video[QStringLiteral("effects")] = videoEffects;
+    if (videoStack.isEmpty())
+      video.remove(QStringLiteral("effectStack"));
+    else
+      video[QStringLiteral("effectStack")] = videoStack;
+    video[QStringLiteral("separateAudio")] = true;
+    video.remove(QStringLiteral("embeddedAudio"));
+
+    m_clips[index] = video;
+    m_clips.append(audio);
+    highestLane = qMax(highestLane, TimelinePlacement::trackNumber(track));
+    addedIds.append(audio.value(QStringLiteral("id")).toString());
+  }
+
+  // Once, after the loop: ensureTrackExists emits tracksChanged, and a batch
+  // that opened two lanes would otherwise publish a track count that does not
+  // cover the clips already appended.
+  if (highestLane > 0)
+    ensureTrackExists(QStringLiteral("A%1").arg(highestLane));
+  markDirty();
+  emit clipsChanged();
+  emit tracksChanged();
+  emit timelineChanged();
+  if (!addedIds.isEmpty())
+    setSelectedClipId(addedIds.first());
+  return addedIds;
+}
+
+bool Backend::restoreClipAudio(const QStringList &clipIds) {
+  // Either half identifies the pair, because the command is reached from the
+  // context menu of whichever clip was right-clicked: a video clip whose audio
+  // was extracted, or the extracted audio clip itself.
+  QSet<QString> videoIds;
+  for (const QString &clipId : clipIds) {
+    const int index = clipIndex(clipId);
+    if (index < 0)
+      continue;
+    const QVariantMap clip = m_clips.at(index).toMap();
+    const QString extractedFrom =
+        clip.value(QStringLiteral("extractedFromClipId")).toString();
+    if (!extractedFrom.isEmpty())
+      videoIds.insert(extractedFrom);
+    else if (clip.value(QStringLiteral("separateAudio")).toBool())
+      videoIds.insert(clip.value(QStringLiteral("id")).toString());
+    // Legacy pairs, from before extracted audio became an independent clip.
+    const QString group = clip.value(QStringLiteral("linkGroupId")).toString();
+    if (!group.isEmpty()) {
+      for (const auto &value : m_clips) {
+        const QVariantMap other = value.toMap();
+        if (other.value(QStringLiteral("linkGroupId")).toString() == group &&
+            other.value(QStringLiteral("separateAudio")).toBool())
+          videoIds.insert(other.value(QStringLiteral("id")).toString());
+      }
+    }
+  }
+  if (videoIds.isEmpty())
+    return false;
+
+  // The settings that moved out with the sound come back, so a level set on the
+  // extracted lane is not lost by putting it back.
+  QHash<QString, QVariantMap> audioEffectsByVideo;
+  QHash<QString, QVariantList> audioStackByVideo;
+  QVector<int> removeIndexes;
+  for (int i = 0; i < m_clips.size(); ++i) {
+    const QVariantMap clip = m_clips.at(i).toMap();
+    if (clip.value(QStringLiteral("kind")).toString() !=
+        QStringLiteral("audio"))
+      continue;
+    QString owner = clip.value(QStringLiteral("extractedFromClipId")).toString();
+    if (owner.isEmpty()) {
+      const QString group = clip.value(QStringLiteral("linkGroupId")).toString();
+      if (group.isEmpty())
+        continue;
+      for (const auto &value : m_clips) {
+        const QVariantMap other = value.toMap();
+        if (other.value(QStringLiteral("linkGroupId")).toString() == group &&
+            other.value(QStringLiteral("separateAudio")).toBool())
+          owner = other.value(QStringLiteral("id")).toString();
+      }
+    }
+    if (owner.isEmpty() || !videoIds.contains(owner))
+      continue;
+    audioEffectsByVideo.insert(owner, clip.value(QStringLiteral("effects")).toMap());
+    audioStackByVideo.insert(owner,
+                             clip.value(QStringLiteral("effectStack")).toList());
+    removeIndexes.append(i);
+  }
+
+  rememberState();
+  for (int i = 0; i < m_clips.size(); ++i) {
+    QVariantMap clip = m_clips.at(i).toMap();
+    const QString clipId = clip.value(QStringLiteral("id")).toString();
+    if (!videoIds.contains(clipId))
+      continue;
+    QVariantMap effects = clip.value(QStringLiteral("effects")).toMap();
+    const QVariantMap recovered = audioEffectsByVideo.value(clipId);
+    for (auto it = recovered.cbegin(); it != recovered.cend(); ++it)
+      effects[it.key()] = it.value();
+    QVariantList stack = clip.value(QStringLiteral("effectStack")).toList();
+    stack.append(audioStackByVideo.value(clipId));
+    if (!effects.isEmpty())
+      clip[QStringLiteral("effects")] = effects;
+    if (!stack.isEmpty())
+      clip[QStringLiteral("effectStack")] = stack;
+    clip.remove(QStringLiteral("separateAudio"));
+    clip.remove(QStringLiteral("linkGroupId"));
+    clip.remove(QStringLiteral("linkedRole"));
+    m_clips[i] = clip;
+  }
+
+  std::sort(removeIndexes.begin(), removeIndexes.end(), std::greater<int>());
+  bool selectionRemoved = false;
+  for (const int index : removeIndexes) {
+    const QString removedId =
+        m_clips.at(index).toMap().value(QStringLiteral("id")).toString();
+    selectionRemoved = selectionRemoved || removedId == m_selectedClipId;
+    m_keyframeEngine.forgetClip(removedId);
+    m_clips.removeAt(index);
+  }
+  pruneEmptyTracks(true);
+  markDirty();
+  emit clipsChanged();
+  emit tracksChanged();
   emit timelineChanged();
   if (selectionRemoved) {
     m_selectedClipId.clear();
@@ -3454,8 +4213,8 @@ void Backend::cancelTranslation() { m_translator.cancel(); }
 void Backend::undo() {
   if (m_undo.isEmpty())
     return;
-  m_redo.append(serializeState());
-  restoreState(m_undo.takeLast(), true);
+  m_redo.append(stateVariant());
+  restoreStateVariant(m_undo.takeLast(), true);
   recordAction(QStringLiteral("undo"));
   markDirty();
   emit historyChanged();
@@ -3463,8 +4222,8 @@ void Backend::undo() {
 void Backend::redo() {
   if (m_redo.isEmpty())
     return;
-  m_undo.append(serializeState());
-  restoreState(m_redo.takeLast(), true);
+  m_undo.append(stateVariant());
+  restoreStateVariant(m_redo.takeLast(), true);
   recordAction(QStringLiteral("redo"));
   markDirty();
   emit historyChanged();
@@ -3494,7 +4253,15 @@ QVariantMap Backend::mediaById(const QString &idv) const {
   return i < 0 ? QVariantMap{} : m_media[i].toMap();
 }
 
+void Backend::scheduleSequenceTranscriptRebuild() {
+  // restart(), not start-if-inactive: the point is to fire once the timeline
+  // has stopped moving, so every further change pushes the rebuild back.
+  m_transcriptRebuildTimer.start();
+}
+
 void Backend::rebuildSequenceTranscript() {
+  CUTPRO_GUI_SCOPE("Backend::rebuildSequenceTranscript");
+  m_transcriptRebuildTimer.stop();
   QVariantList rebuilt;
   struct TimedSegment {
     qint64 startMs = 0;
@@ -3503,23 +4270,21 @@ void Backend::rebuildSequenceTranscript() {
   QVector<TimedSegment> timed;
   bool hasSequenceSources = false;
 
-  for (const QVariant &value : m_clips) {
+  // Cues carry no media, so the whole subtitle track is skipped here without
+  // being visited: on a transcribed timeline this is a handful of clips instead
+  // of twenty thousand.
+  const QVariantList candidates = mediaClips();
+  for (const QVariant &value : candidates) {
     const QVariantMap clip = value.toMap();
     const QString kind = clip.value("kind").toString();
     const QString mediaId = clip.value("mediaId").toString();
     if ((kind != QStringLiteral("video") && kind != QStringLiteral("audio")) ||
         mediaId.isEmpty())
       continue;
-    const QVariantMap media = mediaById(mediaId);
-    const QString normalizedMediaPath =
-        QDir::fromNativeSeparators(media.value("path").toString());
-    const bool generatedSpeech =
-        media.value("excludeFromTranscript").toBool() ||
-        media.value("generatedBy").toString() ==
-            QStringLiteral("text_to_speech") ||
-        normalizedMediaPath.contains(QStringLiteral("/generated-speech/"),
-                                     Qt::CaseInsensitive);
-    if (generatedSpeech)
+    // isTranscribableMedia() answers from a cached set, so the generated-speech
+    // test no longer scans the bin - and no longer converts a QVariantMap per
+    // bin entry - once per clip.
+    if (!isTranscribableMedia(mediaId))
       continue;
     hasSequenceSources = true;
     if (!m_sourceTranscripts.contains(mediaId))
@@ -3599,18 +4364,14 @@ void Backend::rebuildSequenceTranscript() {
 }
 
 int Backend::mediaIndex(const QString &v) const {
-  for (int i = 0; i < m_media.size(); ++i)
-    if (m_media[i].toMap().value("id") == v)
-      return i;
-  return -1;
+  ensureMediaCaches();
+  return m_cachedMediaIndex.value(v, -1);
 }
 int Backend::clipIndex(const QString &v) const {
-  for (int i = 0; i < m_clips.size(); ++i)
-    if (m_clips[i].toMap().value("id") == v)
-      return i;
-  return -1;
+  ensureClipCaches();
+  return m_cachedClipIndex.value(v, -1);
 }
-QJsonObject Backend::stateObject() const {
+QVariantMap Backend::stateVariant() const {
   QVariantMap sourceTranscripts;
   for (auto it = m_sourceTranscripts.cbegin(); it != m_sourceTranscripts.cend();
        ++it)
@@ -3625,36 +4386,54 @@ QJsonObject Backend::stateObject() const {
   for (auto it = m_transcriptCoverageMs.cbegin();
        it != m_transcriptCoverageMs.cend(); ++it)
     transcriptCoverage.insert(it.key(), it.value());
-  QJsonObject o{{"schemaVersion", 4},
-                {"projectId", m_projectId},
-                {"projectName", m_projectName},
-                {"projectLocation", m_projectLocation},
-                {"sequenceId", m_sequenceId},
-                {"sequenceName", m_sequenceName},
-                {"videoTrackCount", m_videoTrackCount},
-                {"audioTrackCount", m_audioTrackCount},
-                {"minVideoTracks", m_minVideoTracks},
-                {"minAudioTracks", m_minAudioTracks},
-                {"mutedTracks", QJsonArray::fromStringList(m_mutedTracks)},
-                {"trackStates", QJsonObject::fromVariantMap(m_trackStates)},
-                {"markers", QJsonArray::fromVariantList(m_markers)},
-                {"snappingEnabled", m_snappingEnabled},
-                {"captionStyle", m_captionStyle.toJson()},
-                {"colorSettings", QJsonObject::fromVariantMap(m_colorSettings)},
-                {"media", QJsonArray::fromVariantList(m_media)},
-                {"clips", QJsonArray::fromVariantList(m_clips)},
-                // Animation channels. They used to live only in memory, so every
-                // keyframe was lost on save - which made the stopwatch a
-                // session-only toy.
-                {"keyframes",
-                 QJsonArray::fromVariantList(m_keyframeEngine.serialize())},
-                {"transcript", QJsonArray::fromVariantList(m_transcript)},
-                {"transcriptLanguage", m_transcriptLanguage},
-                {"sourceTranscripts", QJsonObject::fromVariantMap(sourceTranscripts)},
-                {"sourceTranscriptLanguages", QJsonObject::fromVariantMap(sourceLanguages)},
-                {"transcriptCoverageMs", QJsonObject::fromVariantMap(transcriptCoverage)}};
-  return o;
+  return QVariantMap{
+      {"schemaVersion", 4},
+      {"projectId", m_projectId},
+      {"projectName", m_projectName},
+      {"projectLocation", m_projectLocation},
+      {"sequenceId", m_sequenceId},
+      {"sequenceName", m_sequenceName},
+      {"videoTrackCount", m_videoTrackCount},
+      {"audioTrackCount", m_audioTrackCount},
+      {"minVideoTracks", m_minVideoTracks},
+      {"minAudioTracks", m_minAudioTracks},
+      {"mutedTracks", m_mutedTracks},
+      {"trackStates", m_trackStates},
+      {"markers", m_markers},
+      {"snappingEnabled", m_snappingEnabled},
+      {"captionStyle", m_captionStyle.toJson().toVariantMap()},
+      {"colorSettings", m_colorSettings},
+      {"media", m_media},
+      {"clips", m_clips},
+      // Animation channels. They used to live only in memory, so every
+      // keyframe was lost on save - which made the stopwatch a
+      // session-only toy.
+      {"keyframes", m_keyframeEngine.serialize()},
+      {"transcript", m_transcript},
+      {"transcriptLanguage", m_transcriptLanguage},
+      {"sourceTranscripts", sourceTranscripts},
+      {"sourceTranscriptLanguages", sourceLanguages},
+      {"transcriptCoverageMs", transcriptCoverage}};
 }
+
+// Only the paths that genuinely need JSON - the project file, the SQLite mirror
+// column - pay for this conversion. Undo does not.
+QJsonObject Backend::stateObject() const {
+  return QJsonObject::fromVariantMap(stateVariant());
+}
+
+// A price, not a measurement. Text length is gone as a proxy, so a state is
+// charged for the list spines it may own outright plus a flat per-entry share of
+// the maps inside them; comparing that against the same byte ceiling keeps deep
+// histories of a long timeline from growing without bound.
+qint64 Backend::approximateStateBytes(const QVariantMap &state) {
+  static constexpr qint64 kPerEntryBytes = 320;
+  qint64 entries = 0;
+  for (const char *key : {"clips", "media", "markers", "transcript", "keyframes"})
+    entries += state.value(QLatin1String(key)).toList().size();
+  return entries * kPerEntryBytes;
+}
+
 QByteArray Backend::serializeState(bool pretty) const {
   return QJsonDocument(stateObject())
       .toJson(pretty ? QJsonDocument::Indented : QJsonDocument::Compact);
@@ -3666,8 +4445,27 @@ bool Backend::restoreState(const QByteArray &data, bool history) {
     setError(QStringLiteral("Invalid project file: ") + e.errorString());
     return false;
   }
-  auto o = d.object();
-  const int schemaVersion = o.value("schemaVersion").toInt();
+  return restoreStateVariant(d.object().toVariantMap(), history);
+}
+bool Backend::restoreStateVariant(const QVariantMap &o, bool history) {
+  // These three read like the QJsonValue accessors this function was written
+  // against: a fallback wins only when the stored value is absent or of the
+  // wrong type, never when it is a legitimately empty string or a zero.
+  const auto stringOr = [&o](const char *key, const QString &fallback) {
+    const QVariant v = o.value(QLatin1String(key));
+    return v.typeId() == QMetaType::QString ? v.toString() : fallback;
+  };
+  const auto intOr = [&o](const char *key, int fallback) {
+    const QVariant v = o.value(QLatin1String(key));
+    bool ok = false;
+    const int n = v.toInt(&ok);
+    return ok ? n : fallback;
+  };
+  const auto boolOr = [&o](const char *key, bool fallback) {
+    const QVariant v = o.value(QLatin1String(key));
+    return v.typeId() == QMetaType::Bool ? v.toBool() : fallback;
+  };
+  const int schemaVersion = o.value(QStringLiteral("schemaVersion")).toInt();
   if (schemaVersion < 1 || schemaVersion > 4) {
     setError(QStringLiteral("Unsupported project file version."));
     return false;
@@ -3678,39 +4476,41 @@ bool Backend::restoreState(const QByteArray &data, bool history) {
     m_customBlurEditInstanceId.clear();
     emit customBlurEditChanged();
   }
-  m_projectId = o.value("projectId").toString(id("project"));
-  m_projectName = o.value("projectName").toString("Untitled");
-  m_projectLocation = o.value("projectLocation").toString();
-  m_sequenceId = o.value("sequenceId").toString();
-  m_sequenceName = o.value("sequenceName").toString("Sequence 01");
-  m_videoTrackCount = qBound(1, o.value("videoTrackCount").toInt(1), 64);
+  m_projectId = stringOr("projectId", id("project"));
+  m_projectName = stringOr("projectName", QStringLiteral("Untitled"));
+  m_projectLocation = stringOr("projectLocation", QString());
+  m_sequenceId = stringOr("sequenceId", QString());
+  m_sequenceName = stringOr("sequenceName", QStringLiteral("Sequence 01"));
+  m_videoTrackCount = qBound(1, intOr("videoTrackCount", 1), 64);
   // 0 is a valid saved audio count: projects without audio clips have no
   // audio lane at all.
-  m_audioTrackCount = qBound(0, o.value("audioTrackCount").toInt(0), 64);
+  m_audioTrackCount = qBound(0, intOr("audioTrackCount", 0), 64);
   // Projects saved before the floors existed fall back to the counts they were
   // saved with, so opening one does not silently delete its empty tracks.
   m_minVideoTracks =
-      qBound(1, o.value("minVideoTracks").toInt(m_videoTrackCount), 64);
+      qBound(1, intOr("minVideoTracks", m_videoTrackCount), 64);
   m_minAudioTracks =
-      qBound(0, o.value("minAudioTracks").toInt(m_audioTrackCount), 64);
-  m_trackStates = o.value("trackStates").toObject().toVariantMap();
-  m_markers = o.value("markers").toArray().toVariantList();
-  m_snappingEnabled = o.value("snappingEnabled").toBool(true);
+      qBound(0, intOr("minAudioTracks", m_audioTrackCount), 64);
+  m_trackStates = o.value(QStringLiteral("trackStates")).toMap();
+  m_markers = o.value(QStringLiteral("markers")).toList();
+  m_snappingEnabled = boolOr("snappingEnabled", true);
   m_mutedTracks.clear();
-  for (const auto &value : o.value("mutedTracks").toArray()) {
-    const QString track = value.toString().trimmed().toUpper();
+  for (const QString &value :
+       o.value(QStringLiteral("mutedTracks")).toStringList()) {
+    const QString track = value.trimmed().toUpper();
     if (!m_mutedTracks.contains(track))
       m_mutedTracks.append(track);
   }
-  m_captionStyle = CaptionStyle::fromJson(o.value("captionStyle").toObject());
+  m_captionStyle = CaptionStyle::fromJson(QJsonObject::fromVariantMap(
+      o.value(QStringLiteral("captionStyle")).toMap()));
   m_colorSettings = ColorSettings::defaults();
   m_selectedClipId.clear();
   const QVariantMap savedColorSettings =
-      o.value("colorSettings").toObject().toVariantMap();
+      o.value(QStringLiteral("colorSettings")).toMap();
   for (auto it = savedColorSettings.cbegin(); it != savedColorSettings.cend();
        ++it)
     ColorSettings::setProjectValue(&m_colorSettings, it.key(), it.value());
-  m_media = o.value("media").toArray().toVariantList();
+  m_media = o.value(QStringLiteral("media")).toList();
   // Older projects predate the long-media presentation policy. Normalize the
   // media records during load so their existing clips do not recreate the
   // eager timeline/monitor path on the first repaint.
@@ -3719,38 +4519,46 @@ bool Backend::restoreState(const QByteArray &data, bool history) {
     LargeMediaPolicy::applyPresentationFlags(&media);
     value = media;
   }
-  m_clips = o.value("clips").toArray().toVariantList();
-  m_keyframeEngine.restore(o.value("keyframes").toArray().toVariantList());
-  const bool hasSavedTranscript = o.contains("transcript");
+  m_clips = o.value(QStringLiteral("clips")).toList();
+  m_keyframeEngine.restore(o.value(QStringLiteral("keyframes")).toList());
+  const bool hasSavedTranscript = o.contains(QStringLiteral("transcript"));
   const QVariantList savedTranscript =
-      o.value("transcript").toArray().toVariantList();
-  const QString savedTranscriptLanguage =
-      o.value("transcriptLanguage").toString();
+      o.value(QStringLiteral("transcript")).toList();
+  const QString savedTranscriptLanguage = stringOr("transcriptLanguage", QString());
   m_sourceTranscripts.clear();
   const QVariantMap savedSourceTranscripts =
-      o.value("sourceTranscripts").toObject().toVariantMap();
+      o.value(QStringLiteral("sourceTranscripts")).toMap();
   for (auto it = savedSourceTranscripts.cbegin();
        it != savedSourceTranscripts.cend(); ++it)
     m_sourceTranscripts.insert(it.key(), it.value().toList());
   m_sourceTranscriptLanguages.clear();
   const QVariantMap savedSourceLanguages =
-      o.value("sourceTranscriptLanguages").toObject().toVariantMap();
+      o.value(QStringLiteral("sourceTranscriptLanguages")).toMap();
   for (auto it = savedSourceLanguages.cbegin();
        it != savedSourceLanguages.cend(); ++it)
     m_sourceTranscriptLanguages.insert(it.key(), it.value().toString());
   m_transcriptCoverageMs.clear();
   const QVariantMap savedCoverage =
-      o.value("transcriptCoverageMs").toObject().toVariantMap();
+      o.value(QStringLiteral("transcriptCoverageMs")).toMap();
   for (auto it = savedCoverage.cbegin(); it != savedCoverage.cend(); ++it)
     m_transcriptCoverageMs.insert(it.key(), it.value().toLongLong());
   if (schemaVersion < 4)
     TimelineClipBinding::collapseLegacyEmbeddedAudio(&m_clips, m_media);
+  // Normalisation, but only where it changes something. Every write into a clip
+  // map here detaches it from the snapshot it came from, so writing all of them
+  // unconditionally meant an undo on a transcribed timeline deep-copied twenty
+  // thousand maps to arrive at the values they already held.
   for (auto &value : m_clips) {
-    auto clip = value.toMap();
+    QVariantMap clip = value.toMap();
     const QString kind = clip.value("kind").toString();
     const QVariantMap media = mediaById(clip.value("mediaId").toString());
-    if (LargeMediaPolicy::requiresLightweightHandling(media))
+    bool changed = false;
+    if (LargeMediaPolicy::requiresLightweightHandling(media) &&
+        clip.value("timelineRenderMode").toString() !=
+            QLatin1String("lightweight")) {
       clip["timelineRenderMode"] = QStringLiteral("lightweight");
+      changed = true;
+    }
     QString track =
         TimelinePlacement::normalizedTrack(clip.value("track").toString());
     if (!TimelinePlacement::trackAcceptsKind(track, kind))
@@ -3760,21 +4568,36 @@ bool Backend::restoreState(const QByteArray &data, bool history) {
                                    clip.value("durationMs").toLongLong();
       clip["sourceDurationMs"] =
           qMax(currentExtent, media.value("durationMs").toLongLong());
+      changed = true;
     }
-    clip["track"] = track;
-    QVariantList stack = EffectStack::normalized(
-        clip.value("effectStack").toList());
-    for (auto &effectValue : stack) {
-      QVariantMap instance = effectValue.toMap();
-      if (instance.value("id").toString().isEmpty())
-        instance["id"] = id("effect");
-      effectValue = instance;
+    if (clip.value("track").toString() != track) {
+      clip["track"] = track;
+      changed = true;
     }
-    if (stack.isEmpty())
-      clip.remove("effectStack");
-    else
-      clip["effectStack"] = stack;
-    value = clip;
+    const QVariantList savedStack = clip.value("effectStack").toList();
+    if (savedStack.isEmpty()) {
+      if (clip.contains(QStringLiteral("effectStack"))) {
+        clip.remove(QStringLiteral("effectStack"));
+        changed = true;
+      }
+    } else {
+      QVariantList stack = EffectStack::normalized(savedStack);
+      for (auto &effectValue : stack) {
+        QVariantMap instance = effectValue.toMap();
+        if (instance.value("id").toString().isEmpty())
+          instance["id"] = id("effect");
+        effectValue = instance;
+      }
+      if (stack.isEmpty()) {
+        clip.remove(QStringLiteral("effectStack"));
+        changed = true;
+      } else if (stack != savedStack) {
+        clip["effectStack"] = stack;
+        changed = true;
+      }
+    }
+    if (changed)
+      value = clip;
     ensureTrackExists(track);
   }
   for (int i = m_markers.size() - 1; i >= 0; --i) {
@@ -3819,18 +4642,18 @@ bool Backend::restoreState(const QByteArray &data, bool history) {
   return true;
 }
 void Backend::rememberState() {
-  // Serialised once, used twice. This used to call serializeState() here and
-  // again inside recordAction(), so every undoable edit built the entire project
-  // as JSON two separate times on the GUI thread.
-  const QByteArray snapshot = serializeState();
+  // Taken as values, not as text. This used to serialise the entire project to
+  // JSON here on every undoable edit - ~945 ms with a 19831-cue subtitle track,
+  // on the GUI thread, for a snapshot the action log then usually threw away.
+  const QVariantMap snapshot = stateVariant();
   recordAction(QStringLiteral("edit"), {}, snapshot);
   m_undo << snapshot;
   qint64 bytes = 0;
-  for (const QByteArray &state : m_undo)
-    bytes += state.size();
+  for (const QVariantMap &state : m_undo)
+    bytes += approximateStateBytes(state);
   while (m_undo.size() > 1 &&
          (m_undo.size() > kMaxUndoStates || bytes > kMaxUndoBytes)) {
-    bytes -= m_undo.constFirst().size();
+    bytes -= approximateStateBytes(m_undo.constFirst());
     m_undo.removeFirst();
   }
   m_redo.clear();
@@ -3845,7 +4668,7 @@ void Backend::markDirty(bool v) {
   emit dirtyChanged();
 }
 void Backend::recordAction(const QString &type, const QVariantMap &payload,
-                           const QByteArray &snapshot) {
+                           const QVariantMap &stateSnapshot) {
   if (!m_projectDatabase.isOpen() && !persistProjectDatabase())
     return;
   // The state column used to be filled on every single edit with a freshly
@@ -3859,13 +4682,15 @@ void Backend::recordAction(const QString &type, const QVariantMap &payload,
   //     -> recordAction -> serializeState -> QJsonArray::fromVariantList
   // The row is what makes the log a history, so it still goes in; the snapshot
   // only rides along when a caller already had one to give and enough time has
-  // passed for another copy to be worth what it costs.
+  // passed for another copy to be worth what it costs - and the JSON is built
+  // here, on that rare row, rather than by every caller for every row.
   QByteArray state;
-  if (!snapshot.isEmpty()) {
+  if (!stateSnapshot.isEmpty()) {
     const qint64 now = QDateTime::currentMSecsSinceEpoch();
     if (m_lastActionSnapshotMs == 0 ||
         now - m_lastActionSnapshotMs >= kActionSnapshotIntervalMs) {
-      state = snapshot;
+      state = QJsonDocument(QJsonObject::fromVariantMap(stateSnapshot))
+                  .toJson(QJsonDocument::Compact);
       m_lastActionSnapshotMs = now;
     }
   }
@@ -3925,7 +4750,11 @@ void Backend::pruneEmptyTracks(bool releaseUserTracks) {
   // Audio starts at zero: with no audio clips the sequence has no audio lane,
   // the way CapCut only shows one once something is on it. Video keeps V1.
   int highestAudioTrack = qBound(0, m_minAudioTracks, 64);
-  for (const auto &value : m_clips) {
+  // Cached list: the cues are not on a numbered lane, so a subtitle track used to
+  // make this scan twenty thousand entries of normalizedTrack() long for nothing.
+  // Effect bars are still in here, and the kind test below still drops them.
+  ensureClipCaches();
+  for (const auto &value : m_cachedMediaClips) {
     const QVariantMap clip = value.toMap();
     const QString kind = clip.value("kind").toString();
     // The overlay lanes are not part of the video/audio stack, so nothing on
@@ -4014,12 +4843,13 @@ bool Backend::persistProjectDatabase() {
     }
   }
 
-  // Straight from the object. This used to be
+  // Straight from the values. This used to be
   // QJsonDocument::fromJson(serializeState()).toVariant().toMap(): write every
   // clip out as JSON text, parse the text back, then convert the result to
   // variants - three passes over the whole project, on the GUI thread, 250 ms
-  // after every edit.
-  const QVariantMap state = stateObject().toVariantMap();
+  // after every edit. Then it was stateObject().toVariantMap(), which still made
+  // a JSON copy of every clip only to convert it straight back.
+  const QVariantMap state = stateVariant();
   if (!m_projectDatabase.saveProject(state)) {
     setError(QStringLiteral("Could not update project SQLite database: ") +
              m_projectDatabase.lastError());

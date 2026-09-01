@@ -57,19 +57,28 @@ Rectangle {
         return !trackHasSolo(prefix) || (state && state.solo === true)
     }
 
+    // Base picture selection. Mirrors VideoPreviewHelper::rebuildIndexes in C++:
+    // a real video outranks an image on any track, so an image on an upper video
+    // track no longer replaces the video beneath it. It is composited on top by
+    // the overlay layer instead, which is what the render actually does - the
+    // export builder stacks every video-track clip lowest-track-first and
+    // positions each one from its intrinsic effects.
     function clipAt(position) {
         var selected = null
         var selectedRank = -1
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var clip = Backend.clips[i]
-            if (clip.enabled === false || clip.kind === "subtitle"
+        var clips = Backend.mediaClips
+        for (var i = 0; i < clips.length; ++i) {
+            var clip = clips[i]
+            if (clip.enabled === false
                     || !trackEnabled(clip.track)
                     || position < Number(clip.startMs)
                     || position >= Number(clip.startMs) + Number(clip.durationMs))
                 continue
 
             var isVideo = String(clip.track).charAt(0) === "V"
-            var rank = isVideo ? 1000 + Number(String(clip.track).slice(1)) : 0
+            var lane = isVideo ? (parseInt(String(clip.track).slice(1)) || 0) : 0
+            var rank = !isVideo ? 0
+                     : clip.kind === "image" ? 1000 + lane : 2000 + lane
             if (rank > selectedRank) {
                 selected = clip
                 selectedRank = rank
@@ -78,9 +87,44 @@ Rectangle {
         return selected
     }
 
+    // Image clips that composite over the base picture: logos added via + Logo
+    // and plain images sitting on a video track above the base. Everything at or
+    // below the base is already covered by it, exactly as the render stacks them.
+    readonly property var overlayClips: {
+        var out = []
+        var clips = Backend.mediaClips
+        var position = Backend.playheadMs
+        var base = root.activeClip
+        var baseId = base ? String(base.id) : ""
+        var baseLane = (base && String(base.track).charAt(0) === "V")
+                       ? (parseInt(String(base.track).slice(1)) || 0) : 0
+        for (var i = 0; i < clips.length; ++i) {
+            var clip = clips[i]
+            if (clip.enabled === false || !trackEnabled(clip.track))
+                continue
+            if (position < Number(clip.startMs)
+                    || position >= Number(clip.startMs) + Number(clip.durationMs))
+                continue
+            if (String(clip.id) === baseId)
+                continue
+            var isLogo = clip.overlay === true
+            if (!isLogo && clip.kind !== "image")
+                continue
+            if (!isLogo) {
+                var lane = String(clip.track).charAt(0) === "V"
+                           ? (parseInt(String(clip.track).slice(1)) || 0) : 0
+                if (lane <= baseLane)
+                    continue
+            }
+            out.push(clip)
+        }
+        return out
+    }
+
     function subtitleAt(position) {
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var clip = Backend.clips[i]
+        var clips = Backend.clips
+        for (var i = 0; i < clips.length; ++i) {
+            var clip = clips[i]
             if (clip.kind === "subtitle" && clip.enabled !== false
                     && trackEnabled(clip.track)
                     && position >= Number(clip.startMs)
@@ -93,20 +137,20 @@ Rectangle {
     function mediaForClip(clip) {
         if (!clip)
             return null
-        for (var i = 0; i < Backend.media.length; ++i) {
-            if (Backend.media[i].id === clip.mediaId)
-                return Backend.media[i]
-        }
-        return null
+        var media = Backend.mediaById(String(clip.mediaId || ""))
+        return media && media.id ? media : null
     }
 
     function audioClipFor(clip) {
-        if (!clip || clip.kind === "audio" || !clip.linkGroupId)
+        // After Extract Audio the sound is an independent clip that names the
+        // video it came out of; the video clip only carries the separateAudio
+        // flag, and nothing links the two back.
+        if (!clip || clip.kind === "audio" || clip.separateAudio !== true)
             return clip
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var candidate = Backend.clips[i]
-            if (candidate.linkGroupId === clip.linkGroupId
-                    && candidate.linkedRole === "audio")
+        var clips = Backend.mediaClips
+        for (var i = 0; i < clips.length; ++i) {
+            var candidate = clips[i]
+            if (String(candidate.extractedFromClipId || "") === String(clip.id))
                 return candidate
         }
         return clip
@@ -353,6 +397,69 @@ Rectangle {
                 visible: root.activeMedia && root.activeMedia.kind === "audio"
             }
 
+            // The frame the render composites into: the base picture fits it, and
+            // overlays are placed relative to it. Sized to the base media's own
+            // aspect ratio so it matches the letterboxed picture drawn above.
+            Item {
+                id: overlayLayer
+                readonly property real baseAR: (root.activeMedia
+                                                && root.activeMedia.width > 0
+                                                && root.activeMedia.height > 0)
+                                               ? root.activeMedia.width / root.activeMedia.height
+                                               : 16 / 9
+                width: Math.min(parent.width, parent.height * baseAR)
+                height: Math.min(parent.height, parent.width / baseAR)
+                anchors.centerIn: parent
+                clip: true
+                z: 2
+
+                // Own texture, so a moving overlay does not dirty the decoded frame
+                // drawn beneath it. Positions are deliberately NOT clamped here:
+                // this pane previews the render, so it has to show whatever the
+                // filter graph would produce, off-frame values included.
+                layer.enabled: root.overlayClips.length > 0
+                layer.smooth: true
+
+                Repeater {
+                    model: root.overlayClips
+                    delegate: Item {
+                        id: ov
+                        required property var modelData
+                        readonly property var clip: modelData
+                        readonly property var media: Backend.mediaById(String(clip.mediaId || ""))
+                        readonly property var fx: clip.effects ? clip.effects : ({})
+
+                        readonly property real mediaAR: (media && media.width > 0 && media.height > 0)
+                                                        ? media.width / media.height : 1
+                        readonly property real frameAR: overlayLayer.width / Math.max(1, overlayLayer.height)
+                        // force_original_aspect_ratio=decrease into the frame,
+                        // then the intrinsic scale, then the overlay position -
+                        // the same three steps the export filter graph applies.
+                        readonly property real fitW: mediaAR > frameAR
+                                                     ? overlayLayer.width
+                                                     : overlayLayer.height * mediaAR
+                        readonly property real fitH: fitW / mediaAR
+                        readonly property real scaleFactor: Number(fx.scale !== undefined ? fx.scale : 100)
+
+                        width: fitW * scaleFactor / 100
+                        height: fitH * scaleFactor / 100
+                        x: (overlayLayer.width - width) / 2
+                           + Number(fx.positionX || 0) / 100 * overlayLayer.width
+                        y: (overlayLayer.height - height) / 2
+                           + Number(fx.positionY || 0) / 100 * overlayLayer.height
+                        opacity: Number(fx.opacity !== undefined ? fx.opacity : 100) / 100
+
+                        Image {
+                            anchors.fill: parent
+                            source: ov.media ? root.mediaUrl(ov.media) : ""
+                            fillMode: Image.Stretch
+                            asynchronous: true
+                            cache: true
+                        }
+                    }
+                }
+            }
+
             Column {
                 anchors.centerIn: parent
                 spacing: 8
@@ -382,6 +489,7 @@ Rectangle {
                 id: captionLayer
                 anchors.fill: parent
                 visible: root.captionsVisible && root.activeSubtitle !== null
+                z: 3
 
                 Rectangle {
                     id: captionBackground

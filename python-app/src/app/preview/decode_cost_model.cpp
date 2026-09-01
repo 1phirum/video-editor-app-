@@ -2,8 +2,15 @@
 
 #include "app/preview/codec_decode_traits.h"
 
+#include <QLoggingCategory>
 #include <QMutexLocker>
 #include <QtMath>
+
+// Every advice change, at warning level, because an invisible one is how a
+// preview ends up running at half rate with nothing in the log to say why. The
+// line names the measurement that caused it, so the decision can be argued with
+// instead of guessed at.
+Q_LOGGING_CATEGORY(previewCostLog, "cutpro.preview.cost", QtWarningMsg)
 
 namespace {
 
@@ -128,6 +135,10 @@ void DecodeCostModel::notePlaybackFrame(const QString &path,
     if (lowered >= kMinimumAdvisedSide) {
       entry->advisedSide = lowered;
       ++m_downgrades;
+      qCWarning(previewCostLog).nospace()
+          << "preview cost: frame is " << qRound(entry->frameMs) << " ms against a "
+          << qRound(budgetMs) << " ms budget at " << frameRate
+          << " fps - lowering the preview to " << lowered << " px";
       return;
     }
     entry->advisedSide = kMinimumAdvisedSide;
@@ -139,6 +150,11 @@ void DecodeCostModel::notePlaybackFrame(const QString &path,
     if (loweredRate < frameRate) {
       entry->advisedFrameRate = loweredRate;
       ++m_downgrades;
+      qCWarning(previewCostLog).nospace()
+          << "preview cost: frame is " << qRound(entry->frameMs)
+          << " ms and the picture is already at " << kMinimumAdvisedSide
+          << " px - pacing the preview at " << loweredRate << " fps instead of "
+          << frameRate;
     }
     return;
   }
@@ -157,8 +173,17 @@ void DecodeCostModel::notePlaybackFrame(const QString &path,
     if (sourceLongSide > 0 && raised >= sourceLongSide) {
       entry->advisedSide = 0;
       entry->advisedFrameRate = 0.0;
+      qCWarning(previewCostLog).nospace()
+          << "preview cost: frame is " << qRound(entry->frameMs)
+          << " ms, comfortably inside the " << qRound(budgetMs)
+          << " ms budget - the model has no opinion any more, full source size "
+             "and frame rate";
     } else {
       entry->advisedSide = raised;
+      qCWarning(previewCostLog).nospace()
+          << "preview cost: frame is " << qRound(entry->frameMs) << " ms of a "
+          << qRound(budgetMs) << " ms budget - raising the preview to " << raised
+          << " px";
     }
     ++m_upgrades;
     return;

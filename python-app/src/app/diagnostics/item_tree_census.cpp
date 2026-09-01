@@ -121,6 +121,13 @@ ItemTreeCensus::Result ItemTreeCensus::walk(QObject *root) {
     QObject *object = frame.object;
     if (!object || seen.contains(object))
       continue;
+    // The diagnostics report window is a scene too, and a large one - it holds
+    // the whole playback trace and the census itself as text. Counting it would
+    // put the measuring instrument inside the measurement: opening the report
+    // added ~600 items to the very number the report was printing. Matched by
+    // objectName so the census keeps no dependency on the UI.
+    if (object->objectName() == QLatin1String("cutproDiagnosticsWindow"))
+      continue;
     seen.insert(object);
 
     ++result.items;
@@ -247,13 +254,21 @@ void ItemTreeCensus::startSampling(QQmlApplicationEngine *engine,
                                    int intervalMs) {
   SamplerState &s = sampler();
   s.engine = engine;
+  // Registered but not repeating. sampleNow() needs the engine to find the root
+  // objects, so an off switch cannot simply skip this function - Ctrl+Shift+D
+  // would then report an empty scene.
+  if (intervalMs <= 0) {
+    if (s.timer)
+      s.timer->stop();
+    return;
+  }
   if (!s.timer) {
     s.timer = new QTimer(engine);
     s.timer->setTimerType(Qt::VeryCoarseTimer);
     QObject::connect(s.timer, &QTimer::timeout, engine,
                      []() { ItemTreeCensus::sampleNow(); });
   }
-  s.timer->start(intervalMs > 0 ? intervalMs : kDefaultIntervalMs);
+  s.timer->start(intervalMs);
 }
 
 void ItemTreeCensus::stopSampling() {
@@ -269,6 +284,11 @@ QVariantMap ItemTreeCensus::statistics() {
   map.insert(QStringLiteral("censusSamples"), s.samples);
   map.insert(QStringLiteral("censusItems"), s.last.items);
   map.insert(QStringLiteral("censusPeakItems"), s.peakItems);
+  // Depth was measured on every walk and never published, so the analyzer and the
+  // overlay both printed "0" for it. A deep chain is its own defect - each level
+  // is a transform and a clip test per frame - and it is the number that tells a
+  // wide model apart from a nested one.
+  map.insert(QStringLiteral("censusMaxDepth"), s.last.maxDepth);
   map.insert(QStringLiteral("censusGrowthAlarms"), s.alarms);
   map.insert(QStringLiteral("censusWalkUs"),
              static_cast<qint64>(s.last.elapsedUs));

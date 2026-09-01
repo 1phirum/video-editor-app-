@@ -1,0 +1,219 @@
+11:26:15.479 GUI turn monitor on, budget 20 ms - every event-loop turn longer than this is reported with its marked scope (CUTPRO_TURN_BUDGET_MS=0 turns it off)
+11:26:15.908 GUI thread unresponsive for 426 ms, "stalled somewhere unmarked": "no marked scope"
+11:26:15.959 CrashReporterHost: watching pid 20072 from pid 17488 | reports -> C:/Users/USER/AppData/Local/Antigravity/Cut Pro/crash-reports
+11:26:16.003 Cut Pro: native C++/Qt backend, coreVersion = 0.1.2 | built = Sep  1 2026 11:12:47 | executable = C:/premier-pro/python-app/dist/Cut Pro 2026/cutpro.exe
+11:26:16.344 GUI thread unresponsive for 862 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+11:26:16.344   the innermost frame has only been open 331 ms of the 862 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+11:26:16.400   GUI thread backtrace, innermost first (14 frames):
+11:26:16.400     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+11:26:16.400     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+11:26:16.400     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+11:26:16.400     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+11:26:16.400     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+11:26:16.400     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+11:26:16.400     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+11:26:16.400     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+11:26:16.400     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+11:26:16.400     #9  "cutpro.exe+0x2d8e"
+11:26:16.400     #10  "cutpro.exe+0x12ef"
+11:26:16.400     #11  "cutpro.exe+0x1406"
+11:26:16.400     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+11:26:16.400     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+11:26:17.216 GUI thread unresponsive for 1734 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+11:26:17.216   the innermost frame has only been open 1203 ms of the 1734 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+11:26:17.216   GUI thread backtrace, innermost first (14 frames):
+11:26:17.216     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+11:26:17.216     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+11:26:17.216     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+11:26:17.216     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+11:26:17.216     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+11:26:17.216     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+11:26:17.216     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+11:26:17.216     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+11:26:17.216     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+11:26:17.216     #9  "cutpro.exe+0x2d8e"
+11:26:17.216     #10  "cutpro.exe+0x12ef"
+11:26:17.216     #11  "cutpro.exe+0x1406"
+11:26:17.216     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+11:26:17.216     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+11:26:17.516 GUI thread STILL blocked after 2034 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)" - during launch, before any window exists: this delays startup but cannot show as "Not Responding".
+11:26:17.516   the innermost frame has only been open 1503 ms of the 2034 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+11:26:17.585   GUI thread backtrace, innermost first (48 frames):
+11:26:17.585     #0  "DWrite.dll+0xfc6f"
+11:26:17.585     #1  "DWrite.dll+0x138ed"
+11:26:17.586     #2  "DWrite.dll+0x51ca6"
+11:26:17.586     #3  "DWrite.dll+0x6cf7f"
+11:26:17.586     #4  "DWrite.dll+0x6ce77"
+11:26:17.586     #5  "DWrite.dll+0x6cda8"
+11:26:17.586     #6  "DWrite.dll+0xe4b1"
+11:26:17.586     #7  "DWrite.dll+0xe1be"
+11:26:17.586     #8  "DWrite.dll+0xe125"
+11:26:17.586     #9  "DWrite.dll+0xac3cf"
+11:26:17.586     #10  "DWrite.dll+0xac246"
+11:26:17.586     #11  "DWrite.dll+0x43654"
+11:26:17.586     #12  "DWrite.dll+0x434e3"
+11:26:17.586     #13  "DWrite.dll+0x426da"
+11:26:17.586     #14  "DWrite.dll+0xd8832"
+11:26:17.586     #15  "Qt6Gui.dll!QWindowsDirectWriteFontDatabase::populateFontDatabase()+0x523"
+11:26:17.586     #16  "Qt6Gui.dll!QFontDatabasePrivate::ensureFontDatabase()+0xa7"
+11:26:17.586     #17  "Qt6Gui.dll!QFontDatabasePrivate::findFont(QFontDef const&, int, bool)+0x6e"
+11:26:17.586     #18  "Qt6Gui.dll!QFontDatabasePrivate::load(QFontPrivate const*, int)+0x7fd"
+11:26:17.586     #19  "Qt6Gui.dll!QFontPrivate::engineForScript(int) const+0xc3"
+11:26:17.586     #20  "Qt6Gui.dll!QFontMetricsF::height() const+0x17"
+11:26:17.586     #21  "Qt6Quick.dll!QQuickTextPrivate::lineHeightOffset() const+0x3d"
+11:26:17.586     #22  "Qt6Quick.dll!QQuickTextPrivate::updateSize()+0xc9"
+11:26:17.586     #23  "Qt6Quick.dll!QQuickTextPrivate::updateLayout()+0x1f0"
+11:26:17.586     #24  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+11:26:17.586     #25  "Qt6Qml.dll!QQmlComponentPrivate::complete(QQmlEnginePrivate*, QQmlComponentPrivate::ConstructionState*)+0x74"
+11:26:17.586     #26  "Qt6Qml.dll!QQmlComponentPrivate::completeDeferred(QQmlEnginePrivate*, std::vector<QQmlComponentPrivate::ConstructionState, std::allocator<QQmlComponentPrivate::ConstructionState> >*)+0x2f"
+11:26:17.586     #27  "Qt6QuickTemplates2.dll!QtQuickPrivate::completeDeferred(QObject*, QString const&, QQuickUntypedDeferredPointer*, QQmlEngine*)+0xc9"
+11:26:17.586     #28  "Qt6QuickTemplates2.dll!QQuickPopupItemPrivate::executeContentItem(bool)+0x12f"
+11:26:17.586     #29  "Qt6QuickTemplates2.dll!QQuickControl::componentComplete()+0x46"
+11:26:17.586     #30  "Qt6QuickTemplates2.dll!QQuickPane::componentComplete()+0x12"
+11:26:17.586     #31  "Qt6QuickTemplates2.dll!QQuickPage::componentComplete()+0x12"
+11:26:17.586     #32  "Qt6QuickTemplates2.dll!QQuickPopup::componentComplete()+0xca"
+11:26:17.586     #33  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+11:26:17.586     #34  "Qt6Qml.dll!QQmlComponentPrivate::complete(QQmlEnginePrivate*, QQmlComponentPrivate::ConstructionState*)+0x74"
+11:26:17.586     #35  "Qt6Qml.dll!QQmlComponentPrivate::completeCreate()+0x2ae"
+11:26:17.586     #36  "Qt6Qml.dll!QQmlComponentPrivate::createWithProperties(QObject*, QMap<QString, QVariant> const&, QQmlContext*, QQmlComponentPrivate::CreateBehavior, bool)+0xc4"
+11:26:17.586     #37  "Qt6Qml.dll!QQmlComponent::create(QQmlContext*)+0x46"
+11:26:17.586     #38  "Qt6QuickTemplates2.dll!QQuickToolTip::accessibilityActiveChanged(bool)+0x1cf"
+11:26:17.586     #39  "Qt6QuickTemplates2.dll+0x1070a7 (nearest export: QQuickComboBox::qt_metacall(QMetaObject::Call, int, void**)+0x248a7)"
+11:26:17.586     #40  "Qt6QuickTemplates2.dll+0x10eb9a (nearest export: QQuickComboBox::qt_metacall(QMetaObject::Call, int, void**)+0x2c39a)"
+11:26:17.586     #41  "Qt6Core.dll+0x3fd299 (nearest export: z_adler32_combine64+0x6b4b9)"
+11:26:17.586     #42  "Qt6Quick.dll!QQuickColorGroup::qt_static_metacall(QObject*, QMetaObject::Call, int, void**)+0xcca"
+11:26:17.586     #43  "Qt6Qml.dll!QQmlNotifier::notify(QQmlData*, int)+0x7db"
+11:26:17.586     #44  "Qt6Qml.dll+0x20fe13 (nearest export: QQmlObjectCreator::setPropertyValue(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x13d3)"
+11:26:17.586     #45  "Qt6Qml.dll!QQmlObjectCreator::setPropertyBinding(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x107"
+11:26:17.586     #46  "Qt6Qml.dll!QQmlObjectCreator::setupBindings(QFlags<QQmlObjectCreator::BindingMode>)+0x53e"
+11:26:17.586     #47  "Qt6Qml.dll!QQmlObjectCreator::populateInstance(int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x230"
+11:26:17.601 Using Qt multimedia with FFmpeg version 7.1.3 LGPL version 2.1 or later
+11:26:32.271 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647421bc0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:26:32.271 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647421bc0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:26:33.956 monitor: source key  -> clip_9bf87dbc760e|D:/capcut/At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4|video|0|0|35744891|
+11:26:33.958 playback: session.stop decoder idle, picture at -1 ms, published -1 ms from MonitorPanel.qml:1166 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1766
+11:26:34.292 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647421100] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:26:34.292 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647421100] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:26:34.489 playback: still.publish 1920 px wide, playback picture was 0 px at -1 ms [+531 ms] from C++
+11:26:34.835 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647421900] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:26:34.835 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647421900] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:26:34.842 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647421e40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:26:34.842 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647421e40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:26:34.990 playback: still.publish 1920 px wide, playback picture was 0 px at -1 ms [+501 ms] from C++
+11:26:36.591 playback: playing false -> true at playhead 0 ms [+1601 ms] from MonitorPanel.qml:588 (startPlayback) <- MonitorPanel.qml:2145 (onClicked)
+11:26:36.591 monitor: playing -> true at 0
+11:26:36.591 monitor: playback session at playhead 0 clip clip_9bf87dbc760e
+11:26:36.591 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 0 ms, kind video [+1 ms] from MonitorPanel.qml:727 (startProcessPlayback) <- MonitorPanel.qml:1071 (onPlayingChanged) <- MonitorPanel.qml:588 (startPlayback) <- MonitorPanel.qml:2145 (onClicked)
+11:26:37.153 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647420b80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:26:37.153 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647420b80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:26:37.498 [h264 @ 000002865e0fbc00] Late SEI
+11:26:37.499 [h264 @ 000002865e0fbc00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+11:26:37.499 [h264 @ 000002865e0fbc00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+11:26:37.740 preview playback: first frame after 1144 ms, at source 0 ms (requested 0 ms)
+11:26:37.741 playback: frame at source 0 ms, advanced 0 ms of media in -1 ms of wall clock
+11:26:37.769 playback: playhead is 5 ms AHEAD of the picture (playhead 21 ms, picture 16 ms)
+11:26:37.876 preview cost: frame is 16 ms against a 9 ms budget at 60 fps - lowering the preview to 1440 px
+11:26:38.010 preview cost: frame is 16 ms against a 9 ms budget at 60 fps - lowering the preview to 1106 px
+11:26:38.143 preview cost: frame is 16 ms and the picture is already at 960 px - pacing the preview at 30 fps instead of 60
+11:26:38.801 playback: playhead is 8 ms AHEAD of the picture (playhead 974 ms, picture 966 ms)
+11:26:39.837 playback: playhead is 8 ms AHEAD of the picture (playhead 1824 ms, picture 1816 ms)
+11:26:40.854 playback: playhead is 7 ms AHEAD of the picture (playhead 2690 ms, picture 2683 ms)
+11:26:41.861 playback: playhead is 7 ms AHEAD of the picture (playhead 3523 ms, picture 3516 ms)
+11:26:42.870 playback: playhead is 6 ms AHEAD of the picture (playhead 4456 ms, picture 4450 ms)
+11:26:43.870 playback: playhead is 6 ms AHEAD of the picture (playhead 5372 ms, picture 5366 ms)
+11:26:43.918 [h264 @ 000002865e0fbc00] Late SEI
+11:26:43.919 [h264 @ 000002865e0fbc00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+11:26:43.919 [h264 @ 000002865e0fbc00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+11:26:44.945 playback: playhead is 8 ms AHEAD of the picture (playhead 6258 ms, picture 6250 ms)
+11:26:45.227 playback: playhead.jump 6401 -> 6524 ms (+123) [+8632 ms] from MonitorPanel.qml:1041 (onTriggered)
+11:26:45.959 playback: playhead is 18 ms AHEAD of the picture (playhead 7068 ms, picture 7050 ms)
+11:26:46.987 playback: playhead is 9 ms AHEAD of the picture (playhead 7925 ms, picture 7916 ms)
+11:26:48.053 playback: playhead is 10 ms AHEAD of the picture (playhead 8826 ms, picture 8816 ms)
+11:26:48.317 preview cost: frame is 24 ms and the picture is already at 960 px - pacing the preview at 24 fps instead of 30
+11:26:49.077 playback: playhead is 17 ms AHEAD of the picture (playhead 9667 ms, picture 9650 ms)
+11:26:50.078 playback: playhead is 12 ms AHEAD of the picture (playhead 10412 ms, picture 10400 ms)
+11:26:51.099 [h264 @ 000002865e1cc4c0] Late SEI
+11:26:51.100 [h264 @ 000002865e1cc4c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+11:26:51.100 [h264 @ 000002865e1cc4c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+11:26:51.110 playback: playhead is 6 ms AHEAD of the picture (playhead 11272 ms, picture 11266 ms)
+11:26:52.158 playback: playhead is 8 ms AHEAD of the picture (playhead 12141 ms, picture 12133 ms)
+11:26:53.199 playback: playhead is 6 ms AHEAD of the picture (playhead 13122 ms, picture 13116 ms)
+11:26:54.252 playback: playhead is 15 ms AHEAD of the picture (playhead 14098 ms, picture 14083 ms)
+11:26:55.256 playback: playhead is 11 ms AHEAD of the picture (playhead 15060 ms, picture 15049 ms)
+11:26:56.259 playback: playhead is 20 ms AHEAD of the picture (playhead 15903 ms, picture 15883 ms)
+11:26:57.262 playback: playhead is 8 ms AHEAD of the picture (playhead 16674 ms, picture 16666 ms)
+11:26:57.731 [h264 @ 000002865e1cc4c0] Late SEI
+11:26:57.731 [h264 @ 000002865e1cc4c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+11:26:57.731 [h264 @ 000002865e1cc4c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+11:26:58.292 playback: playhead is 9 ms AHEAD of the picture (playhead 17542 ms, picture 17533 ms)
+11:26:59.303 playback: playhead is 9 ms AHEAD of the picture (playhead 18492 ms, picture 18483 ms)
+11:27:00.309 playback: playhead is 13 ms AHEAD of the picture (playhead 19396 ms, picture 19383 ms)
+11:27:01.312 playback: playhead is 23 ms AHEAD of the picture (playhead 20189 ms, picture 20166 ms)
+11:27:02.063 playback: playhead.jump 20735 -> 20869 ms (+134) [+16836 ms] from MonitorPanel.qml:1041 (onTriggered)
+11:27:02.355 playback: playhead is 14 ms AHEAD of the picture (playhead 21147 ms, picture 21133 ms)
+11:27:03.379 playback: playhead is 5 ms AHEAD of the picture (playhead 22021 ms, picture 22016 ms)
+11:27:04.426 playback: playhead is 8 ms AHEAD of the picture (playhead 22891 ms, picture 22883 ms)
+11:27:04.444 [h264 @ 000002865e0fbc00] Late SEI
+11:27:04.444 [h264 @ 000002865e0fbc00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+11:27:04.445 [h264 @ 000002865e0fbc00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+11:27:05.439 playback: playhead is 10 ms AHEAD of the picture (playhead 23743 ms, picture 23733 ms)
+11:27:06.476 playback: playhead is 15 ms AHEAD of the picture (playhead 24481 ms, picture 24466 ms)
+11:27:07.525 playback: playhead is 15 ms AHEAD of the picture (playhead 25265 ms, picture 25250 ms)
+11:27:08.536 playback: playhead is 13 ms AHEAD of the picture (playhead 26046 ms, picture 26033 ms)
+11:27:09.536 playback: playhead is 6 ms AHEAD of the picture (playhead 26772 ms, picture 26766 ms)
+11:27:10.584 playback: playhead is 14 ms AHEAD of the picture (playhead 27680 ms, picture 27666 ms)
+11:27:11.194 [h264 @ 000002865e0fd200] Late SEI
+11:27:11.195 [h264 @ 000002865e0fd200]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+11:27:11.195 [h264 @ 000002865e0fd200] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+11:27:11.313 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647421640] STSZ atom truncated
+11:27:11.314 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647421640] stream 1, contradictionary STSC and STCO
+11:27:11.314 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647421640] error reading header
+11:27:11.339 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647420e40] STSZ atom truncated
+11:27:11.339 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647420e40] stream 1, contradictionary STSC and STCO
+11:27:11.340 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647420e40] error reading header
+11:27:11.340 qrc:/qml/components/timeline/TimelineClipWaveform.qml:277:13: QML QQuickImage*: The file has no audio stream.
+11:27:11.341 qrc:/qml/components/timeline/TimelineClipWaveform.qml:277:13: QML QQuickImage*: The file has no audio stream.
+11:27:11.341 qrc:/qml/components/timeline/TimelineClipWaveform.qml:277:13: QML QQuickImage*: The file has no audio stream.
+11:27:11.566 qrc:/qml/components/timeline/TimelineClipWaveform.qml:277:13: QML QQuickImage*: The file has no audio stream.
+11:27:11.566 qrc:/qml/components/timeline/TimelineClipWaveform.qml:277:13: QML QQuickImage*: The file has no audio stream.
+11:27:11.566 qrc:/qml/components/timeline/TimelineClipWaveform.qml:277:13: QML QQuickImage*: The file has no audio stream.
+11:27:11.633 playback: playhead is 5 ms AHEAD of the picture (playhead 28655 ms, picture 28650 ms)
+11:27:12.635 playback: playhead is 9 ms AHEAD of the picture (playhead 29459 ms, picture 29450 ms)
+11:27:13.673 playback: playhead is 5 ms AHEAD of the picture (playhead 30354 ms, picture 30349 ms)
+11:27:14.711 playback: playhead is 8 ms AHEAD of the picture (playhead 31174 ms, picture 31166 ms)
+11:27:15.730 playback: playhead is 20 ms AHEAD of the picture (playhead 31853 ms, picture 31833 ms)
+11:27:16.030 qrc:/qml/components/timeline/TimelineClipWaveform.qml:277:13: QML QQuickImage*: The file has no audio stream.
+11:27:16.037 qrc:/qml/components/timeline/TimelineClipWaveform.qml:277:13: QML QQuickImage*: The file has no audio stream.
+11:27:16.175 qrc:/qml/components/timeline/TimelineClipWaveform.qml:277:13: QML QQuickImage*: The file has no audio stream.
+11:27:16.175 qrc:/qml/components/timeline/TimelineClipWaveform.qml:277:13: QML QQuickImage*: The file has no audio stream.
+11:27:16.719 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647420640] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:27:16.719 [mov,mp4,m4a,3gp,3g2,mj2 @ 0000028647420640] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:27:16.786 playback: playhead is 4 ms AHEAD of the picture (playhead 32670 ms, picture 32666 ms)
+11:27:17.004 preview cost: frame is 16 ms against a 9 ms budget at 60 fps - lowering the preview to 1472 px
+11:27:17.186 preview cost: frame is 20 ms against a 9 ms budget at 60 fps - lowering the preview to 988 px
+11:27:17.337 preview cost: frame is 19 ms and the picture is already at 960 px - pacing the preview at 30 fps instead of 60
+11:27:17.825 playback: playhead is 9 ms AHEAD of the picture (playhead 33559 ms, picture 33550 ms)
+11:27:18.582 [h264 @ 000002865e0fbc00] Late SEI
+11:27:18.582 [h264 @ 000002865e0fbc00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+11:27:18.582 [h264 @ 000002865e0fbc00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+11:27:18.827 playback: playhead is 21 ms AHEAD of the picture (playhead 34271 ms, picture 34250 ms)
+11:27:18.897 preview cost: frame is 24 ms and the picture is already at 960 px - pacing the preview at 24 fps instead of 30
+11:27:19.846 playback: playhead is 7 ms AHEAD of the picture (playhead 35023 ms, picture 35016 ms)
+11:27:20.853 playback: playhead is 11 ms AHEAD of the picture (playhead 35827 ms, picture 35816 ms)
+11:27:21.342 playback: playing true -> false at playhead 35924 ms [+19278 ms] from TimelinePanel.qml:2265
+11:27:21.342 monitor: playing -> false at 35924
+11:27:21.343 playback: session.stop decoder running, picture at 36233 ms, published 36233 ms [+0 ms] from MonitorPanel.qml:1096 (onPlayingChanged) <- TimelinePanel.qml:2265
+11:27:22.687 playback: still.publish 1920 px wide, playback picture was 1920 px at 36233 ms [+1346 ms] from C++
+11:27:23.292 playback: still.publish 1920 px wide, playback picture was 1920 px at 36233 ms [+603 ms] from C++
+11:27:23.362 playback: still.publish 1920 px wide, playback picture was 1920 px at 36233 ms [+71 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:27:24.178 playback: still.publish 1920 px wide, playback picture was 1920 px at 36233 ms [+812 ms] from C++
+11:27:24.258 playback: still.publish 1920 px wide, playback picture was 1920 px at 36233 ms [+87 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:27:25.857 playback: still.publish 1920 px wide, playback picture was 1920 px at 36233 ms [+1592 ms] from C++
+11:27:25.909 playback: still.publish 1920 px wide, playback picture was 1920 px at 36233 ms [+51 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:27:26.690 playback: still.publish 1920 px wide, playback picture was 1920 px at 36233 ms [+781 ms] from C++
+11:27:26.782 playback: still.publish 1920 px wide, playback picture was 1920 px at 36233 ms [+90 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:27:29.756 playback: still.publish 1920 px wide, playback picture was 1920 px at 36233 ms [+2975 ms] from C++
+11:27:30.118 playback: still.publish 1920 px wide, playback picture was 1920 px at 36233 ms [+364 ms] from C++
+11:27:30.232 playback: still.publish 1920 px wide, playback picture was 1920 px at 36233 ms [+114 ms] from C++
+11:27:33.536 playback: still.publish 1920 px wide, playback picture was 1920 px at 36233 ms [+3300 ms] from C++
+11:27:47.518 playback: session.stop decoder idle, picture at 36233 ms, published 36233 ms [+13981 ms] from MonitorPanel.qml:1192 (onDestruction)

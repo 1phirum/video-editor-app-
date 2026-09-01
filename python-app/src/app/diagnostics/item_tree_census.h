@@ -78,6 +78,15 @@ public:
   // Starts the repeating sample. Must be called on the GUI thread, after the
   // engine has root objects. Calling twice restarts the timer with the new
   // interval.
+  //
+  // An interval of 0 or less registers the engine for on-demand sampling and
+  // starts no timer. That is the default now, and it is a performance fix rather
+  // than a preference: the walk visits every QObject and every QQuickItem in the
+  // scene on the GUI thread, and this app's window measured 9801 items / 38 ms
+  // per walk. Repeating that every 2 s drops two frames of a 30 fps preview
+  // twice a second, forever - the instrument was a measurable part of the
+  // slowness it was installed to find. Set CUTPRO_CENSUS_MS to bring the timer
+  // back for a session that is hunting scene growth.
   static void startSampling(QQmlApplicationEngine *engine, int intervalMs);
   static void stopSampling();
 

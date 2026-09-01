@@ -1,8 +1,11 @@
 #include "app/preview/gui_thread_watchdog.h"
 
+#include <algorithm>
+
 #include "app/diagnostics/crash_channel.h"
 #include "app/preview/gui_stall_report.h"
 #include "app/preview/gui_stall_tracer.h"
+#include "app/preview/gui_turn_monitor.h"
 
 #include <QByteArray>
 #include <QCoreApplication>
@@ -31,6 +34,38 @@ std::thread g_monitorThread;
 
 } // namespace
 
+qint64 GuiThreadWatchdog::reportThresholdMs() {
+  // The floor on what this instrument can see, and the reason a stutter can be
+  // invisible to it: at 400 ms a stall that drops six frames of a 30 fps preview
+  // is under the threshold and never reaches report(), so the log is silent about
+  // exactly the range users describe as "slow" rather than "frozen". Lowering it
+  // costs log volume and nothing else, so it is a switch rather than a new
+  // default.
+  static const qint64 threshold = []() -> qint64 {
+    const QByteArray raw = qgetenv("CUTPRO_STALL_REPORT_MS").trimmed();
+    if (raw.isEmpty())
+      return kReportThresholdMs;
+    bool ok = false;
+    const qint64 value = raw.toLongLong(&ok);
+    if (!ok || value <= 0)
+      return kReportThresholdMs;
+    // Below ~120 ms the heartbeat's own resolution starts to dominate, and every
+    // scheduler hiccup on the machine becomes a "stall".
+    return qBound<qint64>(Q_INT64_C(120), value, Q_INT64_C(60000));
+  }();
+  return threshold;
+}
+
+int GuiThreadWatchdog::heartbeatIntervalMs() {
+  // A stall cannot be measured more finely than the beat that detects it. With
+  // the default 400 ms threshold a 100 ms beat is right; asking for 150 ms
+  // reporting with a 100 ms beat would report every stall as "150 ms" whatever it
+  // really was, so the beat follows the threshold down.
+  const qint64 quarter = reportThresholdMs() / 4;
+  return static_cast<int>(qBound<qint64>(
+      Q_INT64_C(16), quarter, static_cast<qint64>(kHeartbeatIntervalMs)));
+}
+
 qint64 GuiThreadWatchdog::traceThresholdMs() {
   // Read once. The monitor thread asks for it on every report, and a stall run
   // is exactly when the process should not be doing environment lookups.
@@ -46,7 +81,7 @@ qint64 GuiThreadWatchdog::traceThresholdMs() {
     // A stall below the report threshold never reaches report() at all, so
     // asking to trace at 100 ms would silently do nothing; clamping makes the
     // lowest useful value the lowest accepted one.
-    return qMax(value, kReportThresholdMs);
+    return qMax(value, reportThresholdMs());
   }();
   return threshold;
 }
@@ -113,7 +148,7 @@ void GuiThreadWatchdog::start() {
   // keeps it usable from translation units that never see Qt's event loop.
   auto *beat = new QTimer(QCoreApplication::instance());
   beat->setTimerType(Qt::CoarseTimer);
-  beat->setInterval(kHeartbeatIntervalMs);
+  beat->setInterval(heartbeatIntervalMs());
   QObject::connect(beat, &QTimer::timeout, beat, [this]() {
     const quint64 tick =
         m_heartbeat.fetch_add(1, std::memory_order_relaxed) + 1;
@@ -131,6 +166,13 @@ void GuiThreadWatchdog::start() {
 }
 
 void GuiThreadWatchdog::markWindowShown() {
+  // Timestamped, not just flagged. The first stall of a run routinely straddles
+  // this moment - the window is created part-way through the QML load and the
+  // thread does not yield until the load finishes - and a plain flag read when
+  // the monitor samples then says "a window existed", turning four seconds of
+  // startup into a reported freeze. Comparing against when the stall began is the
+  // only reading that survives that.
+  m_windowShownAtMs.store(monotonicMs(), std::memory_order_release);
   m_windowShown.store(true, std::memory_order_relaxed);
 }
 
@@ -147,7 +189,7 @@ void GuiThreadWatchdog::monitor() {
   // thread wedged in one call from one churning through thousands of cheap ones,
   // and that distinction decides whether the fix is "move it off the thread" or
   // "stop doing it n times".
-  qint64 nextReportAtMs = kReportThresholdMs;
+  qint64 nextReportAtMs = reportThresholdMs();
   bool countedStall = false;
   bool countedSevere = false;
 
@@ -155,12 +197,12 @@ void GuiThreadWatchdog::monitor() {
     // Half the heartbeat interval: fast enough that the reported duration is
     // close to the real one, slow enough to stay invisible in a profile.
     std::this_thread::sleep_for(
-        std::chrono::milliseconds(kHeartbeatIntervalMs / 2));
+        std::chrono::milliseconds(std::max(8, heartbeatIntervalMs() / 2)));
 
     const quint64 beat = m_heartbeat.load(std::memory_order_relaxed);
     if (beat != lastSeen) {
       lastSeen = beat;
-      nextReportAtMs = kReportThresholdMs;
+      nextReportAtMs = reportThresholdMs();
       countedStall = false;
       countedSevere = false;
       continue;
@@ -205,6 +247,17 @@ void GuiThreadWatchdog::report(qint64 ageMs, bool severe) {
   if (worst) {
     m_worstStallMs.store(ageMs, std::memory_order_relaxed);
     m_worstScope.store(scope.blocking, std::memory_order_relaxed);
+    // Recorded with the stall rather than read back later: by the time anything
+    // asks, the window exists, and a launch stall would then be indistinguishable
+    // from a freeze a user sat through. This is the only fact that separates
+    // "startup took two seconds" from "the app hung".
+    //
+    // Judged from when the stall began, not from now: a stall that started before
+    // the first window and was still running after it is startup cost, however
+    // long it went on.
+    const qint64 shownAt = m_windowShownAtMs.load(std::memory_order_acquire);
+    m_worstBeforeWindow.store(shownAt == 0 || stallBeganMs < shownAt,
+                              std::memory_order_relaxed);
   }
 
   // Published before anything is logged. If this stall never ends - which is the
@@ -291,6 +344,10 @@ QVariantMap GuiThreadWatchdog::statistics() const {
       m_worstStallMs.load(std::memory_order_relaxed);
   stats[QStringLiteral("guiWorstStallScope")] =
       worst ? QString::fromLatin1(worst) : QString();
+  stats[QStringLiteral("guiWorstStallBeforeWindow")] =
+      m_worstBeforeWindow.load(std::memory_order_relaxed);
+  stats[QStringLiteral("guiWindowShown")] =
+      m_windowShown.load(std::memory_order_relaxed);
   stats[QStringLiteral("guiStallTraces")] =
       static_cast<qulonglong>(m_traceCaptures.load(std::memory_order_relaxed));
   stats[QStringLiteral("guiStallTracerReady")] = GuiStallTracer::available();
@@ -298,6 +355,10 @@ QVariantMap GuiThreadWatchdog::statistics() const {
   // full of unattributed 400 ms hitches reads as a tracer failure rather than as
   // the threshold being above them.
   stats[QStringLiteral("guiStallTraceThresholdMs")] = traceThresholdMs();
+  // Published so a quiet log can be read correctly: no stalls at a 400 ms
+  // threshold and no stalls at a 150 ms one are very different claims.
+  stats[QStringLiteral("guiStallReportThresholdMs")] = reportThresholdMs();
+  stats[QStringLiteral("guiHeartbeatIntervalMs")] = heartbeatIntervalMs();
   // The chain and the frames of the worst stall, so the debug overlay shows what
   // the log would have said without needing the log.
   {
@@ -308,6 +369,14 @@ QVariantMap GuiThreadWatchdog::statistics() const {
   }
   const QVariantMap scopeStats = GuiScopeStack::statistics();
   for (auto it = scopeStats.cbegin(); it != scopeStats.cend(); ++it)
+    stats[it.key()] = it.value();
+  // The frame-scale half of the same measurement. Merged here rather than wired
+  // into the bridge separately: every consumer of this map - the snapshot file,
+  // `cutpro --diagnose`, the analyzer - then sees dropped frames without a second
+  // registration, and the two halves can never disagree about which run they
+  // describe.
+  const QVariantMap turnStats = GuiTurnMonitor::statistics();
+  for (auto it = turnStats.cbegin(); it != turnStats.cend(); ++it)
     stats[it.key()] = it.value();
   return stats;
 }

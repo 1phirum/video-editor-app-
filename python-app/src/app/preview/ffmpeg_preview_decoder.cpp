@@ -424,16 +424,28 @@ void FfmpegPreviewDecoder::warmAudioOutput() {
   m_audioDevice = nullptr;
 }
 
+void FfmpegPreviewDecoder::setAudioVolume(double volume) {
+  const double bounded = qBound(0.0, volume, 1.0);
+  m_audioVolume = bounded;
+  // Both paths, because which one is live depends on whether the threaded sink
+  // managed to start on this machine.
+  if (!m_audioOut.failed())
+    m_audioOut.setVolume(bounded);
+  if (m_audioSink)
+    m_audioSink->setVolume(bounded);
+}
+
 void FfmpegPreviewDecoder::startAudio(const QString &path,
                                       qint64 sourcePositionMs,
                                       qint64 durationMs, double volume) {
+  m_audioVolume = qBound(0.0, volume, 1.0);
   if (!resolveAudioOutput())
     return;
 
   if (!m_audioOut.failed()) {
     // Arms the threaded sink. Queued, so pressing Play returns to the event loop
     // whether or not the endpoint is quick about it today.
-    m_audioOut.begin(volume);
+    m_audioOut.begin(m_audioVolume);
   } else {
     // A device change is the only thing that invalidates a sink; everything else
     // reuses it, which is the whole point of the change.
@@ -445,7 +457,7 @@ void FfmpegPreviewDecoder::startAudio(const QString &path,
       m_audioSink->setBufferSize(m_audioFormat.bytesForDuration(kAudioBufferUs));
     }
 
-    m_audioSink->setVolume(qBound(0.0, volume, 1.0));
+    m_audioSink->setVolume(m_audioVolume);
     m_audioDevice = m_audioSink->start();
     if (!m_audioDevice) {
       releaseAudioSink();

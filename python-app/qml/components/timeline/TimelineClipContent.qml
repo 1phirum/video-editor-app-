@@ -109,6 +109,10 @@ Item {
     readonly property bool showWaveform: (root.waveformUrl !== ""
                                           || root.waveToken !== "")
                                          && !root.isSubtitle
+                                         // Extract Audio moved this clip's sound
+                                         // to its own lane; the strip belongs
+                                         // there now, not here.
+                                         && root.clipData.separateAudio !== true
                                          && (root.isAudio
                                              || root.height >= Theme.clipMinWaveformSpace)
     readonly property bool showLabel: root.width >= Theme.clipMinLabelWidth

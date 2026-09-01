@@ -1,0 +1,660 @@
+12:39:15.924 GUI turn monitor on, budget 20 ms - every event-loop turn longer than this is reported with its marked scope (CUTPRO_TURN_BUDGET_MS=0 turns it off)
+12:39:15.979 CrashReporterHost: watching pid 5352 from pid 1908 | reports -> C:/Users/USER/AppData/Local/Antigravity/Cut Pro/crash-reports
+12:39:15.993 Cut Pro: native C++/Qt backend, coreVersion = 0.1.2 | built = Sep  1 2026 11:12:47 | executable = C:/premier-pro/python-app/dist/Cut Pro 2026/cutpro.exe
+12:39:16.368 GUI thread unresponsive for 442 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+12:39:16.871 GUI thread unresponsive for 946 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+12:39:16.902   GUI thread backtrace, innermost first (14 frames):
+12:39:16.903     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+12:39:16.903     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+12:39:16.903     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+12:39:16.903     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+12:39:16.903     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+12:39:16.903     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+12:39:16.903     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+12:39:16.903     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+12:39:16.903     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+12:39:16.903     #9  "cutpro.exe+0x2d8e"
+12:39:16.903     #10  "cutpro.exe+0x12ef"
+12:39:16.903     #11  "cutpro.exe+0x1406"
+12:39:16.903     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+12:39:16.903     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+12:39:17.623 Using Qt multimedia with FFmpeg version 7.1.3 LGPL version 2.1 or later
+12:39:17.842 GUI thread unresponsive for 1916 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+12:39:17.899   GUI thread backtrace, innermost first (48 frames):
+12:39:17.899     #0  "igd9dxva64.dll+0x11d40"
+12:39:17.899     #1  "igd9dxva64.dll+0x54b49"
+12:39:17.899     #2  "igd9dxva64.dll+0x278ea5"
+12:39:17.899     #3  "igd9dxva64.dll+0xe30e"
+12:39:17.899     #4  "igd9dxva64.dll+0xa4f606"
+12:39:17.899     #5  "igd9dxva64.dll+0x9f92ea"
+12:39:17.899     #6  "igd9dxva64.dll+0x9f9457"
+12:39:17.899     #7  "ntdll.dll+0x11eada (nearest export: RtlIsCriticalSectionLocked+0x516a)"
+12:39:17.899     #8  "ntdll.dll+0x10c33 (nearest export: RtlRaiseException+0x1533)"
+12:39:17.899     #9  "ntdll.dll!RtlDeleteElementGenericTableAvlEx+0x4fc"
+12:39:17.899     #10  "ntdll.dll!LdrGetProcedureAddressForCaller+0xb2a"
+12:39:17.899     #11  "ntdll.dll!LdrUnloadDll+0xe4b"
+12:39:17.899     #12  "ntdll.dll!LdrGetDllHandleEx+0xca4"
+12:39:17.899     #13  "ntdll.dll!LdrGetDllHandleEx+0x8b0"
+12:39:17.899     #14  "ntdll.dll!LdrLoadDll+0x170"
+12:39:17.899     #15  "KERNELBASE.dll!LoadLibraryExW+0xff"
+12:39:17.899     #16  "KERNELBASE.dll!LoadLibraryExA+0x64"
+12:39:17.899     #17  "igd9trinity64.dll+0x28c9fa"
+12:39:17.899     #18  "igd9trinity64.dll+0xe1d6a4"
+12:39:17.899     #19  "igd9trinity64.dll+0xe14cc0"
+12:39:17.899     #20  "igd9trinity64.dll+0xe1570f"
+12:39:17.899     #21  "igdumdim64.dll+0xf0647"
+12:39:17.899     #22  "igdumdim64.dll+0xef1bc"
+12:39:17.899     #23  "d3d9.dll+0x6d1fd (nearest export: D3DPERF_EndEvent+0x298d)"
+12:39:17.899     #24  "d3d9.dll+0x6cc4d (nearest export: D3DPERF_EndEvent+0x23dd)"
+12:39:17.899     #25  "d3d9.dll+0x7b6a"
+12:39:17.899     #26  "d3d9.dll+0x5a1e"
+12:39:17.899     #27  "d3d9.dll+0x50ef"
+12:39:17.899     #28  "d3d9.dll!Direct3DCreate9Ex+0x15b"
+12:39:17.899     #29  "d3d9.dll!Direct3DCreate9+0x1e"
+12:39:17.899     #30  "qwindows.dll+0x3c4ae (nearest export: qt_plugin_instance+0x3a80e)"
+12:39:17.899     #31  "qwindows.dll+0x6ad2a (nearest export: qt_plugin_instance+0x6908a)"
+12:39:17.899     #32  "qwindows.dll+0xdac88 (nearest export: qt_plugin_instance+0xd8fe8)"
+12:39:17.899     #33  "qwindows.dll+0x6afcc (nearest export: qt_plugin_instance+0x6932c)"
+12:39:17.899     #34  "qwindows.dll+0x1c44a (nearest export: qt_plugin_instance+0x1a7aa)"
+12:39:17.900     #35  "Qt6Gui.dll!QWindowPrivate::create(bool)+0x186"
+12:39:17.900     #36  "Qt6Gui.dll!QWindowPrivate::setVisible(bool)+0x9b"
+12:39:17.900     #37  "Qt6Quick.dll!QQuickWindowQmlImpl::componentComplete()+0x7a"
+12:39:17.900     #38  "Qt6QuickTemplates2.dll!QQuickApplicationWindow::componentComplete()+0x7a"
+12:39:17.900     #39  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+12:39:17.900     #40  "Qt6Qml.dll!QQmlComponentPrivate::complete(QQmlEnginePrivate*, QQmlComponentPrivate::ConstructionState*)+0x74"
+12:39:17.900     #41  "Qt6Qml.dll!QQmlComponentPrivate::completeCreate()+0x2ae"
+12:39:17.900     #42  "Qt6Qml.dll!QQmlComponentPrivate::createWithProperties(QObject*, QMap<QString, QVariant> const&, QQmlContext*, QQmlComponentPrivate::CreateBehavior, bool)+0xc4"
+12:39:17.900     #43  "Qt6Qml.dll!QQmlComponent::create(QQmlContext*)+0x46"
+12:39:17.900     #44  "Qt6Qml.dll!QQmlApplicationEnginePrivate::finishLoad(QQmlComponent*)+0x92"
+12:39:17.900     #45  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+12:39:17.900     #46  "cutpro.exe+0x2d8e"
+12:39:17.900     #47  "cutpro.exe+0x12ef"
+12:39:17.951 GUI thread STILL blocked after 2025 ms, "stalled somewhere unmarked": "no marked scope" - this is the state Windows shows as "Not Responding".
+12:39:17.964   GUI thread backtrace, innermost first (48 frames):
+12:39:17.965     #0  "Qt6Qml.dll+0x3ad270 (nearest export: QQmlLocale::registerStringLocaleCompare(QV4::ExecutionEngine*)+0xc8fa0)"
+12:39:17.965     #1  "Qt6Qml.dll!QV4::QQmlContextWrapper::lookupScopeObjectProperty(QV4::Lookup*, QV4::ExecutionEngine*, QV4::Value*)+0xa2"
+12:39:17.965     #2  "0x229168b0c59"
+12:39:17.965     #3  "Qt6Qml.dll+0x165b98 (nearest export: qt_v4DebuggerHook+0x7ba8)"
+12:39:17.965     #4  "Qt6Qml.dll!QV4::ExecutableCompilationUnit::createNamedObjectsPerComponent(int)+0x82f"
+12:39:17.965     #5  "Qt6Qml.dll!QQmlJavaScriptExpression::evaluate(QV4::CallData*, bool*)+0x31d"
+12:39:17.965     #6  "Qt6Qml.dll!QQmlBinding::evaluate(bool*)+0xb7"
+12:39:17.965     #7  "Qt6Qml.dll!QQmlBinding::doUpdate(QQmlJavaScriptExpression::DeleteWatcher const&, QFlags<QQmlPropertyData::WriteFlag>, QV4::Scope&)+0x7e"
+12:39:17.965     #8  "Qt6Qml.dll!QQmlBinding::update(QFlags<QQmlPropertyData::WriteFlag>)+0x211"
+12:39:17.965     #9  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x161"
+12:39:17.965     #10  "Qt6Qml.dll!QQmlIncubatorPrivate::incubate(QQmlInstantiationInterrupt&)+0x4b8"
+12:39:17.965     #11  "Qt6Qml.dll!QQmlEnginePrivate::incubate(QQmlIncubator&, QQmlRefPointer<QQmlContextData> const&)+0x246"
+12:39:17.965     #12  "Qt6QmlModels.dll!QQmlDelegateModel::cancel(int)+0x88b"
+12:39:17.965     #13  "Qt6Quick.dll!QQuickRepeater::clear()+0x370"
+12:39:17.965     #14  "Qt6Quick.dll!QQuickRepeater::setModel(QVariant const&)+0x290"
+12:39:17.965     #15  "Qt6Qml.dll+0x42a5af (nearest export: QQmlLocale::registerStringLocaleCompare(QV4::ExecutionEngine*)+0x1462df)"
+12:39:17.965     #16  "Qt6Qml.dll!QQmlPropertyPrivate::write(QObject*, QQmlPropertyData const&, QVariant const&, QQmlRefPointer<QQmlContextData> const&, QFlags<QQmlPropertyData::WriteFlag>)+0xb88"
+12:39:17.965     #17  "Qt6Qml.dll!QQmlBinding::slowWrite(QQmlPropertyData const&, QQmlPropertyData const&, QV4::Value const&, bool, QFlags<QQmlPropertyData::WriteFlag>)+0x54f"
+12:39:17.965     #18  "Qt6Qml.dll+0x347e9a (nearest export: QQmlLocale::registerStringLocaleCompare(QV4::ExecutionEngine*)+0x63bca)"
+12:39:17.965     #19  "Qt6Qml.dll!QQmlBinding::doUpdate(QQmlJavaScriptExpression::DeleteWatcher const&, QFlags<QQmlPropertyData::WriteFlag>, QV4::Scope&)+0x19f"
+12:39:17.965     #20  "Qt6Qml.dll!QQmlBinding::update(QFlags<QQmlPropertyData::WriteFlag>)+0x211"
+12:39:17.965     #21  "Qt6Qml.dll!QQmlNotifier::emitNotify(QQmlNotifierEndpoint*, void**)+0x215"
+12:39:17.965     #22  "Qt6Core.dll+0x3fcf21 (nearest export: z_adler32_combine64+0x6b141)"
+12:39:17.965     #23  "Qt6Qml.dll!QQmlVMEMetaObject::metaCall(QObject*, QMetaObject::Call, int, void**)+0x436"
+12:39:17.965     #24  "Qt6Core.dll!QMetaObject::metacall(QObject*, QMetaObject::Call, int, void**)+0x84"
+12:39:17.965     #25  "Qt6Qml.dll!QV4::QObjectWrapper::setProperty(QV4::ExecutionEngine*, QObject*, QQmlPropertyData const*, QV4::Value const&)+0x39b"
+12:39:17.965     #26  "Qt6Qml.dll!QV4::QObjectWrapper::setQmlProperty(QV4::ExecutionEngine*, QQmlRefPointer<QQmlContextData> const&, QObject*, QV4::String*, QFlags<QV4::QObjectWrapper::Flag>, QV4::Value const&)+0x11e"
+12:39:17.965     #27  "Qt6Qml.dll!QV4::QObjectWrapper::virtualPut(QV4::Managed*, QV4::PropertyKey, QV4::Value const&, QV4::Value*)+0x19a"
+12:39:17.965     #28  "Qt6Qml.dll!QV4::Lookup::setterFallback(QV4::Lookup*, QV4::ExecutionEngine*, QV4::Value&, QV4::Value const&)+0xba"
+12:39:17.965     #29  "Qt6Qml.dll+0x161bce (nearest export: qt_v4DebuggerHook+0x3bde)"
+12:39:17.965     #30  "Qt6Qml.dll+0x165c9f (nearest export: qt_v4DebuggerHook+0x7caf)"
+12:39:17.965     #31  "Qt6Qml.dll!QV4::Function::updateInternalClass(QV4::ExecutionEngine*, QList<QByteArray> const&)+0xb00"
+12:39:17.965     #32  "Qt6Qml.dll+0x1613dc (nearest export: qt_v4DebuggerHook+0x33ec)"
+12:39:17.965     #33  "Qt6Qml.dll+0x165c9f (nearest export: qt_v4DebuggerHook+0x7caf)"
+12:39:17.965     #34  "Qt6Qml.dll!QV4::ExecutableCompilationUnit::createNamedObjectsPerComponent(int)+0x82f"
+12:39:17.965     #35  "Qt6Qml.dll!QV4::Function::call(QObject*, void**, QMetaType const*, int, QV4::ExecutionContext*)+0x293"
+12:39:17.965     #36  "Qt6Qml.dll!QQmlJavaScriptExpression::evaluate(void**, QMetaType const*, int)+0x105"
+12:39:17.965     #37  "Qt6Qml.dll!QQmlBoundSignalExpression::evaluate(void**)+0x31c"
+12:39:17.965     #38  "Qt6Qml.dll!QQmlBoundSignalExpression::QQmlBoundSignalExpression(QObject const*, int, QQmlRefPointer<QQmlContextData> const&, QObject*, QV4::Function*, QV4::ExecutionContext*)+0x8f8"
+12:39:17.965     #39  "Qt6Qml.dll!QQmlNotifier::emitNotify(QQmlNotifierEndpoint*, void**)+0x215"
+12:39:17.965     #40  "Qt6Core.dll+0x3fcf21 (nearest export: z_adler32_combine64+0x6b141)"
+12:39:17.965     #41  "Qt6Qml.dll!QQmlVMEMetaObject::metaCall(QObject*, QMetaObject::Call, int, void**)+0x436"
+12:39:17.965     #42  "Qt6Qml.dll+0x34915c (nearest export: QQmlLocale::registerStringLocaleCompare(QV4::ExecutionEngine*)+0x64e8c)"
+12:39:17.965     #43  "Qt6Qml.dll!QQmlBinding::doUpdate(QQmlJavaScriptExpression::DeleteWatcher const&, QFlags<QQmlPropertyData::WriteFlag>, QV4::Scope&)+0x19f"
+12:39:17.966     #44  "Qt6Qml.dll!QQmlBinding::update(QFlags<QQmlPropertyData::WriteFlag>)+0x211"
+12:39:17.966     #45  "Qt6Quick.dll!QQuickKeysAttached::volumeDownPressed(QQuickKeyEvent*)+0xa8d"
+12:39:17.966     #46  "Qt6Quick.dll+0x3d0e25 (nearest export: QQuickInputMethod::qt_metacall(QMetaObject::Call, int, void**)+0x9edc5)"
+12:39:17.966     #47  "Qt6Quick.dll!QQuickItem::geometryChange(QRectF const&, QRectF const&)+0x20f"
+12:39:31.646 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997900] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:39:31.646 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997900] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:39:31.947 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997e40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:39:31.947 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997e40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:39:32.458 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b998680] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:39:32.458 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b998680] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:39:32.996 monitor: source key  -> clip_476ac5cfdb8d|D:/capcut/Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4|video|0|0|30673443|
+12:39:32.996 playback: session.stop decoder idle, picture at -1 ms, published -1 ms from MonitorPanel.qml:1189 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1766
+12:39:33.151 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997100] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:39:33.151 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997100] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:39:33.316 playback: still.publish 1920 px wide, playback picture was 0 px at -1 ms [+311 ms] from C++
+12:39:33.531 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b998900] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:39:33.531 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b998900] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:39:33.542 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997380] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:39:33.542 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997380] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:39:33.680 playback: still.publish 1920 px wide, playback picture was 0 px at -1 ms [+363 ms] from C++
+12:39:34.106 playback: playing false -> true at playhead 0 ms [+427 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:39:34.106 monitor: playing -> true at 0
+12:39:34.106 monitor: playback session at playhead 0 clip clip_476ac5cfdb8d
+12:39:34.106 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 0 ms, kind video [+1 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:39:34.334 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b996e40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:39:34.335 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b996e40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:39:34.631 [h264 @ 000002292e45d880] Late SEI
+12:39:34.631 [h264 @ 000002292e45d880]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:39:34.631 [h264 @ 000002292e45d880] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:39:34.857 preview playback: first frame after 747 ms, at source 0 ms (requested 0 ms)
+12:39:34.858 playback: frame at source 0 ms, advanced 0 ms of media in -1 ms of wall clock
+12:39:34.897 playback: playhead is 37 ms AHEAD of the picture (playhead 37 ms, picture 0 ms)
+12:39:35.968 playback: playhead.jump 745 -> 1102 ms (+357) [+1859 ms] from MonitorPanel.qml:1064 (onTriggered)
+12:39:35.970 playback: playhead is 19 ms AHEAD of the picture (playhead 1102 ms, picture 1083 ms)
+12:39:37.023 playback: playhead is 38 ms AHEAD of the picture (playhead 2163 ms, picture 2125 ms)
+12:39:38.101 playback: playhead is 30 ms AHEAD of the picture (playhead 3238 ms, picture 3208 ms)
+12:39:38.276 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b9983c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:39:38.276 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b9983c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:39:39.106 playback: playhead is 37 ms AHEAD of the picture (playhead 4245 ms, picture 4208 ms)
+12:39:40.147 playback: playhead is 35 ms AHEAD of the picture (playhead 5285 ms, picture 5250 ms)
+12:39:40.861 [h264 @ 000002292e45d880] Late SEI
+12:39:40.861 [h264 @ 000002292e45d880]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:39:40.861 [h264 @ 000002292e45d880] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:39:41.205 playback: playhead is 11 ms AHEAD of the picture (playhead 6344 ms, picture 6333 ms)
+12:39:42.220 playback: playhead is 22 ms AHEAD of the picture (playhead 7355 ms, picture 7333 ms)
+12:39:43.266 playback: playhead is 28 ms AHEAD of the picture (playhead 8403 ms, picture 8375 ms)
+12:39:44.316 playback: playhead is 35 ms AHEAD of the picture (playhead 9451 ms, picture 9416 ms)
+12:39:45.373 playback: playhead is 12 ms AHEAD of the picture (playhead 10512 ms, picture 10500 ms)
+12:39:46.420 playback: playhead is 17 ms AHEAD of the picture (playhead 11558 ms, picture 11541 ms)
+12:39:47.110 [h264 @ 000002292e45d880] Late SEI
+12:39:47.111 [h264 @ 000002292e45d880]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:39:47.111 [h264 @ 000002292e45d880] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:39:47.477 playback: playhead is 26 ms AHEAD of the picture (playhead 12609 ms, picture 12583 ms)
+12:39:48.515 playback: playhead is 29 ms AHEAD of the picture (playhead 13654 ms, picture 13625 ms)
+12:39:49.564 playback: playhead is 34 ms AHEAD of the picture (playhead 14700 ms, picture 14666 ms)
+12:39:50.565 playback: playhead is 36 ms AHEAD of the picture (playhead 15702 ms, picture 15666 ms)
+12:39:51.628 playback: playhead is 13 ms AHEAD of the picture (playhead 16763 ms, picture 16750 ms)
+12:39:52.698 playback: playhead is 10 ms AHEAD of the picture (playhead 17801 ms, picture 17791 ms)
+12:39:53.360 [h264 @ 000002292e45d880] Late SEI
+12:39:53.360 [h264 @ 000002292e45d880]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:39:53.360 [h264 @ 000002292e45d880] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:39:53.716 playback: playhead is 20 ms AHEAD of the picture (playhead 18853 ms, picture 18833 ms)
+12:39:54.726 playback: playhead is 25 ms AHEAD of the picture (playhead 19858 ms, picture 19833 ms)
+12:39:54.753 playback: playing true -> false at playhead 19858 ms [+18784 ms] from MonitorPanel.qml:2234 (onClicked)
+12:39:54.753 monitor: playing -> false at 19858
+12:39:54.754 playback: session.stop decoder running, picture at 19875 ms, published 19875 ms [+1 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:39:56.196 qrc:/qml/components/timeline/TimelineClipWaveform.qml:277:13: QML QQuickImage*: The file has no audio stream.
+12:39:56.198 qrc:/qml/components/timeline/TimelineClipWaveform.qml:277:13: QML QQuickImage*: The file has no audio stream.
+12:39:56.459 playback: still.publish 1920 px wide, playback picture was 1920 px at 19875 ms [+1705 ms] from C++
+12:40:17.456 playback: playing false -> true at playhead 19875 ms [+20996 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:40:17.456 monitor: playing -> true at 19875
+12:40:17.456 monitor: playback session at playhead 19875 clip clip_476ac5cfdb8d
+12:40:17.456 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 19875 ms, kind video [+1 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:40:17.767 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b9983c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:40:17.768 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b9983c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:40:17.970 [h264 @ 000002292bc2e780] Late SEI
+12:40:17.970 [h264 @ 000002292bc2e780]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:40:17.970 [h264 @ 000002292bc2e780] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:40:18.198 preview playback: first frame after 739 ms, at source 19875 ms (requested 19875 ms)
+12:40:18.198 playback: frame at source 19875 ms, advanced 0 ms of media in 23465 ms of wall clock
+12:40:18.234 playback: playhead is 30 ms AHEAD of the picture (playhead 19905 ms, picture 19875 ms)
+12:40:19.271 playback: playhead is 26 ms AHEAD of the picture (playhead 20942 ms, picture 20916 ms)
+12:40:20.297 playback: playhead is 9 ms AHEAD of the picture (playhead 21967 ms, picture 21958 ms)
+12:40:21.337 playback: playhead is 8 ms AHEAD of the picture (playhead 23008 ms, picture 23000 ms)
+12:40:22.349 playback: playhead is 21 ms AHEAD of the picture (playhead 24021 ms, picture 24000 ms)
+12:40:22.807 playback: playing true -> false at playhead 24444 ms [+5349 ms] from MonitorPanel.qml:2234 (onClicked)
+12:40:22.808 monitor: playing -> false at 24444
+12:40:22.808 playback: session.stop decoder running, picture at 24458 ms, published 24458 ms [+1 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:40:24.228 playback: session.stop decoder idle, picture at 24458 ms, published 24458 ms [+1421 ms] from MonitorPanel.qml:1215 (onDestruction) <- main.qml:238 (onTapped)
+12:40:24.650 playback: still.publish 1920 px wide, playback picture was 1920 px at 24458 ms [+431 ms] from C++
+12:40:26.245 playback: playing false -> true at playhead 24458 ms [+1587 ms] from ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:26.245 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 24458 ms, kind video [+0 ms] from ExportPreviewPlayer.qml:226 (startCurrentDecode) <- ExportPreviewPlayer.qml:308 (onPlayingChanged) <- ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback)
+12:40:26.509 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997e40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:40:26.509 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997e40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:40:26.637 [h264 @ 000002292bc2f2c0] Late SEI
+12:40:26.638 [h264 @ 000002292bc2f2c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:40:26.638 [h264 @ 000002292bc2f2c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:40:27.036 preview playback: first frame after 784 ms, at source 24458 ms (requested 24458 ms)
+12:40:27.036 playback: frame at source 24458 ms, advanced 0 ms of media in 4253 ms of wall clock
+12:40:27.336 [h264 @ 000002292bc2f2c0] Late SEI
+12:40:27.336 [h264 @ 000002292bc2f2c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:40:27.336 [h264 @ 000002292bc2f2c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:40:28.225 playback: playing true -> false at playhead 26422 ms [+1976 ms] from ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:28.226 playback: session.stop decoder running, picture at 25625 ms, published 25625 ms [+0 ms] from ExportPreviewPlayer.qml:310 (onPlayingChanged) <- ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:28.524 playback: still.publish 1920 px wide, playback picture was 1920 px at 25625 ms [+298 ms] from C++
+12:40:29.365 playback: playing false -> true at playhead 26422 ms [+841 ms] from ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:29.365 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 26422 ms, kind video [+1 ms] from ExportPreviewPlayer.qml:226 (startCurrentDecode) <- ExportPreviewPlayer.qml:308 (onPlayingChanged) <- ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback)
+12:40:29.635 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b996e40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:40:29.635 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b996e40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:40:29.768 [h264 @ 000002292bc2f2c0] Late SEI
+12:40:29.768 [h264 @ 000002292bc2f2c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:40:29.768 [h264 @ 000002292bc2f2c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:40:29.901 preview playback: first frame after 531 ms, at source 26458 ms (requested 26422 ms)
+12:40:29.901 playback: frame at source 26458 ms, advanced 833 ms of media in 1697 ms of wall clock
+12:40:32.955 playback: playing true -> false at playhead 30009 ms [+3588 ms] from ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:32.956 playback: session.stop decoder running, picture at 29500 ms, published 29500 ms [+0 ms] from ExportPreviewPlayer.qml:310 (onPlayingChanged) <- ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:34.580 playback: playing false -> true at playhead 30009 ms [+1639 ms] from ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:34.580 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 30009 ms, kind video [+0 ms] from ExportPreviewPlayer.qml:226 (startCurrentDecode) <- ExportPreviewPlayer.qml:308 (onPlayingChanged) <- ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback)
+12:40:34.825 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997640] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:40:34.825 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997640] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:40:34.963 [h264 @ 000002292bc2f2c0] Late SEI
+12:40:34.963 [h264 @ 000002292bc2f2c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:40:34.963 [h264 @ 000002292bc2f2c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:40:35.293 preview playback: first frame after 695 ms, at source 30041 ms (requested 30009 ms)
+12:40:35.293 playback: frame at source 30041 ms, advanced 541 ms of media in 2351 ms of wall clock
+12:40:36.288 [h264 @ 000002292bc2f2c0] Late SEI
+12:40:36.288 [h264 @ 000002292bc2f2c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:40:36.289 [h264 @ 000002292bc2f2c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:40:36.469 playback: playing true -> false at playhead 31880 ms [+1873 ms] from ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:36.469 playback: session.stop decoder running, picture at 31208 ms, published 31208 ms [+0 ms] from ExportPreviewPlayer.qml:310 (onPlayingChanged) <- ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:36.769 playback: still.publish 1920 px wide, playback picture was 1920 px at 31208 ms [+306 ms] from C++
+12:40:38.021 playback: playing false -> true at playhead 31880 ms [+1249 ms] from ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:38.026 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 31880 ms, kind video [+0 ms] from ExportPreviewPlayer.qml:226 (startCurrentDecode) <- ExportPreviewPlayer.qml:308 (onPlayingChanged) <- ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback)
+12:40:38.274 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b996e40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:40:38.274 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b996e40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:40:38.399 [h264 @ 000002292bc2e040] Late SEI
+12:40:38.400 [h264 @ 000002292bc2e040]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:40:38.400 [h264 @ 000002292bc2e040] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:40:38.498 preview playback: first frame after 470 ms, at source 31916 ms (requested 31880 ms)
+12:40:38.498 playback: frame at source 31916 ms, advanced 708 ms of media in 2037 ms of wall clock
+12:40:43.193 playback: playing true -> false at playhead 37033 ms [+5166 ms] from ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:43.193 playback: session.stop decoder running, picture at 36583 ms, published 36583 ms [+0 ms] from ExportPreviewPlayer.qml:310 (onPlayingChanged) <- ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:46.673 playback: playing false -> true at playhead 37033 ms [+3480 ms] from ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:46.673 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 37033 ms, kind video [+0 ms] from ExportPreviewPlayer.qml:226 (startCurrentDecode) <- ExportPreviewPlayer.qml:308 (onPlayingChanged) <- ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback)
+12:40:46.931 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997900] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:40:46.931 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997900] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:40:47.059 [h264 @ 000002292bc2dc80] Late SEI
+12:40:47.060 [h264 @ 000002292bc2dc80]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:40:47.060 [h264 @ 000002292bc2dc80] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:40:47.377 preview playback: first frame after 699 ms, at source 37041 ms (requested 37033 ms)
+12:40:47.377 playback: frame at source 37041 ms, advanced 458 ms of media in 4210 ms of wall clock
+12:40:47.605 [h264 @ 000002292bc2dc80] Late SEI
+12:40:47.605 [h264 @ 000002292bc2dc80]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:40:47.605 [h264 @ 000002292bc2dc80] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:40:47.988 playback: playing true -> false at playhead 38319 ms [+1313 ms] from ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:47.989 playback: session.stop decoder running, picture at 37625 ms, published 37625 ms [+0 ms] from ExportPreviewPlayer.qml:310 (onPlayingChanged) <- ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:40:48.283 playback: still.publish 1920 px wide, playback picture was 1920 px at 37625 ms [+294 ms] from C++
+12:40:49.168 playback: session.stop decoder idle, picture at 37625 ms, published 37625 ms [+890 ms] from ExportPreviewPlayer.qml:318 (onDestruction) <- main.qml:238 (onTapped)
+12:40:49.208 monitor: source key  -> clip_476ac5cfdb8d|D:/capcut/Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4|video|0|0|30673443|
+12:40:49.208 playback: session.stop decoder idle, picture at 37625 ms, published 37625 ms [+34 ms] from MonitorPanel.qml:1189 (onActiveSourceKeyChanged) <- main.qml:238 (onTapped)
+12:40:49.865 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997640] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:40:49.865 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997640] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:40:49.901 playback: still.publish 1920 px wide, playback picture was 1920 px at 37625 ms [+696 ms] from C++
+12:40:50.881 playback: playing false -> true at playhead 38319 ms [+976 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:40:50.881 monitor: playing -> true at 38319
+12:40:50.881 monitor: playback session at playhead 38319 clip clip_476ac5cfdb8d
+12:40:50.881 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 38319 ms, kind video [+1 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:40:51.059 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b998680] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:40:51.060 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b998680] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:40:51.227 [h264 @ 000002292e773d00] Late SEI
+12:40:51.228 [h264 @ 000002292e773d00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:40:51.228 [h264 @ 000002292e773d00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:40:51.415 preview playback: first frame after 531 ms, at source 38333 ms (requested 38319 ms)
+12:40:51.415 playback: frame at source 38333 ms, advanced 708 ms of media in 3454 ms of wall clock
+12:40:51.449 playback: playhead is 33 ms AHEAD of the picture (playhead 38366 ms, picture 38333 ms)
+12:40:52.472 playback: playhead is 9 ms AHEAD of the picture (playhead 39384 ms, picture 39375 ms)
+12:40:53.215 playback: playing true -> false at playhead 40117 ms [+2332 ms] from MonitorPanel.qml:2234 (onClicked)
+12:40:53.215 monitor: playing -> false at 40117
+12:40:53.215 playback: session.stop decoder running, picture at 40125 ms, published 40125 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:40:56.040 playback: playing false -> true at playhead 40125 ms [+2831 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:40:56.040 monitor: playing -> true at 40125
+12:40:56.040 monitor: playback session at playhead 40125 clip clip_476ac5cfdb8d
+12:40:56.040 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 40125 ms, kind video [+0 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:40:56.283 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997bc0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:40:56.284 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997bc0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:40:56.417 [h264 @ 000002295710d9c0] Late SEI
+12:40:56.418 [h264 @ 000002295710d9c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:40:56.418 [h264 @ 000002295710d9c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:40:56.647 preview playback: first frame after 598 ms, at source 40125 ms (requested 40125 ms)
+12:40:56.648 playback: frame at source 40125 ms, advanced 0 ms of media in 3440 ms of wall clock
+12:40:56.669 playback: playhead is 20 ms AHEAD of the picture (playhead 40145 ms, picture 40125 ms)
+12:40:57.688 playback: playhead is 36 ms AHEAD of the picture (playhead 41161 ms, picture 41125 ms)
+12:40:58.005 playback: playing true -> false at playhead 41436 ms [+1957 ms] from MonitorPanel.qml:2234 (onClicked)
+12:40:58.005 monitor: playing -> false at 41436
+12:40:58.006 playback: session.stop decoder running, picture at 41458 ms, published 41458 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:40:59.869 playback: playing false -> true at playhead 41458 ms [+1865 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:40:59.869 monitor: playing -> true at 41458
+12:40:59.869 monitor: playback session at playhead 41458 clip clip_476ac5cfdb8d
+12:40:59.869 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 41458 ms, kind video [+0 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:41:00.115 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997900] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:41:00.116 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997900] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:41:00.257 [h264 @ 0000022941279380] Late SEI
+12:41:00.257 [h264 @ 0000022941279380]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:41:00.257 [h264 @ 0000022941279380] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:41:00.577 preview playback: first frame after 703 ms, at source 41458 ms (requested 41458 ms)
+12:41:00.577 playback: frame at source 41458 ms, advanced 0 ms of media in 2593 ms of wall clock
+12:41:00.606 playback: playhead is 24 ms AHEAD of the picture (playhead 41482 ms, picture 41458 ms)
+12:41:01.662 playback: playhead is 38 ms AHEAD of the picture (playhead 42538 ms, picture 42500 ms)
+12:41:02.649 [h264 @ 0000022941279380] Late SEI
+12:41:02.649 [h264 @ 0000022941279380]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:41:02.649 [h264 @ 0000022941279380] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:41:02.672 playback: playhead is 49 ms AHEAD of the picture (playhead 43549 ms, picture 43500 ms)
+12:41:02.838 playback: playing true -> false at playhead 43692 ms [+2967 ms] from MonitorPanel.qml:2234 (onClicked)
+12:41:02.839 monitor: playing -> false at 43692
+12:41:02.839 playback: session.stop decoder running, picture at 43708 ms, published 43708 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:41:05.578 playback: playing false -> true at playhead 43708 ms [+2752 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:41:05.578 monitor: playing -> true at 43708
+12:41:05.578 monitor: playback session at playhead 43708 clip clip_476ac5cfdb8d
+12:41:05.578 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 43708 ms, kind video [+0 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:41:05.834 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997900] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:41:05.835 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997900] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:41:05.976 [h264 @ 000002292e36f3c0] Late SEI
+12:41:05.976 [h264 @ 000002292e36f3c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:41:05.976 [h264 @ 000002292e36f3c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:41:06.313 [h264 @ 000002292e36f3c0] Late SEI
+12:41:06.313 [h264 @ 000002292e36f3c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:41:06.313 [h264 @ 000002292e36f3c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:41:06.402 preview playback: first frame after 806 ms, at source 43708 ms (requested 43708 ms)
+12:41:06.402 playback: frame at source 43708 ms, advanced 0 ms of media in 3573 ms of wall clock
+12:41:06.421 playback: playhead is 16 ms AHEAD of the picture (playhead 43724 ms, picture 43708 ms)
+12:41:07.473 playback: playhead is 27 ms AHEAD of the picture (playhead 44777 ms, picture 44750 ms)
+12:41:08.413 playback: playing true -> false at playhead 45655 ms [+2820 ms] from MonitorPanel.qml:2234 (onClicked)
+12:41:08.413 monitor: playing -> false at 45655
+12:41:08.413 playback: session.stop decoder running, picture at 45708 ms, published 45708 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:41:22.794 playback: still.publish 1920 px wide, playback picture was 1920 px at 45708 ms [+14380 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:41:22.820 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997900] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:41:22.820 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997900] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0000022951565d40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0000022951565d40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'D:/capcut/Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 1
+    compatible_brands: isomiso2avc1mp41
+    creation_time   : 2026-08-04T01:07:07.000000Z
+  Duration: 08:31:13.44, start: 0.000000, bitrate: 1871 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 1740 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+      Metadata:
+        creation_time   : 2026-08-04T01:07:07.000000Z
+        handler_name    : ISO Media file produced by Google Inc.
+        vendor_id       : [0][0][0][0]
+  Stream #0:1[0x2](eng): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 127 kb/s (default)
+      Metadata:
+        creation_time   : 2026-08-04T02:26:20.000000Z
+        handler_name    : ISO Media file produced by Google Inc.
+        vendor_id       : [0][0][0][0]
+12:41:32.262 playback: playing false -> true at playhead 45708 ms [+9471 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:41:32.262 monitor: playing -> true at 45708
+12:41:32.262 monitor: playback session at playhead 45708 clip clip_476ac5cfdb8d
+12:41:32.262 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 45708 ms, kind video [+0 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:41:32.497 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997bc0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:41:32.497 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997bc0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:41:32.637 [h264 @ 000002292bab3bc0] Late SEI
+12:41:32.637 [h264 @ 000002292bab3bc0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:41:32.637 [h264 @ 000002292bab3bc0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:41:32.804 preview playback: first frame after 535 ms, at source 45708 ms (requested 45708 ms)
+12:41:32.804 playback: frame at source 45708 ms, advanced 0 ms of media in 24401 ms of wall clock
+12:41:32.858 playback: playhead is 6 ms AHEAD of the picture (playhead 45756 ms, picture 45750 ms)
+12:41:33.886 playback: playhead is 36 ms AHEAD of the picture (playhead 46786 ms, picture 46750 ms)
+12:41:34.913 playback: playhead is 21 ms AHEAD of the picture (playhead 47812 ms, picture 47791 ms)
+12:41:35.857 playback: playing true -> false at playhead 48716 ms [+3590 ms] from MonitorPanel.qml:2234 (onClicked)
+12:41:35.857 monitor: playing -> false at 48716
+12:41:35.857 playback: session.stop decoder running, picture at 48750 ms, published 48750 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:41:39.650 playback: still.publish 1920 px wide, playback picture was 1920 px at 48750 ms [+3802 ms] from C++
+12:41:39.698 playback: still.publish 1920 px wide, playback picture was 1920 px at 48750 ms [+49 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:41:41.017 playback: playing false -> true at playhead 48750 ms [+1312 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:41:41.017 monitor: playing -> true at 48750
+12:41:41.017 monitor: playback session at playhead 48750 clip clip_476ac5cfdb8d
+12:41:41.017 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 48750 ms, kind video [+0 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:41:41.269 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b998680] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:41:41.269 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b998680] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:41:41.402 [h264 @ 0000022957b83980] Late SEI
+12:41:41.403 [h264 @ 0000022957b83980]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:41:41.403 [h264 @ 0000022957b83980] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:41:41.749 preview playback: first frame after 724 ms, at source 48750 ms (requested 48750 ms)
+12:41:41.749 playback: frame at source 48750 ms, advanced 0 ms of media in 5903 ms of wall clock
+12:41:41.793 playback: playhead is 41 ms AHEAD of the picture (playhead 48791 ms, picture 48750 ms)
+12:41:42.751 [h264 @ 0000022957b83980] Late SEI
+12:41:42.751 [h264 @ 0000022957b83980]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:41:42.751 [h264 @ 0000022957b83980] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:41:42.826 playback: playhead is 34 ms AHEAD of the picture (playhead 49825 ms, picture 49791 ms)
+12:41:43.827 playback: playhead is 33 ms AHEAD of the picture (playhead 50824 ms, picture 50791 ms)
+12:41:44.845 playback: playhead is 8 ms AHEAD of the picture (playhead 51841 ms, picture 51833 ms)
+12:41:45.877 playback: playhead is 40 ms AHEAD of the picture (playhead 52873 ms, picture 52833 ms)
+12:41:46.928 playback: playhead is 8 ms AHEAD of the picture (playhead 53924 ms, picture 53916 ms)
+12:41:47.440 playback: playing true -> false at playhead 54402 ms [+6417 ms] from MonitorPanel.qml:2234 (onClicked)
+12:41:47.441 monitor: playing -> false at 54402
+12:41:47.441 playback: session.stop decoder running, picture at 54416 ms, published 54416 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:41:48.079 playback: playing false -> true at playhead 54416 ms [+646 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:41:48.079 monitor: playing -> true at 54416
+12:41:48.079 monitor: playback session at playhead 54416 clip clip_476ac5cfdb8d
+12:41:48.088 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 54416 ms, kind video [+0 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:41:48.347 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997bc0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:41:48.347 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997bc0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:41:48.481 [h264 @ 0000022957b85e80] Late SEI
+12:41:48.481 [h264 @ 0000022957b85e80]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:41:48.481 [h264 @ 0000022957b85e80] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:41:48.790 preview playback: first frame after 700 ms, at source 54416 ms (requested 54416 ms)
+12:41:48.791 playback: frame at source 54416 ms, advanced 0 ms of media in 1371 ms of wall clock
+12:41:48.836 playback: playhead is 42 ms AHEAD of the picture (playhead 54458 ms, picture 54416 ms)
+12:41:49.603 playback: playing true -> false at playhead 55189 ms [+1515 ms] from MonitorPanel.qml:2234 (onClicked)
+12:41:49.604 monitor: playing -> false at 55189
+12:41:49.604 playback: session.stop decoder running, picture at 55208 ms, published 55208 ms [+1 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:41:50.687 playback: playing false -> true at playhead 55208 ms [+1087 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:41:50.687 monitor: playing -> true at 55208
+12:41:50.687 monitor: playback session at playhead 55208 clip clip_476ac5cfdb8d
+12:41:50.694 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 55208 ms, kind video [+1 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:41:50.953 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b996e40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:41:50.953 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b996e40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:41:51.102 [h264 @ 000002292e74ff00] Late SEI
+12:41:51.102 [h264 @ 000002292e74ff00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:41:51.102 [h264 @ 000002292e74ff00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:41:51.346 preview playback: first frame after 651 ms, at source 55208 ms (requested 55208 ms)
+12:41:51.346 playback: frame at source 55208 ms, advanced 0 ms of media in 1762 ms of wall clock
+12:41:51.366 playback: playhead is 18 ms AHEAD of the picture (playhead 55226 ms, picture 55208 ms)
+12:41:52.168 [h264 @ 000002292e74ff00] Late SEI
+12:41:52.169 [h264 @ 000002292e74ff00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:41:52.169 [h264 @ 000002292e74ff00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:41:52.185 playback: playing true -> false at playhead 56028 ms [+1491 ms] from MonitorPanel.qml:2234 (onClicked)
+12:41:52.185 monitor: playing -> false at 56028
+12:41:52.185 playback: session.stop decoder running, picture at 56000 ms, published 56000 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:41:56.565 playback: session.stop decoder idle, picture at 56000 ms, published 56000 ms [+4388 ms] from MonitorPanel.qml:1215 (onDestruction) <- main.qml:238 (onTapped)
+12:41:56.836 playback: still.publish 1920 px wide, playback picture was 1920 px at 56000 ms [+268 ms] from C++
+12:41:58.319 playback: playing false -> true at playhead 56000 ms [+1477 ms] from ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:41:58.321 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 56000 ms, kind video [+0 ms] from ExportPreviewPlayer.qml:226 (startCurrentDecode) <- ExportPreviewPlayer.qml:308 (onPlayingChanged) <- ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback)
+12:41:58.575 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b998100] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:41:58.575 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b998100] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:41:58.713 [h264 @ 000002292bab1a80] Late SEI
+12:41:58.713 [h264 @ 000002292bab1a80]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:41:58.713 [h264 @ 000002292bab1a80] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:41:59.088 preview playback: first frame after 765 ms, at source 56000 ms (requested 56000 ms)
+12:41:59.088 playback: frame at source 56000 ms, advanced 0 ms of media in 6949 ms of wall clock
+12:41:59.088 [h264 @ 000002292bab1a80] Late SEI
+12:41:59.088 [h264 @ 000002292bab1a80]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:41:59.088 [h264 @ 000002292bab1a80] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:42:05.341 [h264 @ 000002292bab1a80] Late SEI
+12:42:05.342 [h264 @ 000002292bab1a80]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:42:05.342 [h264 @ 000002292bab1a80] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:42:11.591 [h264 @ 000002292bab1a80] Late SEI
+12:42:11.592 [h264 @ 000002292bab1a80]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:42:11.592 [h264 @ 000002292bab1a80] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:42:14.981 playback: playing true -> false at playhead 72655 ms [+16660 ms] from ExportPreviewPlayer.qml:317 (onDestruction) <- main.qml:238 (onTapped)
+12:42:14.981 playback: session.stop decoder running, picture at 71875 ms, published 71875 ms [+0 ms] from ExportPreviewPlayer.qml:310 (onPlayingChanged) <- ExportPreviewPlayer.qml:317 (onDestruction) <- main.qml:238 (onTapped)
+12:42:15.086 playback: session.stop decoder idle, picture at 71875 ms, published 71875 ms [+104 ms] from ExportPreviewPlayer.qml:318 (onDestruction) <- main.qml:238 (onTapped)
+12:42:15.121 monitor: source key  -> clip_476ac5cfdb8d|D:/capcut/Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4|video|0|0|30673443|
+12:42:15.121 playback: session.stop decoder idle, picture at 71875 ms, published 71875 ms [+35 ms] from MonitorPanel.qml:1189 (onActiveSourceKeyChanged) <- main.qml:238 (onTapped)
+12:42:17.055 playback: still.publish 1920 px wide, playback picture was 1920 px at 71875 ms [+1934 ms] from C++
+12:42:17.060 playback: playing false -> true at playhead 72655 ms [+15 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:42:17.060 monitor: playing -> true at 72655
+12:42:17.060 monitor: playback session at playhead 72655 clip clip_476ac5cfdb8d
+12:42:17.060 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 72655 ms, kind video [+0 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:42:17.277 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997e40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:42:17.279 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997e40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:42:17.431 [h264 @ 000002291786c340] Late SEI
+12:42:17.432 [h264 @ 000002291786c340]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:42:17.432 [h264 @ 000002291786c340] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:42:17.695 preview playback: first frame after 619 ms, at source 72666 ms (requested 72655 ms)
+12:42:17.695 playback: frame at source 72666 ms, advanced 791 ms of media in 2730 ms of wall clock
+12:42:17.745 playback: playhead is 6 ms AHEAD of the picture (playhead 72714 ms, picture 72708 ms)
+12:42:18.750 playback: playhead is 8 ms AHEAD of the picture (playhead 73716 ms, picture 73708 ms)
+12:42:19.758 playback: playhead is 20 ms AHEAD of the picture (playhead 74728 ms, picture 74708 ms)
+12:42:19.780 [h264 @ 000002291786c340] Late SEI
+12:42:19.781 [h264 @ 000002291786c340]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:42:19.781 [h264 @ 000002291786c340] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:42:20.803 playback: playhead is 21 ms AHEAD of the picture (playhead 75771 ms, picture 75750 ms)
+12:42:21.023 playback: playing true -> false at playhead 75965 ms [+3949 ms] from MonitorPanel.qml:2234 (onClicked)
+12:42:21.023 monitor: playing -> false at 75965
+12:42:21.023 playback: session.stop decoder running, picture at 75958 ms, published 75958 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:42:24.065 monitor: source key clip_476ac5cfdb8d|D:/capcut/Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4|video|0|0|30673443| -> clip_d8ba001999c1|D:/capcut/Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4|video|0|0|30673443|
+12:42:24.065 playback: session.stop decoder idle, picture at 75958 ms, published 75958 ms [+3049 ms] from MonitorPanel.qml:1189 (onActiveSourceKeyChanged) <- TimelinePanel.qml:714 (deleteSelectedClips) <- TimelinePanel.qml:972 (onClicked)
+12:42:24.065 monitor: source key clip_d8ba001999c1|D:/capcut/Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4|video|0|0|30673443| -> clip_d8ba001999c1|D:/USER/Pictures/ps_ebvisacard-eng.jpg|image|0|0|30673443|
+12:42:24.077 playback: session.stop decoder idle, picture at 75958 ms, published 75958 ms [+3 ms] from MonitorPanel.qml:1189 (onActiveSourceKeyChanged) <- TimelinePanel.qml:714 (deleteSelectedClips) <- TimelinePanel.qml:972 (onClicked)
+12:42:35.422 monitor: source key clip_d8ba001999c1|D:/USER/Pictures/ps_ebvisacard-eng.jpg|image|0|0|30673443| -> 
+12:42:35.422 playback: session.stop decoder idle, picture at 75958 ms, published 75958 ms [+11353 ms] from MonitorPanel.qml:1189 (onActiveSourceKeyChanged) <- TimelinePanel.qml:714 (deleteSelectedClips) <- TimelinePanel.qml:972 (onClicked)
+12:42:40.911 monitor: source key  -> clip_aa11ad085b99|D:/capcut/Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4|video|0|0|30673443|
+12:42:40.911 playback: session.stop decoder idle, picture at 75958 ms, published 75958 ms [+5488 ms] from MonitorPanel.qml:1189 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1766
+12:42:41.329 playback: still.publish 1920 px wide, playback picture was 1920 px at 75958 ms [+410 ms] from C++
+12:42:41.660 playback: still.publish 1920 px wide, playback picture was 1920 px at 75958 ms [+338 ms] from C++
+12:42:42.057 playback: playing false -> true at playhead 75958 ms [+391 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:42:42.057 monitor: playing -> true at 75958
+12:42:42.057 monitor: playback session at playhead 75958 clip clip_aa11ad085b99
+12:42:42.057 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 75958 ms, kind video [+1 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:42:42.325 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b996e40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:42:42.326 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b996e40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:42:42.466 [h264 @ 000002292b987940] Late SEI
+12:42:42.466 [h264 @ 000002292b987940]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:42:42.466 [h264 @ 000002292b987940] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:42:42.612 preview playback: first frame after 548 ms, at source 75958 ms (requested 75958 ms)
+12:42:42.612 playback: frame at source 75958 ms, advanced 0 ms of media in 21623 ms of wall clock
+12:42:42.627 playback: playhead is 14 ms AHEAD of the picture (playhead 75972 ms, picture 75958 ms)
+12:42:43.692 playback: playhead is 28 ms AHEAD of the picture (playhead 77028 ms, picture 77000 ms)
+12:42:44.457 playback: playing true -> false at playhead 77759 ms [+2395 ms] from MonitorPanel.qml:2234 (onClicked)
+12:42:44.458 monitor: playing -> false at 77759
+12:42:44.458 playback: session.stop decoder running, picture at 77791 ms, published 77791 ms [+1 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:42:49.198 playback: still.publish 1920 px wide, playback picture was 1920 px at 77791 ms [+4743 ms] from C++
+12:42:52.922 playback: session.stop decoder idle, picture at 77791 ms, published 77791 ms [+3726 ms] from MonitorPanel.qml:1215 (onDestruction) <- main.qml:238 (onTapped)
+12:42:53.097 playback: still.publish 1920 px wide, playback picture was 1920 px at 77791 ms [+182 ms] from C++
+12:42:54.045 playback: playing false -> true at playhead 77791 ms [+935 ms] from ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:42:54.045 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 77791 ms, kind video [+0 ms] from ExportPreviewPlayer.qml:226 (startCurrentDecode) <- ExportPreviewPlayer.qml:308 (onPlayingChanged) <- ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback)
+12:42:54.299 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997bc0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:42:54.299 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997bc0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:42:54.442 [h264 @ 000002292c5c13c0] Late SEI
+12:42:54.442 [h264 @ 000002292c5c13c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:42:54.442 [h264 @ 000002292c5c13c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:42:54.702 preview playback: first frame after 659 ms, at source 77791 ms (requested 77791 ms)
+12:42:54.702 playback: frame at source 77791 ms, advanced 0 ms of media in 10261 ms of wall clock
+12:42:57.918 [h264 @ 000002292c5c13c0] Late SEI
+12:42:57.918 [h264 @ 000002292c5c13c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:42:57.920 [h264 @ 000002292c5c13c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:43:02.925 playback: playing true -> false at playhead 86655 ms [+8885 ms] from ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:43:02.925 playback: session.stop decoder running, picture at 86000 ms, published 86000 ms [+0 ms] from ExportPreviewPlayer.qml:310 (onPlayingChanged) <- ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:43:03.162 playback: still.publish 1920 px wide, playback picture was 1920 px at 86000 ms [+229 ms] from C++
+12:43:36.338 playback: playing false -> true at playhead 86655 ms [+33181 ms] from ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:43:36.338 playback: session.start Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4 at source 86655 ms, kind video [+0 ms] from ExportPreviewPlayer.qml:226 (startCurrentDecode) <- ExportPreviewPlayer.qml:308 (onPlayingChanged) <- ExportPreviewPlayer.qml:250 (startPlayback) <- ExportPreviewPlayer.qml:257 (togglePlayback)
+12:43:36.484 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997bc0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:43:36.484 [mov,mp4,m4a,3gp,3g2,mj2 @ 000002292b997bc0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:43:36.672 [h264 @ 000002292b9866c0] Late SEI
+12:43:36.672 [h264 @ 000002292b9866c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:43:36.672 [h264 @ 000002292b9866c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:43:36.890 preview playback: first frame after 546 ms, at source 86666 ms (requested 86655 ms)
+12:43:36.890 playback: frame at source 86666 ms, advanced 666 ms of media in 33967 ms of wall clock
+12:43:37.483 [h264 @ 000002292b9866c0] Late SEI
+12:43:37.483 [h264 @ 000002292b9866c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:43:37.483 [h264 @ 000002292b9866c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:43:38.475 playback: playing true -> false at playhead 88776 ms [+2143 ms] from ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:43:38.475 playback: session.stop decoder running, picture at 88208 ms, published 88208 ms [+0 ms] from ExportPreviewPlayer.qml:310 (onPlayingChanged) <- ExportPreviewPlayer.qml:255 (togglePlayback) <- ExportPreviewPlayer.qml:643 (onClicked)
+12:43:38.792 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+309 ms] from C++
+12:43:40.056 playback: session.stop decoder idle, picture at 88208 ms, published 88208 ms [+1260 ms] from ExportPreviewPlayer.qml:318 (onDestruction) <- main.qml:238 (onTapped)
+12:43:40.110 monitor: source key  -> clip_aa11ad085b99|D:/capcut/Reborn With The Blessing Of Martial God... Now I Reign Supreme at the Academy - 1-101 - Manhwa Recap.mp4|video|0|0|30673443|
+12:43:40.110 playback: session.stop decoder idle, picture at 88208 ms, published 88208 ms [+53 ms] from MonitorPanel.qml:1189 (onActiveSourceKeyChanged) <- main.qml:238 (onTapped)
+12:43:40.873 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+766 ms] from C++
+12:43:43.617 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+2739 ms] from C++
+12:43:43.664 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+48 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:43:45.368 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+1703 ms] from C++
+12:43:45.459 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+95 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:43:49.053 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+3589 ms] from C++
+12:43:49.148 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+94 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:43:53.182 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+4033 ms] from C++
+12:43:53.280 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+98 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:43:57.250 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+3974 ms] from C++
+12:43:57.348 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+92 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:01.310 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+3963 ms] from C++
+12:44:01.396 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+95 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:02.914 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+1512 ms] from C++
+12:44:03.001 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+96 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:03.804 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+800 ms] from C++
+12:44:03.906 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+91 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:04.366 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+461 ms] from C++
+12:44:04.458 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+97 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:04.864 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+401 ms] from C++
+12:44:04.947 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+89 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:05.315 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+361 ms] from C++
+12:44:05.412 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+98 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:05.814 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+400 ms] from C++
+12:44:05.914 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+99 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:06.139 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+232 ms] from C++
+12:44:06.239 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+92 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:06.409 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+183 ms] from C++
+12:44:06.514 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+91 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:06.649 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+144 ms] from C++
+12:44:06.757 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+97 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:06.883 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+128 ms] from C++
+12:44:06.978 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+96 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:07.066 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+94 ms] from C++
+12:44:07.174 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+100 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:07.254 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+91 ms] from C++
+12:44:07.364 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+96 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:07.439 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+80 ms] from C++
+12:44:07.539 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+93 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:07.639 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+101 ms] from C++
+12:44:07.740 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+106 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:07.782 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+36 ms] from C++
+12:44:07.880 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+98 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:07.942 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+60 ms] from C++
+12:44:08.037 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+100 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:08.085 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+57 ms] from C++
+12:44:08.182 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+89 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:09.318 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+1129 ms] from C++
+12:44:09.413 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+95 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:09.621 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+210 ms] from C++
+12:44:09.718 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+96 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:09.791 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+78 ms] from C++
+12:44:09.886 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+97 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:10.019 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+126 ms] from C++
+12:44:10.114 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+89 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:44.360 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+34253 ms] from C++
+12:44:44.456 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+95 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:52.825 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+8375 ms] from C++
+12:44:52.937 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+98 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:53.832 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+894 ms] from C++
+12:44:53.909 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+89 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:54.470 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+551 ms] from C++
+12:44:54.570 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+97 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:55.030 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+460 ms] from C++
+12:44:55.120 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+89 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:55.504 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+388 ms] from C++
+12:44:55.604 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+94 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:58.552 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+2951 ms] from C++
+12:44:58.640 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+91 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:58.958 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+311 ms] from C++
+12:44:59.050 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+95 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:59.383 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+344 ms] from C++
+12:44:59.494 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+97 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:44:59.749 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+268 ms] from C++
+12:44:59.852 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+89 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:45:02.045 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+2192 ms] from C++
+12:45:02.142 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+98 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:45:02.485 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+354 ms] from C++
+12:45:02.591 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+95 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:45:02.930 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+339 ms] from C++
+12:45:03.026 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+93 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:45:03.437 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+407 ms] from C++
+12:45:03.520 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+83 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:45:04.125 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+604 ms] from C++
+12:45:04.221 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+95 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:45:04.673 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+453 ms] from C++
+12:45:04.766 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+96 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:45:05.257 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+492 ms] from C++
+12:45:05.352 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+98 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:45:22.520 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+17162 ms] from C++
+12:45:22.608 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+95 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:45:31.055 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+8436 ms] from C++
+12:45:31.151 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+96 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:45:31.524 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+369 ms] from C++
+12:45:31.617 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+95 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:45:59.669 GUI turn 51 ms (budget 20 ms, ~1 frames of 30 fps lost): "no marked scope"""
+12:46:11.140 GUI turn 24 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+12:46:15.386 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+43767 ms] from C++
+12:46:15.477 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+98 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:46:24.246 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+8776 ms] from C++
+12:46:24.349 playback: still.publish 1920 px wide, playback picture was 1920 px at 88208 ms [+98 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:46:27.656 playback: session.stop decoder idle, picture at 88208 ms, published 88208 ms [+3297 ms] from MonitorPanel.qml:1215 (onDestruction)
+12:46:46.622 QWaitCondition: Destroyed while threads are still waiting

@@ -26,27 +26,8 @@ QString resolvePython(const QString &configured) {
 }
 
 TextToSpeechEngine::TextToSpeechEngine(QObject *parent) : QObject(parent) {
-  connect(&m_process, &QProcess::readyReadStandardOutput, this, [this]() {
-    m_stdout += m_process.readAllStandardOutput();
-    const QList<QByteArray> lines = m_stdout.split('\n');
-    for (const QByteArray &line : lines) {
-      const QByteArray trimmed = line.trimmed();
-      if (!trimmed.startsWith("PROGRESS "))
-        continue;
-      bool ok = false;
-      const double value = trimmed.mid(9).toDouble(&ok);
-      if (ok) {
-        const double bounded = qBound(0.0, value, 0.99);
-        const int completed =
-            qMin(m_segmentCount,
-                 qMax(0, qRound(bounded * qMax(1, m_segmentCount))));
-        setState(bounded,
-                 QStringLiteral("Generating subtitle voice %1 of %2...")
-                     .arg(completed)
-                     .arg(m_segmentCount));
-      }
-    }
-  });
+  connect(&m_process, &QProcess::readyReadStandardOutput, this,
+          [this]() { consumeStdout(); });
   connect(&m_process, &QProcess::readyReadStandardError, this, [this]() {
     const QString error = QString::fromLocal8Bit(m_process.readAllStandardError())
                               .trimmed();
@@ -62,37 +43,127 @@ TextToSpeechEngine::TextToSpeechEngine(QObject *parent) : QObject(parent) {
   connect(&m_process,
           qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,
           [this](int code, QProcess::ExitStatus status) {
+            consumeStdout();
+            // The last line may have arrived without its newline.
+            if (!m_stdoutTail.trimmed().isEmpty())
+              handleWorkerLine(m_stdoutTail);
+            m_stdoutTail.clear();
             if (m_cancelRequested) {
               finish(false, {}, QStringLiteral("Voice generation cancelled"));
               return;
             }
             const bool processOk = status == QProcess::NormalExit && code == 0;
-            QVariantList outputs;
             QString error;
-            const QList<QByteArray> lines = m_stdout.split('\n');
-            for (auto it = lines.crbegin(); it != lines.crend(); ++it) {
-              const QJsonDocument document = QJsonDocument::fromJson(it->trimmed());
-              if (!document.isObject())
-                continue;
-              const QJsonObject object = document.object();
-              outputs = object.value(QStringLiteral("outputs"))
-                            .toArray()
-                            .toVariantList();
+            if (!m_resultLine.isEmpty()) {
+              const QJsonObject object =
+                  QJsonDocument::fromJson(m_resultLine).object();
               error = object.value(QStringLiteral("error")).toString();
-              break;
             }
-            bool filesExist = !outputs.isEmpty();
-            for (const QVariant &value : outputs) {
-              if (!QFileInfo::exists(value.toMap().value("path").toString())) {
-                filesExist = false;
-                break;
-              }
-            }
-            const bool success = processOk && filesExist;
+            QVariantList outputs;
+            if (processOk)
+              outputs = readManifest(&error);
+            const bool success = processOk && !outputs.isEmpty();
             if (!success && error.isEmpty())
               error = QStringLiteral("Text-to-speech failed.");
             finish(success, success ? outputs : QVariantList{}, error);
           });
+}
+
+void TextToSpeechEngine::consumeStdout() {
+  m_stdoutTail += m_process.readAllStandardOutput();
+  int start = 0;
+  for (;;) {
+    const int newline = m_stdoutTail.indexOf('\n', start);
+    if (newline < 0)
+      break;
+    // mid(), not fromRawData(): a line that needs no trimming would otherwise be
+    // kept as a view into a buffer this function is about to shift underneath it.
+    handleWorkerLine(m_stdoutTail.mid(start, newline - start));
+    start = newline + 1;
+  }
+  if (start > 0)
+    m_stdoutTail.remove(0, start);
+}
+
+void TextToSpeechEngine::handleWorkerLine(const QByteArray &line) {
+  const QByteArray trimmed = line.trimmed();
+  if (trimmed.isEmpty())
+    return;
+  if (trimmed.startsWith("PROGRESS ")) {
+    // "PROGRESS <fraction> [done] [total]". The counts are authoritative when the
+    // worker sends them: with requests overlapping, completions no longer arrive in
+    // order, so an index reconstructed from the fraction would jitter backwards.
+    const QList<QByteArray> fields = trimmed.simplified().split(' ');
+    bool ok = false;
+    const double value = fields.value(1).toDouble(&ok);
+    if (!ok)
+      return;
+    const double bounded = qBound(0.0, value, 0.99);
+    int done = -1;
+    int total = m_segmentCount;
+    if (fields.size() >= 4) {
+      bool doneOk = false;
+      bool totalOk = false;
+      const int parsedDone = fields.at(2).toInt(&doneOk);
+      const int parsedTotal = fields.at(3).toInt(&totalOk);
+      if (doneOk && totalOk && parsedTotal > 0) {
+        done = parsedDone;
+        total = parsedTotal;
+      }
+    }
+    if (done < 0)
+      done = qRound(bounded * qMax(1, total));
+    setState(bounded, QStringLiteral("Generating subtitle voice %1 of %2...")
+                          .arg(qBound(0, done, total))
+                          .arg(total));
+    return;
+  }
+  if (trimmed.startsWith("MANIFEST ")) {
+    m_manifestPath = QString::fromUtf8(trimmed.mid(9)).trimmed();
+    return;
+  }
+  if (trimmed.startsWith('{'))
+    m_resultLine = trimmed;
+}
+
+QVariantList TextToSpeechEngine::readManifest(QString *error) const {
+  if (m_manifestPath.isEmpty()) {
+    // No manifest line at all: fall back to a result object that carried the list
+    // inline, so an older worker on disk still works.
+    if (!m_resultLine.isEmpty())
+      return QJsonDocument::fromJson(m_resultLine)
+          .object()
+          .value(QStringLiteral("outputs"))
+          .toArray()
+          .toVariantList();
+    if (error && error->isEmpty())
+      *error = QStringLiteral("Text-to-speech produced no manifest.");
+    return {};
+  }
+  QFile file(m_manifestPath);
+  if (!file.open(QIODevice::ReadOnly)) {
+    if (error && error->isEmpty())
+      *error = QStringLiteral("Could not read the voice manifest: %1")
+                   .arg(file.errorString());
+    return {};
+  }
+  QJsonParseError parseError;
+  const QJsonDocument document =
+      QJsonDocument::fromJson(file.readAll(), &parseError);
+  file.close();
+  if (!document.isObject()) {
+    if (error && error->isEmpty())
+      *error = QStringLiteral("The voice manifest is not readable: %1")
+                   .arg(parseError.errorString());
+    return {};
+  }
+  const QJsonObject object = document.object();
+  if (error && error->isEmpty())
+    *error = object.value(QStringLiteral("error")).toString();
+  // The worker already verified that every one of these exists and is long enough
+  // to be speech, and it fails loudly when one does not. Re-stat'ing twenty
+  // thousand files here only moved that work onto the GUI thread.
+  return object.value(QStringLiteral("outputs")).toArray().toVariantList();
 }
 
 bool TextToSpeechEngine::inProgress() const {
@@ -174,7 +245,9 @@ bool TextToSpeechEngine::generateSegments(
     return false;
   }
 
-  m_stdout.clear();
+  m_stdoutTail.clear();
+  m_resultLine.clear();
+  m_manifestPath.clear();
   m_outputPath.clear();
   m_cancelRequested = false;
   m_finishHandled = false;

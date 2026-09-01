@@ -28,6 +28,46 @@ Rectangle {
     property var activeAudioClip: Backend.videoPreviewHelper.activeAudioClip || null
     property var activeSubtitle: Backend.videoPreviewHelper.activeSubtitle || null
     property url sourceUrl: mediaUrl(activeMedia)
+    // Overlay items live at the playhead and draw on top of the decoded base
+    // frame. Two sources feed this: logos added via + Logo (overlay:true, always
+    // composited), and plain image clips that sit on a video track ABOVE the
+    // decoded base picture. The preview helper now ranks real video over images,
+    // so a higher image no longer replaces the video underneath - it comes back
+    // here and is drawn over it, matching how the export stacks tracks.
+    readonly property var overlayClips: {
+        var out = []
+        var list = Backend.clips
+        var t = Backend.playheadMs
+        var base = root.activeClip
+        var baseId = base ? String(base.id) : ""
+        var baseLane = (base && String(base.track).charAt(0) === "V")
+                       ? (parseInt(String(base.track).substring(1)) || 0) : 0
+        for (var i = 0; i < list.length; ++i) {
+            var c = list[i]
+            if (!c || c.enabled === false)
+                continue
+            if (t < Number(c.startMs || 0)
+                    || t >= Number(c.startMs || 0) + Number(c.durationMs || 0))
+                continue
+            if (String(c.id) === baseId)
+                continue
+            var isLogo = c.overlay === true
+            var isImage = c.kind === "image"
+            if (!isLogo && !isImage)
+                continue
+            // A plain image only composites when it is above the base picture; on
+            // or below it, the video already covers it (as the export would), so
+            // drawing it on top would disagree with the render.
+            if (!isLogo) {
+                var lane = String(c.track).charAt(0) === "V"
+                           ? (parseInt(String(c.track).substring(1)) || 0) : 0
+                if (lane <= baseLane)
+                    continue
+            }
+            out.push(c)
+        }
+        return out
+    }
     property bool deferredSourceArmed: false
     // Armed once a video clip becomes active, or on the first play/scrub gesture.
     // Arming a source no longer means re-opening it per frame: the C++ scrub
@@ -119,11 +159,8 @@ Rectangle {
     function clipById(clipId) {
         if (!clipId)
             return null
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            if (Backend.clips[i].id === clipId)
-                return Backend.clips[i]
-        }
-        return null
+        var clip = Backend.clipById(String(clipId))
+        return clip.id === undefined ? null : clip
     }
 
     function monitorClipAt(position) {
@@ -230,16 +267,42 @@ Rectangle {
             return null
         if (clip.kind === "audio")
             return clip
-        if (!clip.linkGroupId)
+        // After Extract Audio the sound is an independent clip that names the
+        // video it came out of. Nothing links the two back.
+        if (clip.separateAudio !== true)
             return clip
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var candidate = Backend.clips[i]
-            if (candidate.linkGroupId === clip.linkGroupId
-                    && candidate.linkedRole === "audio")
+        var clips = Backend.mediaClips
+        for (var i = 0; i < clips.length; ++i) {
+            var candidate = clips[i]
+            if (String(candidate.extractedFromClipId || "") === String(clip.id))
                 return candidate
         }
         return clip
     }
+    // Extract Audio handed this clip's sound to an independent A-track clip. The
+    // preview decoder still plays the file's embedded stream, so it can stand in
+    // for that clip - but only while the two are still in step. Once the user
+    // moves or trims the extracted clip the sound belongs where they put it, and
+    // the decoder has to fall silent so the clip's own player is the only thing
+    // heard. Deleting the extracted clip leaves the video silent, which is what
+    // CapCut does too; "Restore Clip Audio" or undo brings it back.
+    readonly property bool embeddedAudioRouted: {
+        if (!root.activeClip || root.activeClip.separateAudio !== true)
+            return false
+        var audio = root.activeAudioClip
+        if (!audio || String(audio.id || "") === String(root.activeClip.id))
+            return false
+        return Number(audio.startMs) === Number(root.activeClip.startMs)
+                && Number(audio.sourceInMs || 0)
+                   === Number(root.activeClip.sourceInMs || 0)
+                && Number(audio.durationMs) === Number(root.activeClip.durationMs)
+    }
+    // True when the video clip's own sound must not be heard from the decoder:
+    // it has been extracted, and the clip that owns it now is either gone or no
+    // longer sitting where the video does.
+    readonly property bool embeddedAudioSilenced:
+        root.activeClip && root.activeClip.separateAudio === true
+        && !root.embeddedAudioRouted
     function audioEffectValue(key, fallback) {
         var values = activeAudioClip && activeAudioClip.effects
                 ? activeAudioClip.effects : activeEffects
@@ -256,6 +319,7 @@ Rectangle {
     }
     function replacementAudioMuted() {
         return Backend.appSettings.muteAllAudio === true
+                || root.embeddedAudioSilenced
                 || (root.activeAudioClip
                     && (Backend.mutedTracks.indexOf(
                             String(root.activeAudioClip.track)) >= 0
@@ -267,12 +331,24 @@ Rectangle {
                      ? 100 : Number(Backend.appSettings.masterVolume)) / 100
                     * Math.pow(10, root.audioEffectValue("volumeDb", 0) / 20)))
     }
+    // Mute, as a level rather than as a stopped stream.
+    //
+    // The native preview took audioEnabled and volume as start() arguments and
+    // never looked at them again, so muting a track mid-playback only turned the
+    // icon red - the audio kept going until the next seek - and un-muting had
+    // nothing to switch back on, because a session started muted never opened an
+    // audio stream at all. The stream now always runs and this level carries the
+    // mute, so both directions are heard on the next pump.
+    readonly property real previewAudioLevel:
+        root.replacementAudioMuted() ? 0.0 : root.replacementAudioVolume()
+    onPreviewAudioLevelChanged: Backend.setPreviewVolume(root.previewAudioLevel)
     function startReplacementAudio() {
         if (root.useProcessPreview)
             return
         var path = root.audioSourcePath()
-        if (!root.playing || path === "" || !root.activeClip
-                || root.replacementAudioMuted()) {
+        // Deliberately not gated on mute any more: tearing the session down for a
+        // muted track is exactly what made un-muting impossible.
+        if (!root.playing || path === "" || !root.activeClip) {
             if (root.replacementAudioKey !== "") {
                 root.replacementAudioKey = ""
                 Backend.stopPreviewDecode()
@@ -292,7 +368,7 @@ Rectangle {
         root.replacementAudioKey = nextKey
         Backend.startPreviewDecode(path, "audio", localPosition, remaining,
                                    0, 0, 30, true,
-                                   root.replacementAudioVolume())
+                                   root.previewAudioLevel)
     }
     // Same idea as animatedValue(), for a parameter of one effect instance. The
     // channel name comes from the engine so the panel, the monitor and the export
@@ -356,19 +432,16 @@ Rectangle {
             return null
         // Editing must follow the selected effect, rather than clipAt(). The
         // latter can resolve a different clip when visual tracks overlap.
-        for (var clipIndex = 0; clipIndex < Backend.clips.length; ++clipIndex) {
-            var clip = Backend.clips[clipIndex]
-            if (clip.id !== Backend.customBlurEditClipId)
-                continue
-            var stack = clip.effectStack || []
-            for (var effectIndex = 0; effectIndex < stack.length; ++effectIndex) {
-                var effect = stack[effectIndex]
-                if (effect.id === Backend.customBlurEditInstanceId
-                        && effect.definitionId === "custom_blur"
-                        && effect.enabled !== false)
-                    return effect
-            }
+        var clip = Backend.clipById(String(Backend.customBlurEditClipId))
+        if (clip.id === undefined)
             return null
+        var stack = clip.effectStack || []
+        for (var effectIndex = 0; effectIndex < stack.length; ++effectIndex) {
+            var effect = stack[effectIndex]
+            if (effect.id === Backend.customBlurEditInstanceId
+                    && effect.definitionId === "custom_blur"
+                    && effect.enabled !== false)
+                return effect
         }
         return null
     }
@@ -454,10 +527,10 @@ Rectangle {
     function clipAt(position) {
         var selected = null
         var selectedRank = -1
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var clip = Backend.clips[i]
+        var clips = Backend.mediaClips
+        for (var i = 0; i < clips.length; ++i) {
+            var clip = clips[i]
             if (clip.enabled === false
-                    || clip.kind === "subtitle"
                     || !root.trackEnabled(clip.track)
                     || position < clip.startMs
                     || position >= clip.startMs + clip.durationMs)
@@ -476,8 +549,9 @@ Rectangle {
     }
 
     function subtitleAt(position) {
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var clip = Backend.clips[i]
+        var clips = Backend.clips
+        for (var i = 0; i < clips.length; ++i) {
+            var clip = clips[i]
             if (clip.kind === "subtitle"
                     && clip.enabled !== false
                     && root.trackEnabled(clip.track)
@@ -491,18 +565,19 @@ Rectangle {
     function mediaForClip(clip) {
         if (!clip)
             return null
-        for (var i = 0; i < Backend.media.length; ++i) {
-            if (Backend.media[i].id === clip.mediaId)
-                return Backend.media[i]
-        }
-        return null
+        // O(1) in C++. Walking Backend.media here cost one QVariantMap-to-JS
+        // conversion per bin entry, and a generated voice track puts one entry in
+        // the bin per spoken cue.
+        var media = Backend.mediaById(String(clip.mediaId || ""))
+        return media && media.id ? media : null
     }
 
     function nextClip(position) {
         var result = null
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var clip = Backend.clips[i]
-            if (clip.enabled === false || clip.kind === "subtitle"
+        var clips = Backend.mediaClips
+        for (var i = 0; i < clips.length; ++i) {
+            var clip = clips[i]
+            if (clip.enabled === false
                     || !root.trackEnabled(clip.track)
                     || clip.startMs < position)
                 continue
@@ -588,10 +663,20 @@ Rectangle {
     readonly property int scrubSettleMs: 90
     property double lastScrubRequestMs: 0
     property bool scrubRequestQueued: false
+    // Raised only while the pause handler re-anchors the playhead onto the frame
+    // that is on screen. That write emits playheadChanged, and the paused seek
+    // path answers a playhead change with a *coarse* request - which
+    // ScrubFrameService serves out of its cache synchronously, from any bucket
+    // within half a GOP (up to 500 ms) of the position. So pausing published a
+    // frame from up to half a second away and then corrected it when the exact
+    // one finished decoding: the picture visibly jumped at the click. The pause
+    // handler asks for the exact frame itself, so the coarse one is not merely
+    // wrong, it is redundant.
+    property bool pauseAnchoring: false
 
     function scheduleProcessFrame() {
         if (!root.useProcessPreview || !root.processPreviewArmed
-                || !root.activeMedia || root.playing)
+                || !root.activeMedia || root.playing || root.pauseAnchoring)
             return
         // Restarted on every move: this one is meant to fire after the motion,
         // not during it.
@@ -626,6 +711,26 @@ Rectangle {
         root.requestProcessFrame(exact === true)
     }
 
+    // True while the first picture of a playback session is still on its way, so
+    // the playhead has no business moving yet.
+    //
+    // Bounded by what the decoder reports rather than by a fixed number of
+    // milliseconds. The bound used to be 600 ms, and the measured first-frame
+    // latency of a seek into a long H.264 file on this machine is 512-1111 ms:
+    // every press of Play whose seek took longer ran the timecode ~0.6 s forward
+    // and then snapped it back when the frame landed. The absolute ceiling only
+    // covers a source that reports itself as decoding but never yields a frame
+    // at all, and an audio-only clip is never held because it publishes none.
+    function holdingForFirstFrame() {
+        if (!root.activeMedia || root.activeMedia.kind !== "video")
+            return false
+        if (Backend.previewError !== "")
+            return false
+        if (Date.now() - root.processPlaybackWallMs > 5000)
+            return false
+        return Backend.previewDecoding
+    }
+
     function startProcessPlayback() {
         if (!root.useProcessPreview || !root.activeMedia || !root.activeClip)
             return false
@@ -649,8 +754,12 @@ Rectangle {
                     Number(root.activeMedia.width || 0),
                     Number(root.activeMedia.height || 0),
                     Number(root.activeMedia.frameRate || 30),
-                    !originalAudioOutput.muted,
-                    originalAudioOutput.volume,
+                    // Always on when the source has audio. The flag is start-time
+                    // only, so making it follow mute meant a track un-muted during
+                    // playback had no stream to come back to; previewAudioLevel is
+                    // what mute moves now, and it is live.
+                    true,
+                    root.previewAudioLevel,
                     root.audioSourcePath())
     }
 
@@ -742,11 +851,23 @@ Rectangle {
             property var timelineClip: modelData
             property bool audioClip: timelineClip
                                            && timelineClip.kind === "audio"
-            property bool representedByMainPlayer: root.activeMedia
+            // Whose audio the program player already carries. Two cases: the
+            // active clip *is* this audio clip, and - after Extract Audio - this
+            // is the extracted clip of the active video clip and still sits
+            // where that clip does, in which case the preview decoder is playing
+            // the same stream out of the same file. Without the second case an
+            // extracted clip would be heard twice, once from the decoder and
+            // once from the MediaPlayer below; without the "still sits where"
+            // test, dragging it out of sync would silence it instead.
+            property bool representedByMainPlayer: (root.activeMedia
                                                    && root.activeMedia.kind === "audio"
                                                    && root.activeClip
                                                    && String(root.activeClip.id)
-                                                      === String(timelineClip.id)
+                                                      === String(timelineClip.id))
+                                                   || (root.embeddedAudioRouted
+                                                       && root.activeAudioClip
+                                                       && String(root.activeAudioClip.id || "")
+                                                          === String(timelineClip.id))
 
             function localPosition() {
                 return Math.max(0, Backend.playheadMs
@@ -817,15 +938,10 @@ Rectangle {
 
     AudioOutput {
         id: originalAudioOutput
-        muted: Backend.appSettings.muteAllAudio === true
-               || (root.activeAudioClip
-                   && (Backend.mutedTracks.indexOf(
-                           String(root.activeAudioClip.track)) >= 0
-                       || !root.trackEnabled(root.activeAudioClip.track)))
-        volume: Math.max(0, Math.min(1,
-                    (Backend.appSettings.masterVolume === undefined
-                     ? 100 : Number(Backend.appSettings.masterVolume)) / 100
-                    * Math.pow(10, root.audioEffectValue("volumeDb", 0) / 20)))
+        // The QML MediaPlayer path. Same expressions as previewAudioLevel, and live
+        // here already - this half of the monitor never had the bug.
+        muted: root.replacementAudioMuted()
+        volume: root.replacementAudioVolume()
     }
 
     Timer {
@@ -912,11 +1028,11 @@ Rectangle {
                 // - sat that far ahead of the frame on screen, which is why
                 // pausing looked like the image jumped forward.
                 //
-                // previewPresentedSourceMs() is the pts of the frame the decoder
-                // actually published. Each new one re-anchors the clock; between
-                // frames the wall clock still interpolates, so the timecode moves
-                // smoothly at the 50 ms UI tick instead of stepping at the source
-                // frame rate.
+                // previewPresentedSourceMs() is the pts of the frame QML was
+                // handed. Each new one re-anchors the clock; between frames the
+                // wall clock still interpolates, so the timecode moves smoothly
+                // at the 50 ms UI tick instead of stepping at the source frame
+                // rate.
                 const shown = Backend.previewPresentedSourceMs()
                 if (shown >= 0 && shown !== root.presentedSourceMs) {
                     root.presentedSourceMs = shown
@@ -924,17 +1040,27 @@ Rectangle {
                             Number(root.activeClip.startMs)
                             + Math.max(0, shown - Number(
                                            root.activeClip.sourceInMs || 0))
-                    root.processPlaybackWallMs = Date.now()
-                } else if (shown < 0
-                           && Date.now() - root.processPlaybackWallMs < 600) {
+                    // Back-dated to when that frame was handed over, not to now.
+                    // This tick runs every 50 ms and the source publishes every
+                    // 33-40, so "now" is up to a frame or two late; anchoring
+                    // there discarded the delay on every frame and left the
+                    // playhead permanently behind the picture - the gap the
+                    // pause handler then closed by jumping forward, which is
+                    // what reads as the image being pushed ahead at the click.
+                    // Capped so a GUI thread that stalled for a second does not
+                    // turn one tick into a visible lurch.
+                    const age = Backend.previewPresentedAgeMs()
+                    root.processPlaybackWallMs =
+                            Date.now() - Math.min(Math.max(0, age), 120)
+                } else if (shown < 0 && root.holdingForFirstFrame()) {
                     // Nothing on screen yet. Holding the playhead still is the
                     // honest answer while the first frame is being decoded -
-                    // advancing it and snapping back on arrival would show the
-                    // timecode running and then jumping backwards. The 600 ms
-                    // bound is what keeps an audio-only clip, which publishes no
-                    // video frame at all, from freezing the playhead forever.
+                    // advancing it and snapping back on arrival showed the
+                    // timecode running 600-1100 ms forward and then jumping
+                    // backwards at every press of Play.
                     return
                 }
+
                 Backend.playheadMs = Math.min(
                             Backend.durationMs,
                             root.processPlaybackTimelineMs
@@ -973,36 +1099,65 @@ Rectangle {
         } else {
             player.pause()
             root.replacementAudioKey = ""
-            // Snap the playhead back onto the frame that was on screen, and only
-            // ever backwards.
+            // Freeze the picture first, then ask what it is.
             //
-            // Measured, with CUTPRO_PLAYBACK_TRACE on: the click writes
-            // playing = false at, say, playhead 6458 ms, and by the time this
-            // handler reads the decoder - 36 ms later, because the write goes
-            // through the metaobject system and the decode thread is not stopped
-            // yet - the decoder has published the *next* frame at 6541 ms. That
-            // frame was never the picture the user clicked on. Taking it moved the
-            // playhead 42-83 ms forward on every pause, and requestFrameNow()
-            // then rendered that later frame, which is exactly the "the image goes
-            // ahead when I pause" report.
+            // The decode thread keeps publishing after the click - the write to
+            // playing goes through the metaobject system - so at the moment of
+            // the click the newest published frame can be one the GUI thread has
+            // not drawn yet. stop() joins the decode thread, and Backend drops
+            // any frame that was queued behind it, so what is recorded as
+            // presented is the frame QML was actually handed.
             //
-            // The playhead during playback is the last published frame plus
-            // interpolation, so it is never behind the picture. A presented
-            // position that is *ahead* of it therefore always means a frame that
-            // arrived after the click, and must be ignored; one that is behind it
-            // is the frame boundary to land on.
-            const shown = root.useProcessPreview
-                        ? Backend.previewPresentedSourceMs() : -1
-            if (shown >= 0 && root.activeClip) {
-                const shownTimelineMs = Number(root.activeClip.startMs)
-                        + Math.max(0, shown - Number(
-                                       root.activeClip.sourceInMs || 0))
-                if (shownTimelineMs < Backend.playheadMs)
-                    Backend.playheadMs = shownTimelineMs
-            }
+            // The anchor is then taken at or before where the playback clock had
+            // got to: a frame that was handed over after the clock passed it is
+            // one the eye never had, and anchoring onto it is exactly the "image
+            // goes ahead when I pause" report. Taking the answer only backwards
+            // used to leave the opposite artefact - the still one frame behind
+            // the picture - because the clock itself lagged the picture by a
+            // frame or two; the UI tick now back-dates its anchor, so the clock
+            // and the picture name the same frame and neither direction moves.
             Backend.stopPreviewDecode()
-            if (root.useProcessPreview)
-                root.requestFrameNow(true)
+            if (root.useProcessPreview && root.activeClip) {
+                // The live clock, not Backend.playheadMs: the tick that last
+                // wrote the playhead was up to 50 ms ago.
+                const clockSourceMs = root.presentedSourceMs >= 0
+                        ? root.presentedSourceMs
+                          + Math.max(0, Date.now() - root.processPlaybackWallMs)
+                        : root.activeSourcePosition()
+                const shown = Backend.previewPresentedSourceMsAtOrBefore(
+                                clockSourceMs)
+                if (shown >= 0) {
+                    root.presentedSourceMs = shown
+                    const shownTimelineMs = Number(root.activeClip.startMs)
+                            + Math.max(0, shown - Number(
+                                           root.activeClip.sourceInMs || 0))
+                    root.pauseAnchoring = true
+                    Backend.playheadMs = Math.min(Backend.durationMs,
+                                                  shownTimelineMs)
+                    root.pauseAnchoring = false
+                }
+            }
+            // The exact frame at that position, but only when it would look
+            // different. The scrub decoder takes the nearest frame to the
+            // position it is given and the position is a frame's own pts, so it
+            // lands on the same frame - decoded at the source's own resolution
+            // instead of at playback resolution.
+            //
+            // That upgrade is worth a repaint on a machine that had to drop the
+            // preview (the log shows this file falling to 960 px and climbing
+            // back to 1500), and worth nothing when the picture already carries
+            // more pixels than the panel draws. The repaint itself is not free of
+            // consequence: it lands 100-400 ms after the freeze, so a still that
+            // changes nothing still makes the frozen frame twitch.
+            if (root.useProcessPreview) {
+                const drawnWidth = Math.round(videoContainer.width
+                                              * Screen.devicePixelRatio)
+                const pictureWidth = Backend.previewPresentedFrameWidth()
+                if (pictureWidth <= 0 || pictureWidth < drawnWidth)
+                    root.requestFrameNow(true)
+            }
+
+
         }
     }
 
@@ -1353,11 +1508,232 @@ Rectangle {
                 padding: Backend.captionBlurPadding
             }
 
+            // ---- Logo / graphic overlays -------------------------------------
+            // Pure-QML compositing above the base picture. Geometry mirrors the
+            // export: fit into the frame, then the intrinsic scale %, then a
+            // centered position offset in percent of the frame - so what is
+            // dragged here is what the export renders.
+            Item {
+                id: overlayLayer
+                anchors.fill: viewer
+                clip: true
+                z: 2
+
+                // Rendered into its own texture, so moving an overlay recomposites
+                // that texture instead of dirtying the region of the video Image
+                // underneath it. Without this, a drag repaints the base picture's
+                // node every frame and leaves smears where the decoded frame is not
+                // refreshed in step with the gesture. Only paid for when there is
+                // something to draw - an always-on layer is a permanent FBO the
+                // size of the monitor.
+                layer.enabled: root.overlayClips.length > 0
+                layer.smooth: true
+
+                Repeater {
+                    model: root.overlayClips
+                    delegate: Item {
+                        id: ov
+                        required property var modelData
+                        readonly property var clip: modelData
+                        readonly property var media: Backend.mediaById(String(clip.mediaId || ""))
+                        readonly property var fx: clip.effects ? clip.effects : ({})
+                        readonly property bool selected: String(Backend.selectedClipId) === String(clip.id)
+
+                        readonly property real mediaAR: (media && media.width > 0 && media.height > 0)
+                                                        ? media.width / media.height : 1
+                        readonly property real frameAR: overlayLayer.width / Math.max(1, overlayLayer.height)
+                        // PreserveAspectFit into the frame, matching ffmpeg's
+                        // force_original_aspect_ratio=decrease on the sequence size.
+                        readonly property real fitW: mediaAR > frameAR
+                                                     ? overlayLayer.width
+                                                     : overlayLayer.height * mediaAR
+                        readonly property real fitH: fitW / mediaAR
+
+                        // Live values drive the item while a gesture is active;
+                        // otherwise they track the committed clip effects.
+                        property bool interacting: false
+                        property real liveScale: Number(fx.scale !== undefined ? fx.scale : 100)
+                        property real livePosX: Number(fx.positionX || 0)
+                        property real livePosY: Number(fx.positionY || 0)
+                        onFxChanged: if (!interacting) {
+                            liveScale = Number(fx.scale !== undefined ? fx.scale : 100)
+                            livePosX = Number(fx.positionX || 0)
+                            livePosY = Number(fx.positionY || 0)
+                        }
+
+                        width: fitW * liveScale / 100
+                        height: fitH * liveScale / 100
+                        x: (overlayLayer.width - width) / 2 + livePosX / 100 * overlayLayer.width
+                        y: (overlayLayer.height - height) / 2 + livePosY / 100 * overlayLayer.height
+                        opacity: Number(fx.opacity !== undefined ? fx.opacity : 100) / 100
+
+                        // Keep a dragged overlay inside the picture. Position is a
+                        // percentage of the frame away from centre, so with
+                        // x = (frame - item)/2 + p/100*frame, staying within
+                        // [0, frame - item] bounds p to +/-50*(1 - item/frame).
+                        // An overlay scaled larger than the frame gets the mirrored
+                        // range, so it can still be panned but never uncovers an
+                        // edge. Also inside the export's own +/-100 clamp on
+                        // positionX/positionY, so the preview cannot commit a value
+                        // the render would ignore.
+                        function clampPos(value, itemSize, frameSize) {
+                            if (frameSize <= 0)
+                                return 0
+                            var limit = 50 * (1 - itemSize / frameSize)
+                            var low = Math.max(-100, Math.min(limit, -limit))
+                            var high = Math.min(100, Math.max(limit, -limit))
+                            return Math.max(low, Math.min(high, value))
+                        }
+                        // OVERLAY_DELEGATE_REST
+                        Image {
+                            anchors.fill: parent
+                            source: ov.media ? root.mediaUrl(ov.media) : ""
+                            fillMode: Image.Stretch
+                            asynchronous: true
+                            cache: true
+                        }
+
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "transparent"
+                            border.color: Theme.accent
+                            border.width: 1.5
+                            visible: ov.selected
+                        }
+
+                        // Move: drag anywhere on the overlay.
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.SizeAllCursor
+                            acceptedButtons: Qt.LeftButton
+                            property real pressX: 0
+                            property real pressY: 0
+                            property real basePosX: 0
+                            property real basePosY: 0
+                            onPressed: function (mouse) {
+                                Backend.selectedClipId = String(ov.clip.id)
+                                ov.interacting = true
+                                var p = mapToItem(overlayLayer, mouse.x, mouse.y)
+                                pressX = p.x; pressY = p.y
+                                basePosX = ov.livePosX; basePosY = ov.livePosY
+                            }
+                            onPositionChanged: function (mouse) {
+                                if (!ov.interacting) return
+                                var p = mapToItem(overlayLayer, mouse.x, mouse.y)
+                                // Clamped against the press anchor rather than
+                                // accumulated, so a pointer that runs past the edge
+                                // and comes back picks the overlay up where it left
+                                // it instead of drifting.
+                                ov.livePosX = ov.clampPos(
+                                    basePosX + (p.x - pressX) / overlayLayer.width * 100,
+                                    ov.width, overlayLayer.width)
+                                ov.livePosY = ov.clampPos(
+                                    basePosY + (p.y - pressY) / overlayLayer.height * 100,
+                                    ov.height, overlayLayer.height)
+                            }
+                            onReleased: {
+                                ov.interacting = false
+                                var cid = String(ov.clip.id)
+                                var px = Math.round(ov.livePosX * 100) / 100
+                                var py = Math.round(ov.livePosY * 100) / 100
+                                Backend.setClipEffectSetting(cid, "positionX", px)
+                                Backend.setClipEffectSetting(cid, "positionY", py)
+                            }
+                        }
+
+                        // Resize: four corner handles, CapCut style. Each scales
+                        // the overlay uniformly about its centre - the item is
+                        // centre-anchored, so the pointer's distance from the
+                        // centre maps straight onto scale no matter which corner
+                        // is grabbed. Aspect ratio is preserved (uniform scale),
+                        // matching how the export applies scale.
+                        Repeater {
+                            model: [
+                                { hx: 0, vy: 0, diag: true },
+                                { hx: 1, vy: 0, diag: false },
+                                { hx: 0, vy: 1, diag: false },
+                                { hx: 1, vy: 1, diag: true }
+                            ]
+                            delegate: Rectangle {
+                                required property var modelData
+                                width: 12; height: 12; radius: 2
+                                color: Theme.accent
+                                visible: ov.selected
+                                x: modelData.hx * ov.width - width / 2
+                                y: modelData.vy * ov.height - height / 2
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: modelData.diag ? Qt.SizeFDiagCursor
+                                                                : Qt.SizeBDiagCursor
+                                    acceptedButtons: Qt.LeftButton
+                                    property real startDist: 1
+                                    property real startScale: 100
+                                    onPressed: function (mouse) {
+                                        Backend.selectedClipId = String(ov.clip.id)
+                                        ov.interacting = true
+                                        var cx = ov.x + ov.width / 2
+                                        var cy = ov.y + ov.height / 2
+                                        var p = mapToItem(overlayLayer, mouse.x, mouse.y)
+                                        startDist = Math.max(4, Math.hypot(p.x - cx, p.y - cy))
+                                        startScale = ov.liveScale
+                                    }
+                                    onPositionChanged: function (mouse) {
+                                        if (!ov.interacting) return
+                                        var cx = ov.x + ov.width / 2
+                                        var cy = ov.y + ov.height / 2
+                                        var p = mapToItem(overlayLayer, mouse.x, mouse.y)
+                                        var d = Math.hypot(p.x - cx, p.y - cy)
+                                        ov.liveScale = Math.max(5, Math.min(400, startScale * d / startDist))
+                                    }
+                                    onReleased: {
+                                        ov.interacting = false
+                                        var cid = String(ov.clip.id)
+                                        var s = Math.round(ov.liveScale * 100) / 100
+                                        Backend.setClipEffectSetting(cid, "scale", s)
+                                        // Growing the overlay shrinks how far off
+                                        // centre it may sit, so a position that was
+                                        // legal at the old size can now hang off an
+                                        // edge. Pull it back in and commit only when
+                                        // the scale actually moved it.
+                                        var cx = ov.clampPos(ov.livePosX, ov.width,
+                                                             overlayLayer.width)
+                                        var cy = ov.clampPos(ov.livePosY, ov.height,
+                                                             overlayLayer.height)
+                                        if (Math.abs(cx - ov.livePosX) > 0.001) {
+                                            ov.livePosX = cx
+                                            Backend.setClipEffectSetting(
+                                                cid, "positionX", Math.round(cx * 100) / 100)
+                                        }
+                                        if (Math.abs(cy - ov.livePosY) > 0.001) {
+                                            ov.livePosY = cy
+                                            Backend.setClipEffectSetting(
+                                                cid, "positionY", Math.round(cy * 100) / 100)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
                 Item {
                     id: captionLayer
                     anchors.fill: parent
                     visible: root.activeSubtitle !== null
                     z: 3
+
+                    // Live font size drives the caption while a corner resize is
+                    // in progress; otherwise it tracks the committed global style.
+                    property bool fontResizing: false
+                    property real liveFontSize: Backend.captionFontSize
+                    Connections {
+                        target: Backend
+                        function onCaptionStyleChanged() {
+                            if (!captionLayer.fontResizing)
+                                captionLayer.liveFontSize = Backend.captionFontSize
+                        }
+                    }
 
                     function clampX(value, itemWidth) {
                         return Math.max(8, Math.min(parent.width - itemWidth - 8, value))
@@ -1405,7 +1781,9 @@ Rectangle {
                         text: root.activeSubtitle ? root.activeSubtitle.text : ""
                         color: Backend.captionTextColor
                         font.family: Backend.captionFontFamily
-                        font.pixelSize: Math.min(Backend.captionFontSize,
+                        font.pixelSize: Math.min(captionLayer.fontResizing
+                                                 ? captionLayer.liveFontSize
+                                                 : Backend.captionFontSize,
                                                  Math.max(12, viewer.height * 0.18))
                         font.bold: Backend.captionBold
                         font.italic: Backend.captionItalic
@@ -1478,6 +1856,49 @@ Rectangle {
                         radius: Theme.radiusSm + 2
                         visible: root.captionSelected
                         z: 21
+                    }
+
+                    // Resize: bottom-right handle scales the caption font size,
+                    // the same global style the drag repositions. Distance from
+                    // the box centre maps to size, matching the image overlay.
+                    Rectangle {
+                        width: 12; height: 12; radius: 2
+                        color: Theme.accent
+                        visible: root.captionSelected
+                        z: 22
+                        x: captionBackground.width - width / 2
+                        y: captionBackground.height - height / 2
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.SizeFDiagCursor
+                            acceptedButtons: Qt.LeftButton
+                            property real startDist: 1
+                            property real startSize: 24
+                            onPressed: function (mouse) {
+                                root.captionSelected = true
+                                captionLayer.fontResizing = true
+                                var cx = captionBackground.x + captionBackground.width / 2
+                                var cy = captionBackground.y + captionBackground.height / 2
+                                var p = mapToItem(captionLayer, mouse.x, mouse.y)
+                                startDist = Math.max(4, Math.hypot(p.x - cx, p.y - cy))
+                                startSize = Backend.captionFontSize
+                                captionLayer.liveFontSize = startSize
+                            }
+                            onPositionChanged: function (mouse) {
+                                if (!captionLayer.fontResizing) return
+                                var cx = captionBackground.x + captionBackground.width / 2
+                                var cy = captionBackground.y + captionBackground.height / 2
+                                var p = mapToItem(captionLayer, mouse.x, mouse.y)
+                                var d = Math.hypot(p.x - cx, p.y - cy)
+                                captionLayer.liveFontSize = Math.max(12,
+                                    Math.min(120, startSize * d / startDist))
+                            }
+                            onReleased: {
+                                captionLayer.fontResizing = false
+                                Backend.captionFontSize = Math.round(captionLayer.liveFontSize)
+                            }
+                            onCanceled: captionLayer.fontResizing = false
+                        }
                     }
                 }
             }

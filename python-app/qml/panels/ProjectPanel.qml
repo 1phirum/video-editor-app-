@@ -47,13 +47,11 @@ Rectangle {
     }
 
     property var sortedMedia: {
-        var arr = []
-        for (var i = 0; i < Backend.media.length; i++) {
-            if (Backend.media[i].hiddenInProjectPanel !== true
-                    && String(Backend.media[i].generatedBy || "")
-                       !== "text_to_speech")
-                arr.push(Backend.media[i])
-        }
+        // Backend.visibleMedia is already filtered in C++. This used to read
+        // Backend.media three times per entry plus once per loop condition, so a
+        // generated voice track turned every bin refresh into tens of thousands
+        // of QVariantMap-to-JS conversions.
+        var arr = Backend.visibleMedia.slice(0)
         arr.sort(function(a, b) {
             var nameA = (a.name || "").toLowerCase()
             var nameB = (b.name || "").toLowerCase()

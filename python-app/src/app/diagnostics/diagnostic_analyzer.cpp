@@ -1,5 +1,6 @@
 #include "app/diagnostics/diagnostic_analyzer.h"
 
+#include <QMap>
 #include <QRegularExpression>
 #include <algorithm>
 
@@ -55,10 +56,15 @@ void appendGuiFindings(const QVariantMap &stats, QList<Finding> &out) {
 
   if (worst > 0) {
     // A stall before the first window exists is launch cost, not a freeze: there
-    // is nothing on screen for Windows to grey out. The watchdog says so in its
-    // own verdict, and repeating that as a warning would train the reader to
-    // ignore the category.
+    // is nothing on screen for Windows to grey out.
+    //
+    // The watchdog reports this as a flag rather than in its verdict text, which
+    // is the only way to know it: by the time anything reads the statistics the
+    // window is up, so "was there a window when this happened" cannot be
+    // reconstructed afterwards. The verdict strings are still checked, for a
+    // channel dump written by an older build.
     const bool preWindow =
+        flag(stats, "guiWorstStallBeforeWindow") ||
         verdictText.contains(QStringLiteral("cannot show as Not Responding"),
                              Qt::CaseInsensitive) ||
         verdictText.contains(QStringLiteral("no window"), Qt::CaseInsensitive);
@@ -81,7 +87,17 @@ void appendGuiFindings(const QVariantMap &stats, QList<Finding> &out) {
                   QStringLiteral("This is launch cost - loading the graphics "
                                  "driver and compiling QML - not a freeze the "
                                  "user can see."),
-                  QString()});
+                  // Not a defect, but not free either: this is time the user
+                  // spends looking at nothing, and the trace names what spent it.
+                  worst >= kHitchMs
+                      ? QStringLiteral("Nothing is broken, but %1 ms of startup "
+                                       "went into \"%2\" - read the top frames "
+                                       "of the trace before deciding that is "
+                                       "acceptable.")
+                            .arg(worst)
+                            .arg(scope.isEmpty() ? QStringLiteral("(unmarked)")
+                                                 : scope)
+                      : QString()});
     else if (worst >= kFreezeMs)
       out.append({Severity::Critical, QStringLiteral("gui.stall.freeze"),
                   QStringLiteral("The GUI thread was blocked long enough for "
@@ -304,16 +320,30 @@ QString mostCommon(const QStringList &values) {
   return best;
 }
 
-void appendPlaybackFindings(const QStringList &history, QList<Finding> &out) {
+void appendPlaybackFindings(const QVariantMap &stats,
+                            const QStringList &history, QList<Finding> &out) {
   if (history.isEmpty()) {
+    // Two different situations, one empty list. Saying "the trace is off" when it
+    // is on and idle sends the reader to relaunch the app and lose the state they
+    // were about to report; saying "nothing was played" when the trace is off
+    // presents silence as a clean bill of health.
+    const bool on = flag(stats, "playbackTraceEnabled");
     out.append({Severity::Info, QStringLiteral("playback.trace.off"),
-                QStringLiteral("No playback events were recorded"),
-                QStringLiteral("PlaybackTrace history is empty"),
-                QStringLiteral("Either nothing has been played, or the trace is "
-                               "off - it is not evidence that playback is "
-                               "healthy."),
-                QStringLiteral("Relaunch with CUTPRO_PLAYBACK_TRACE=1 and play "
-                               "a few seconds.")});
+                on ? QStringLiteral("Playback has not been used in this session")
+                   : QStringLiteral("The playback trace is off"),
+                on ? QStringLiteral("PlaybackTrace is on and its history is "
+                                    "empty")
+                   : QStringLiteral("CUTPRO_PLAYBACK_TRACE is not set, so "
+                                    "nothing was recorded"),
+                on ? QStringLiteral("Nothing has been played yet - this is not "
+                                    "evidence that playback is healthy.")
+                   : QStringLiteral("Playback problems cannot be diagnosed from "
+                                    "this capture: no events, no timings, no QML "
+                                    "callers."),
+                on ? QStringLiteral("Play a few seconds, pause, and capture "
+                                    "again.")
+                   : QStringLiteral("Relaunch with CUTPRO_PLAYBACK_TRACE=1 and "
+                                    "play a few seconds.")});
     return;
   }
 
@@ -522,7 +552,7 @@ QList<Finding> DiagnosticAnalyzer::analyze(const QVariantMap &stats,
   appendSceneFindings(stats, findings);
   appendModelFindings(stats, findings);
   appendCrashFindings(stats, findings);
-  appendPlaybackFindings(playbackHistory, findings);
+  appendPlaybackFindings(stats, playbackHistory, findings);
 
   // Worst first, and stable within a severity so the order does not shuffle
   // between two captures taken seconds apart.

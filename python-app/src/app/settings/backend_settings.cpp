@@ -16,6 +16,7 @@
 #include "app/preview/timeline_preview_prefetcher.h"
 #include "app/preview/timeline_thumbnail_service.h"
 
+#include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
 #include <QSize>
@@ -126,10 +127,24 @@ bool Backend::startPreviewDecode(
   // would otherwise land on top of the first played frame.
   m_scrubFrames.cancel();
   m_previewFrameFromScrub = false;
+  // No picture belongs to this session yet. Leaving the previous session's frame
+  // recorded would let the first UI tick anchor the clock on it.
+  m_paintedSourceMs = -1;
+  m_previousPaintedSourceMs = -1;
+  m_paintedWallMs = 0;
+  m_paintedFrameWidth = 0;
   return m_previewDecoder.start(normalizePath(path), mediaKind,
                                 sourcePositionMs, durationMs, sourceWidth,
                                 sourceHeight, frameRate, audioEnabled, volume,
                                 normalizePath(audioPath));
+}
+
+void Backend::setPreviewVolume(double volume) {
+  // The live half of mute. QML recomputes this whenever mutedTracks, the track's
+  // enabled flag, the master volume or the clip's volume effect changes, so a mute
+  // during playback is heard immediately instead of at the next seek - and, because
+  // the stream is no longer torn down for a muted track, so is an un-mute.
+  m_previewDecoder.setAudioVolume(volume);
 }
 
 bool Backend::requestPreviewFrame(const QString &path,
@@ -429,10 +444,12 @@ void Backend::stopPreviewDecode() {
   if (PlaybackTrace::enabled())
     PlaybackTrace::instance().record(
         "session.stop",
-        QStringLiteral("decoder %1, picture at %2 ms")
+        QStringLiteral("decoder %1, picture at %2 ms, published %3 ms")
             .arg(m_previewDecoder.running() ? QStringLiteral("running")
                                             : QStringLiteral("idle"))
+            .arg(m_paintedSourceMs)
             .arg(m_previewDecoder.presentedSourceMs()));
+
   m_scrubFrames.cancel();
   m_previewDecoder.stop();
 }
@@ -440,8 +457,33 @@ void Backend::stopPreviewDecode() {
 qint64 Backend::previewPresentedSourceMs() const {
   // Deliberately not cleared by stopPreviewDecode(): the pause path stops the
   // session and then asks which frame was on screen so it can re-render that
-  // one. A new session clears it in the decoder's own start().
-  return m_previewDecoder.presentedSourceMs();
+  // one. startPreviewDecode() clears it for the next session.
+  //
+  // This is the frame the GUI thread was handed, not the newest one the decode
+  // thread published - see m_paintedSourceMs. The two differ by exactly the
+  // queued call between them, which is the frame the pause used to jump onto.
+  return m_paintedSourceMs;
+}
+
+int Backend::previewPresentedFrameWidth() const { return m_paintedFrameWidth; }
+
+qint64 Backend::previewPresentedAgeMs() const {
+  if (m_paintedSourceMs < 0 || m_paintedWallMs <= 0)
+    return -1;
+  const qint64 age = QDateTime::currentMSecsSinceEpoch() - m_paintedWallMs;
+  return age < 0 ? 0 : age;
+}
+
+qint64 Backend::previewPresentedSourceMsAtOrBefore(qint64 sourceMs) const {
+  if (m_paintedSourceMs < 0)
+    return -1;
+  if (m_paintedSourceMs <= sourceMs)
+    return m_paintedSourceMs;
+  // The newest picture is ahead of the clock, so it is the one that was still
+  // waiting to be drawn. Fall back to its predecessor; if there is none, the
+  // session has produced a single frame and that frame is what is on screen.
+  return m_previousPaintedSourceMs >= 0 ? m_previousPaintedSourceMs
+                                        : m_paintedSourceMs;
 }
 
 void Backend::tracePlaybackDrift(qint64 presentedTimelineMs) const {

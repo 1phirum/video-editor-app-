@@ -46,12 +46,32 @@ public:
   // every playhead jump and every playhead-versus-picture gap, each with the QML
   // caller that caused it. Empty unless CUTPRO_PLAYBACK_TRACE is set.
   Q_INVOKABLE QString playbackTrace(int maxEntries = 128) const;
+
+  // --- the expert diagnosis ------------------------------------------------
+  // The rules in DiagnosticAnalyzer applied to everything measured right now.
+  // One map per finding: severity ("critical"/"warning"/"info"), id, title,
+  // evidence, meaning, action. Worst first.
+  Q_INVOKABLE QVariantList findings() const;
+  // One line: "2 critical, 3 warnings", or that nothing was found.
+  Q_INVOKABLE QString verdict() const;
+  // The same diagnosis as plain text, for copying out of the report window.
+  Q_INVOKABLE QString diagnosisText() const;
+  // The crash channel as the reporter would read it.
+  Q_INVOKABLE QString crashChannelText() const;
+  // Everything - diagnosis, statistics, census, models, playback trace, channel
+  // - as one text block, identical to what writeSnapshot() puts in the file.
+  Q_INVOKABLE QString fullReport(const QString &note = QString()) const;
   // Writes everything known right now to a file in the crash-report directory
   // and returns its path. This is the "capture evidence while it is happening"
   // button: no freeze, no debugger, no crash required.
   Q_INVOKABLE QString writeSnapshot(const QString &note = QString());
   Q_INVOKABLE QStringList reports(int limit = 20) const;
   Q_INVOKABLE QString reportDirectory() const;
+  // Prints the same text to the console and writes it to the file, and returns
+  // the path. What Ctrl+Shift+D calls now that there is no report window: the
+  // console is where it gets read while the app is running, the file is what
+  // survives the process.
+  Q_INVOKABLE QString printReport(const QString &note = QString());
 
   // --- reporter self-test ------------------------------------------------
   // Blocks the GUI thread for `ms`. The reporter should notice at its hang

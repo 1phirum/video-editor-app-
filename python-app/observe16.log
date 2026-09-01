@@ -1,0 +1,537 @@
+17:43:03.576 GUI turn monitor on, budget 20 ms - every event-loop turn longer than this is reported with its marked scope (CUTPRO_TURN_BUDGET_MS=0 turns it off)
+17:43:03.761 GUI thread unresponsive for 182 ms, "stalled somewhere unmarked": "no marked scope"
+17:43:03.801   GUI thread backtrace, innermost first (13 frames):
+17:43:03.801     #0  "ntdll.dll!NtCreateUserProcess+0x14"
+17:43:03.801     #1  "KERNELBASE.dll+0x80305 (nearest export: CreateProcessInternalW+0x2c25)"
+17:43:03.801     #2  "KERNELBASE.dll!CreateProcessW+0x66"
+17:43:03.801     #3  "KERNEL32.DLL!CreateProcessW+0x54"
+17:43:03.801     #4  "Qt6Core.dll!QProcess::qt_metacall(QMetaObject::Call, int, void**)+0xdab"
+17:43:03.801     #5  "Qt6Core.dll+0x2d7ac9 (nearest export: QProcessEnvironment::systemEnvironment()+0x1589)"
+17:43:03.801     #6  "Qt6Core.dll!QProcess::startDetached(QString const&, QList<QString> const&, QString const&, long long*)+0x124"
+17:43:03.801     #7  "cutpro_diagnostics.dll!CrashReporterHost::start()+0x707"
+17:43:03.801     #8  "cutpro.exe+0x27ab"
+17:43:03.801     #9  "cutpro.exe+0x12ef"
+17:43:03.801     #10  "cutpro.exe+0x1406"
+17:43:03.801     #11  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+17:43:03.801     #12  "ntdll.dll!RtlUserThreadStart+0x2c"
+17:43:03.961 GUI thread unresponsive for 382 ms, "stalled somewhere unmarked": "no marked scope"
+17:43:03.961   GUI thread backtrace, innermost first (13 frames):
+17:43:03.961     #0  "ntdll.dll!NtCreateUserProcess+0x14"
+17:43:03.961     #1  "KERNELBASE.dll+0x80305 (nearest export: CreateProcessInternalW+0x2c25)"
+17:43:03.961     #2  "KERNELBASE.dll!CreateProcessW+0x66"
+17:43:03.961     #3  "KERNEL32.DLL!CreateProcessW+0x54"
+17:43:03.961     #4  "Qt6Core.dll!QProcess::qt_metacall(QMetaObject::Call, int, void**)+0xdab"
+17:43:03.961     #5  "Qt6Core.dll+0x2d7ac9 (nearest export: QProcessEnvironment::systemEnvironment()+0x1589)"
+17:43:03.961     #6  "Qt6Core.dll!QProcess::startDetached(QString const&, QList<QString> const&, QString const&, long long*)+0x124"
+17:43:03.961     #7  "cutpro_diagnostics.dll!CrashReporterHost::start()+0x707"
+17:43:03.961     #8  "cutpro.exe+0x27ab"
+17:43:03.961     #9  "cutpro.exe+0x12ef"
+17:43:03.961     #10  "cutpro.exe+0x1406"
+17:43:03.961     #11  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+17:43:03.961     #12  "ntdll.dll!RtlUserThreadStart+0x2c"
+17:43:04.343 GUI thread unresponsive for 764 ms, "stalled somewhere unmarked": "no marked scope"
+17:43:04.343   GUI thread backtrace, innermost first (13 frames):
+17:43:04.343     #0  "ntdll.dll!NtCreateUserProcess+0x14"
+17:43:04.343     #1  "KERNELBASE.dll+0x80305 (nearest export: CreateProcessInternalW+0x2c25)"
+17:43:04.343     #2  "KERNELBASE.dll!CreateProcessW+0x66"
+17:43:04.343     #3  "KERNEL32.DLL!CreateProcessW+0x54"
+17:43:04.343     #4  "Qt6Core.dll!QProcess::qt_metacall(QMetaObject::Call, int, void**)+0xdab"
+17:43:04.343     #5  "Qt6Core.dll+0x2d7ac9 (nearest export: QProcessEnvironment::systemEnvironment()+0x1589)"
+17:43:04.343     #6  "Qt6Core.dll!QProcess::startDetached(QString const&, QList<QString> const&, QString const&, long long*)+0x124"
+17:43:04.343     #7  "cutpro_diagnostics.dll!CrashReporterHost::start()+0x707"
+17:43:04.343     #8  "cutpro.exe+0x27ab"
+17:43:04.343     #9  "cutpro.exe+0x12ef"
+17:43:04.343     #10  "cutpro.exe+0x1406"
+17:43:04.343     #11  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+17:43:04.343     #12  "ntdll.dll!RtlUserThreadStart+0x2c"
+17:43:04.467 CrashReporterHost: watching pid 4680 from pid 24580 | reports -> C:/Users/USER/AppData/Local/Antigravity/Cut Pro/crash-reports
+17:43:04.493 Cut Pro: native C++/Qt backend, coreVersion = 0.1.2 | built = Aug 30 2026 17:31:56 | executable = C:/premier-pro/python-app/dist/Cut Pro 2026/cutpro.exe
+17:43:05.117 GUI thread unresponsive for 1538 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+17:43:05.117   the innermost frame has only been open 613 ms of the 1538 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+17:43:05.134   GUI thread backtrace, innermost first (14 frames):
+17:43:05.134     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+17:43:05.134     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+17:43:05.134     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+17:43:05.134     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+17:43:05.134     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+17:43:05.134     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+17:43:05.134     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+17:43:05.134     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+17:43:05.134     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+17:43:05.134     #9  "cutpro.exe+0x2d8e"
+17:43:05.134     #10  "cutpro.exe+0x12ef"
+17:43:05.134     #11  "cutpro.exe+0x1406"
+17:43:05.134     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+17:43:05.134     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+17:43:05.600 GUI thread STILL blocked after 2021 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)" - during launch, before any window exists: this delays startup but cannot show as "Not Responding".
+17:43:05.600   the innermost frame has only been open 1096 ms of the 2021 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+17:43:05.600   GUI thread backtrace, innermost first (14 frames):
+17:43:05.600     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+17:43:05.600     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+17:43:05.600     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+17:43:05.600     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+17:43:05.600     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+17:43:05.600     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+17:43:05.600     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+17:43:05.600     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+17:43:05.600     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+17:43:05.600     #9  "cutpro.exe+0x2d8e"
+17:43:05.600     #10  "cutpro.exe+0x12ef"
+17:43:05.600     #11  "cutpro.exe+0x1406"
+17:43:05.600     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+17:43:05.600     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+17:43:07.642 GUI thread STILL blocked after 4063 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)" - during launch, before any window exists: this delays startup but cannot show as "Not Responding".
+17:43:07.642   the innermost frame has only been open 3138 ms of the 4063 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+17:43:07.642   GUI thread backtrace, innermost first (14 frames):
+17:43:07.643     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+17:43:07.643     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+17:43:07.643     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+17:43:07.644     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+17:43:07.644     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+17:43:07.644     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+17:43:07.644     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+17:43:07.644     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+17:43:07.644     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+17:43:07.644     #9  "cutpro.exe+0x2d8e"
+17:43:07.644     #10  "cutpro.exe+0x12ef"
+17:43:07.644     #11  "cutpro.exe+0x1406"
+17:43:07.644     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+17:43:07.644     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+17:43:11.727 GUI thread STILL blocked after 8148 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)" - during launch, before any window exists: this delays startup but cannot show as "Not Responding".
+17:43:11.776   GUI thread backtrace, innermost first (48 frames):
+17:43:11.776     #0  "ntdll.dll!ZwCreateFile+0x14"
+17:43:11.776     #1  "KERNELBASE.dll!GetDriveTypeW+0xe57"
+17:43:11.776     #2  "KERNELBASE.dll!CreateFileW+0x97"
+17:43:11.776     #3  "DWrite.dll+0x1bcc3"
+17:43:11.783     #4  "DWrite.dll+0x1bbea"
+17:43:11.783     #5  "DWrite.dll+0x1a959"
+17:43:11.783     #6  "DWrite.dll+0x1a7cf"
+17:43:11.783     #7  "DWrite.dll+0x4b5de"
+17:43:11.783     #8  "DWrite.dll+0x6e100"
+17:43:11.783     #9  "DWrite.dll+0x6e04d"
+17:43:11.783     #10  "DWrite.dll+0xac1e3"
+17:43:11.783     #11  "DWrite.dll+0x43654"
+17:43:11.783     #12  "DWrite.dll+0x434e3"
+17:43:11.783     #13  "DWrite.dll+0x426da"
+17:43:11.783     #14  "DWrite.dll+0xd8832"
+17:43:11.783     #15  "Qt6Gui.dll!QWindowsDirectWriteFontDatabase::populateFontDatabase()+0x523"
+17:43:11.783     #16  "Qt6Gui.dll!QFontDatabasePrivate::ensureFontDatabase()+0xa7"
+17:43:11.783     #17  "Qt6Gui.dll!QFontDatabasePrivate::findFont(QFontDef const&, int, bool)+0x6e"
+17:43:11.783     #18  "Qt6Gui.dll!QFontDatabasePrivate::load(QFontPrivate const*, int)+0x7fd"
+17:43:11.783     #19  "Qt6Gui.dll!QFontPrivate::engineForScript(int) const+0xc3"
+17:43:11.783     #20  "Qt6Gui.dll!QFontMetricsF::height() const+0x17"
+17:43:11.783     #21  "Qt6Quick.dll!QQuickTextPrivate::lineHeightOffset() const+0x3d"
+17:43:11.783     #22  "Qt6Quick.dll!QQuickTextPrivate::updateSize()+0xc9"
+17:43:11.783     #23  "Qt6Quick.dll!QQuickTextPrivate::updateLayout()+0x1f0"
+17:43:11.783     #24  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+17:43:11.783     #25  "Qt6Qml.dll!QQmlComponentPrivate::complete(QQmlEnginePrivate*, QQmlComponentPrivate::ConstructionState*)+0x74"
+17:43:11.783     #26  "Qt6Qml.dll!QQmlComponentPrivate::completeDeferred(QQmlEnginePrivate*, std::vector<QQmlComponentPrivate::ConstructionState, std::allocator<QQmlComponentPrivate::ConstructionState> >*)+0x2f"
+17:43:11.783     #27  "Qt6QuickTemplates2.dll!QtQuickPrivate::completeDeferred(QObject*, QString const&, QQuickUntypedDeferredPointer*, QQmlEngine*)+0xc9"
+17:43:11.783     #28  "Qt6QuickTemplates2.dll!QQuickPopupItemPrivate::executeContentItem(bool)+0x12f"
+17:43:11.783     #29  "Qt6QuickTemplates2.dll!QQuickControl::componentComplete()+0x46"
+17:43:11.783     #30  "Qt6QuickTemplates2.dll!QQuickPane::componentComplete()+0x12"
+17:43:11.783     #31  "Qt6QuickTemplates2.dll!QQuickPage::componentComplete()+0x12"
+17:43:11.785     #32  "Qt6QuickTemplates2.dll!QQuickPopup::componentComplete()+0xca"
+17:43:11.785     #33  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+17:43:11.785     #34  "Qt6Qml.dll!QQmlComponentPrivate::complete(QQmlEnginePrivate*, QQmlComponentPrivate::ConstructionState*)+0x74"
+17:43:11.785     #35  "Qt6Qml.dll!QQmlComponentPrivate::completeCreate()+0x2ae"
+17:43:11.785     #36  "Qt6Qml.dll!QQmlComponentPrivate::createWithProperties(QObject*, QMap<QString, QVariant> const&, QQmlContext*, QQmlComponentPrivate::CreateBehavior, bool)+0xc4"
+17:43:11.785     #37  "Qt6Qml.dll!QQmlComponent::create(QQmlContext*)+0x46"
+17:43:11.785     #38  "Qt6QuickTemplates2.dll!QQuickToolTip::accessibilityActiveChanged(bool)+0x1cf"
+17:43:11.785     #39  "Qt6QuickTemplates2.dll+0x1070a7 (nearest export: QQuickComboBox::qt_metacall(QMetaObject::Call, int, void**)+0x248a7)"
+17:43:11.785     #40  "Qt6QuickTemplates2.dll+0x10eb9a (nearest export: QQuickComboBox::qt_metacall(QMetaObject::Call, int, void**)+0x2c39a)"
+17:43:11.785     #41  "Qt6Core.dll+0x3fd299 (nearest export: z_adler32_combine64+0x6b4b9)"
+17:43:11.785     #42  "Qt6Quick.dll!QQuickColorGroup::qt_static_metacall(QObject*, QMetaObject::Call, int, void**)+0xcca"
+17:43:11.785     #43  "Qt6Qml.dll!QQmlNotifier::notify(QQmlData*, int)+0x7db"
+17:43:11.785     #44  "Qt6Qml.dll+0x20fe13 (nearest export: QQmlObjectCreator::setPropertyValue(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x13d3)"
+17:43:11.785     #45  "Qt6Qml.dll!QQmlObjectCreator::setPropertyBinding(QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x107"
+17:43:11.785     #46  "Qt6Qml.dll!QQmlObjectCreator::setupBindings(QFlags<QQmlObjectCreator::BindingMode>)+0x53e"
+17:43:11.785     #47  "Qt6Qml.dll!QQmlObjectCreator::populateInstance(int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x230"
+17:43:16.350 Using Qt multimedia with FFmpeg version 7.1.3 LGPL version 2.1 or later
+17:45:05.752 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001bd16303c40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+17:45:05.752 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001bd16303c40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+17:45:07.198 monitor: source key  -> clip_5c1cbf97762f|C:/Users/USER/Downloads/Video/The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4|video|0|0|4652814|
+17:45:07.198 playback: session.stop decoder idle, picture at -1 ms from MonitorPanel.qml:1034 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1754
+17:45:07.238 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001bd163026c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+17:45:07.238 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001bd163026c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+17:45:07.453 GUI thread unresponsive for 155 ms, "wedged in": "ClipEffectControlsPanel.rebuildRows"
+17:45:07.475   GUI thread backtrace, innermost first (48 frames):
+17:45:07.475     #0  "ntdll.dll+0x275fc (nearest export: RtlAllocateHeap+0x19ac)"
+17:45:07.475     #1  "ntdll.dll!RtlAllocateHeap+0xbf4"
+17:45:07.475     #2  "ntdll.dll!RtlAllocateHeap+0xabb"
+17:45:07.475     #3  "msvcrt.dll!malloc+0x70"
+17:45:07.475     #4  "libstdc++-6.dll!operator new(unsigned long long)+0x1c"
+17:45:07.475     #5  "Qt6Qml.dll!QQmlProperty::QQmlProperty(QObject*, QString const&)+0x1e"
+17:45:07.475     #6  "Qt6QuickTemplates2.dll!QtQuickPrivate::beginDeferred(QObject*, QString const&, QQuickUntypedDeferredPointer*, bool, QQmlEngine*)+0xcf"
+17:45:07.475     #7  "Qt6QuickTemplates2.dll!QQuickControlPrivate::executeBackground(bool)+0xca"
+17:45:07.475     #8  "Qt6QuickTemplates2.dll!QQuickControl::componentComplete()+0x35"
+17:45:07.475     #9  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+17:45:07.475     #10  "Qt6Qml.dll!QQmlIncubatorPrivate::incubate(QQmlInstantiationInterrupt&)+0x4b8"
+17:45:07.475     #11  "Qt6Qml.dll!QQmlEnginePrivate::incubate(QQmlIncubator&, QQmlRefPointer<QQmlContextData> const&)+0x246"
+17:45:07.475     #12  "Qt6QmlModels.dll!QQmlDelegateModel::cancel(int)+0x88b"
+17:45:07.475     #13  "Qt6Quick.dll!QQuickRepeater::modelUpdated(QQmlChangeSet const&, bool)+0xd61"
+17:45:07.475     #14  "Qt6Core.dll+0x3fd299 (nearest export: z_adler32_combine64+0x6b4b9)"
+17:45:07.475     #15  "Qt6QmlModels.dll!QQmlInstanceModel::modelUpdated(QQmlChangeSet const&, bool)+0x4f"
+17:45:07.475     #16  "Qt6QmlModels.dll!QQmlDelegateModel::event(QEvent*)+0x2ad"
+17:45:07.475     #17  "Qt6QmlModels.dll!QQmlDelegateModel::indexOf(QObject*, QObject*) const+0x873"
+17:45:07.475     #18  "Qt6QmlModels.dll+0x38757 (nearest export: QQmlDelegateModelItemMetaType::initializePrototype()+0x1417)"
+17:45:07.475     #19  "Qt6QmlModels.dll!QQmlDelegateModel::_q_itemsInserted(int, int)+0x140"
+17:45:07.475     #20  "Qt6Core.dll+0x3fd299 (nearest export: z_adler32_combine64+0x6b4b9)"
+17:45:07.475     #21  "Qt6Core.dll!QAbstractItemModel::endInsertRows()+0x110"
+17:45:07.475     #22  "Qt6QmlModels.dll!QQmlListModel::insert(QQmlV4Function*)+0x48d"
+17:45:07.475     #23  "Qt6QmlModels.dll!QQmlListModel::qt_metacall(QMetaObject::Call, int, void**)+0xa0"
+17:45:07.477     #24  "Qt6Qml.dll!QQmlObjectCreator::create(int, QObject*, QQmlInstantiationInterrupt*, int)+0x94"
+17:45:07.477     #25  "Qt6Qml.dll!QV4::QObjectMethod::callInternal(QV4::Value const*, QV4::Value const*, int) const+0x984"
+17:45:07.477     #26  "Qt6Qml.dll+0x1613dc (nearest export: qt_v4DebuggerHook+0x33ec)"
+17:45:07.477     #27  "Qt6Qml.dll+0x165c9f (nearest export: qt_v4DebuggerHook+0x7caf)"
+17:45:07.477     #28  "Qt6Qml.dll!QV4::Function::updateInternalClass(QV4::ExecutionEngine*, QList<QByteArray> const&)+0xb00"
+17:45:07.477     #29  "Qt6Qml.dll+0x1613dc (nearest export: qt_v4DebuggerHook+0x33ec)"
+17:45:07.477     #30  "Qt6Qml.dll+0x165c9f (nearest export: qt_v4DebuggerHook+0x7caf)"
+17:45:07.477     #31  "Qt6Qml.dll!QV4::Function::updateInternalClass(QV4::ExecutionEngine*, QList<QByteArray> const&)+0xb00"
+17:45:07.477     #32  "Qt6Qml.dll+0x1613dc (nearest export: qt_v4DebuggerHook+0x33ec)"
+17:45:07.477     #33  "Qt6Qml.dll+0x165c9f (nearest export: qt_v4DebuggerHook+0x7caf)"
+17:45:07.477     #34  "Qt6Qml.dll!QV4::ExecutableCompilationUnit::createNamedObjectsPerComponent(int)+0x82f"
+17:45:07.477     #35  "Qt6Qml.dll!QV4::Function::call(QObject*, void**, QMetaType const*, int, QV4::ExecutionContext*)+0x293"
+17:45:07.477     #36  "Qt6Qml.dll!QQmlJavaScriptExpression::evaluate(void**, QMetaType const*, int)+0x105"
+17:45:07.477     #37  "Qt6Qml.dll!QQmlBoundSignalExpression::evaluate(void**)+0x31c"
+17:45:07.477     #38  "Qt6Qml.dll!QQmlBoundSignalExpression::QQmlBoundSignalExpression(QObject const*, int, QQmlRefPointer<QQmlContextData> const&, QObject*, QV4::Function*, QV4::ExecutionContext*)+0x8f8"
+17:45:07.477     #39  "Qt6Qml.dll!QQmlNotifier::emitNotify(QQmlNotifierEndpoint*, void**)+0x215"
+17:45:07.477     #40  "Qt6Core.dll+0x3fcf21 (nearest export: z_adler32_combine64+0x6b141)"
+17:45:07.477     #41  "Qt6QmlMeta.dll!QQmlTimer::event(QEvent*)+0x6f"
+17:45:07.477     #42  "Qt6Core.dll!QCoreApplication::notifyInternal2(QObject*, QEvent*)+0x19a"
+17:45:07.477     #43  "Qt6Core.dll!QCoreApplicationPrivate::sendPostedEvents(QObject*, int, QThreadData*)+0x445"
+17:45:07.477     #44  "Qt6Gui.dll!QWindowsGuiEventDispatcher::sendPostedEvents()+0x12"
+17:45:07.477     #45  "Qt6Core.dll!QEventDispatcherWin32::processEvents(QFlags<QEventLoop::ProcessEventsFlag>)+0xaa7"
+17:45:07.477     #46  "Qt6Gui.dll!QWindowsGuiEventDispatcher::processEvents(QFlags<QEventLoop::ProcessEventsFlag>)+0x19"
+17:45:07.477     #47  "Qt6Core.dll!QEventLoop::exec(QFlags<QEventLoop::ProcessEventsFlag>)+0x232"
+17:45:07.658 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001bd16303440] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+17:45:07.658 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001bd16303440] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+17:45:08.374 playback: playing false -> true at playhead 0 ms [+1176 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1870 (onClicked)
+17:45:08.374 monitor: playing -> true at 0
+17:45:08.374 monitor: playback session at playhead 0 clip clip_5c1cbf97762f
+17:45:08.374 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 0 ms, kind video [+1 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1870 (onClicked)
+17:45:08.434 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001bd16302980] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+17:45:08.435 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001bd16302980] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+17:45:08.838 preview playback: first frame after 455 ms, at source 0 ms (requested 0 ms)
+17:45:08.838 playback: frame at source 0 ms, advanced 0 ms of media in -1 ms of wall clock
+17:45:08.874 playback: playhead is 0 ms AHEAD of the picture (playhead 83 ms, picture 83 ms)
+17:45:08.917 playback: playhead.jump 83 -> 250 ms (+167) [+537 ms] from MonitorPanel.qml:938 (onTriggered)
+17:45:08.965 playback: playhead.jump 250 -> 376 ms (+126) [+47 ms] from MonitorPanel.qml:938 (onTriggered)
+17:45:09.919 playback: playhead is 0 ms AHEAD of the picture (playhead 1333 ms, picture 1333 ms)
+17:45:10.966 playback: playhead is 0 ms AHEAD of the picture (playhead 2375 ms, picture 2375 ms)
+17:45:11.835 playback: playing true -> false at playhead 3208 ms [+2870 ms] from MonitorPanel.qml:1868 (onClicked)
+17:45:11.836 monitor: playing -> false at 3208
+17:45:11.836 playback: session.stop decoder running, picture at 3250 ms [+0 ms] from MonitorPanel.qml:1003 (onPlayingChanged) <- MonitorPanel.qml:1868 (onClicked)
+17:45:14.677 playback: playing false -> true at playhead 3208 ms [+2841 ms] from MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1870 (onClicked)
+17:45:14.677 monitor: playing -> true at 3208
+17:45:14.677 monitor: playback session at playhead 3208 clip clip_5c1cbf97762f
+17:45:14.677 playback: session.start The Weakest Boy Enters Demon Slayer Academy With a God’s Power - manhwa recap.mp4 at source 3208 ms, kind video [+1 ms] from MonitorPanel.qml:645 (startProcessPlayback) <- MonitorPanel.qml:968 (onPlayingChanged) <- MonitorPanel.qml:536 (startPlayback) <- MonitorPanel.qml:1870 (onClicked)
+17:45:14.724 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001bd16303700] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+17:45:14.724 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001bd16303700] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+17:45:14.930 preview playback: first frame after 245 ms, at source 3208 ms (requested 3208 ms)
+17:45:14.930 playback: frame at source 3208 ms, advanced -42 ms of media in 3099 ms of wall clock
+17:45:14.950 playback: playhead is 0 ms AHEAD of the picture (playhead 3291 ms, picture 3291 ms)
+17:45:15.100 playback: playhead is 50 ms AHEAD of the picture (playhead 3508 ms, picture 3458 ms)
+17:45:15.148 playback: playhead is 0 ms AHEAD of the picture (playhead 3541 ms, picture 3541 ms)
+17:45:15.248 playback: playhead is 50 ms AHEAD of the picture (playhead 3675 ms, picture 3625 ms)
+17:45:15.298 playback: playhead is 0 ms AHEAD of the picture (playhead 3708 ms, picture 3708 ms)
+17:45:15.348 playback: playhead is 51 ms AHEAD of the picture (playhead 3759 ms, picture 3708 ms)
+17:45:15.398 playback: playhead is 0 ms AHEAD of the picture (playhead 3791 ms, picture 3791 ms)
+17:45:15.499 playback: playhead is 49 ms AHEAD of the picture (playhead 3924 ms, picture 3875 ms)
+17:45:15.548 playback: playhead is 0 ms AHEAD of the picture (playhead 3958 ms, picture 3958 ms)
+17:45:15.598 playback: playhead is 51 ms AHEAD of the picture (playhead 4009 ms, picture 3958 ms)
+17:45:15.649 playback: playhead is 0 ms AHEAD of the picture (playhead 4041 ms, picture 4041 ms)
+17:45:15.749 playback: playhead is 49 ms AHEAD of the picture (playhead 4174 ms, picture 4125 ms)
+17:45:15.798 playback: playhead is 0 ms AHEAD of the picture (playhead 4208 ms, picture 4208 ms)
+17:45:15.850 playback: playhead is 50 ms AHEAD of the picture (playhead 4258 ms, picture 4208 ms)
+17:45:15.900 playback: playhead is 0 ms AHEAD of the picture (playhead 4291 ms, picture 4291 ms)
+17:45:16.000 playback: playhead is 50 ms AHEAD of the picture (playhead 4425 ms, picture 4375 ms)
+17:45:16.051 playback: playhead is 1 ms AHEAD of the picture (playhead 4459 ms, picture 4458 ms)
+17:45:16.100 playback: playhead is 49 ms AHEAD of the picture (playhead 4507 ms, picture 4458 ms)
+17:45:16.149 playback: playhead is 0 ms AHEAD of the picture (playhead 4541 ms, picture 4541 ms)
+17:45:16.248 playback: playhead is 51 ms AHEAD of the picture (playhead 4676 ms, picture 4625 ms)
+17:45:16.299 playback: playhead is 0 ms AHEAD of the picture (playhead 4708 ms, picture 4708 ms)
+17:45:16.349 playback: playhead is 50 ms AHEAD of the picture (playhead 4758 ms, picture 4708 ms)
+17:45:16.400 playback: playhead is 0 ms AHEAD of the picture (playhead 4791 ms, picture 4791 ms)
+17:45:16.500 playback: playhead is 51 ms AHEAD of the picture (playhead 4926 ms, picture 4875 ms)
+17:45:16.549 playback: playhead is 0 ms AHEAD of the picture (playhead 4958 ms, picture 4958 ms)
+17:45:16.598 playback: playhead is 49 ms AHEAD of the picture (playhead 5007 ms, picture 4958 ms)
+17:45:16.648 playback: playhead is 0 ms AHEAD of the picture (playhead 5041 ms, picture 5041 ms)
+17:45:16.750 playback: playhead is 48 ms AHEAD of the picture (playhead 5173 ms, picture 5125 ms)
+17:45:16.800 playback: playhead is 0 ms AHEAD of the picture (playhead 5208 ms, picture 5208 ms)
+17:45:16.848 playback: playhead is 48 ms AHEAD of the picture (playhead 5256 ms, picture 5208 ms)
+17:45:16.900 playback: playhead is 0 ms AHEAD of the picture (playhead 5291 ms, picture 5291 ms)
+17:45:16.999 playback: playhead is 50 ms AHEAD of the picture (playhead 5425 ms, picture 5375 ms)
+17:45:17.049 playback: playhead is 0 ms AHEAD of the picture (playhead 5458 ms, picture 5458 ms)
+17:45:17.099 playback: playhead is 49 ms AHEAD of the picture (playhead 5507 ms, picture 5458 ms)
+17:45:17.149 playback: playhead is 0 ms AHEAD of the picture (playhead 5541 ms, picture 5541 ms)
+17:45:17.249 playback: playhead is 48 ms AHEAD of the picture (playhead 5673 ms, picture 5625 ms)
+17:45:17.299 playback: playhead is 0 ms AHEAD of the picture (playhead 5708 ms, picture 5708 ms)
+17:45:17.351 playback: playhead is 51 ms AHEAD of the picture (playhead 5759 ms, picture 5708 ms)
+17:45:17.399 playback: playhead is 0 ms AHEAD of the picture (playhead 5791 ms, picture 5791 ms)
+17:45:17.500 playback: playhead is 50 ms AHEAD of the picture (playhead 5925 ms, picture 5875 ms)
+17:45:17.549 playback: playhead is 0 ms AHEAD of the picture (playhead 5958 ms, picture 5958 ms)
+17:45:17.599 playback: playhead is 50 ms AHEAD of the picture (playhead 6008 ms, picture 5958 ms)
+17:45:17.649 playback: playhead is 0 ms AHEAD of the picture (playhead 6041 ms, picture 6041 ms)
+17:45:17.748 playback: playhead is 50 ms AHEAD of the picture (playhead 6175 ms, picture 6125 ms)
+17:45:17.799 playback: playhead is 0 ms AHEAD of the picture (playhead 6208 ms, picture 6208 ms)
+17:45:17.851 playback: playhead is 52 ms AHEAD of the picture (playhead 6260 ms, picture 6208 ms)
+17:45:17.901 playback: playhead is 0 ms AHEAD of the picture (playhead 6291 ms, picture 6291 ms)
+17:45:18.003 playback: playhead is 49 ms AHEAD of the picture (playhead 6424 ms, picture 6375 ms)
+17:45:18.050 playback: playhead is 0 ms AHEAD of the picture (playhead 6458 ms, picture 6458 ms)
+17:45:18.098 playback: playhead is 48 ms AHEAD of the picture (playhead 6506 ms, picture 6458 ms)
+17:45:18.150 playback: playhead is 0 ms AHEAD of the picture (playhead 6541 ms, picture 6541 ms)
+17:45:18.250 playback: playhead is 51 ms AHEAD of the picture (playhead 6676 ms, picture 6625 ms)
+17:45:18.299 playback: playhead is 0 ms AHEAD of the picture (playhead 6708 ms, picture 6708 ms)
+17:45:18.350 playback: playhead is 49 ms AHEAD of the picture (playhead 6757 ms, picture 6708 ms)
+17:45:18.400 playback: playhead is 0 ms AHEAD of the picture (playhead 6791 ms, picture 6791 ms)
+17:45:18.499 playback: playhead is 49 ms AHEAD of the picture (playhead 6924 ms, picture 6875 ms)
+17:45:18.548 playback: playhead is 0 ms AHEAD of the picture (playhead 6958 ms, picture 6958 ms)
+17:45:18.600 playback: playhead is 51 ms AHEAD of the picture (playhead 7009 ms, picture 6958 ms)
+17:45:18.657 playback: playhead is 0 ms AHEAD of the picture (playhead 7041 ms, picture 7041 ms)
+17:45:18.758 playback: playhead is 50 ms AHEAD of the picture (playhead 7175 ms, picture 7125 ms)
+17:45:18.809 playback: playhead is 1 ms AHEAD of the picture (playhead 7209 ms, picture 7208 ms)
+17:45:18.916 playback: playhead is 59 ms AHEAD of the picture (playhead 7350 ms, picture 7291 ms)
+17:45:18.959 playback: playhead is 0 ms AHEAD of the picture (playhead 7375 ms, picture 7375 ms)
+17:45:19.009 playback: playhead is 49 ms AHEAD of the picture (playhead 7424 ms, picture 7375 ms)
+17:45:19.057 playback: playhead is 0 ms AHEAD of the picture (playhead 7458 ms, picture 7458 ms)
+17:45:19.157 playback: playhead is 51 ms AHEAD of the picture (playhead 7592 ms, picture 7541 ms)
+17:45:19.207 playback: playhead is 0 ms AHEAD of the picture (playhead 7625 ms, picture 7625 ms)
+17:45:19.257 playback: playhead is 50 ms AHEAD of the picture (playhead 7675 ms, picture 7625 ms)
+17:45:19.307 playback: playhead is 1 ms AHEAD of the picture (playhead 7709 ms, picture 7708 ms)
+17:45:19.408 playback: playhead is 51 ms AHEAD of the picture (playhead 7842 ms, picture 7791 ms)
+17:45:19.458 playback: playhead is 0 ms AHEAD of the picture (playhead 7875 ms, picture 7875 ms)
+17:45:19.508 playback: playhead is 50 ms AHEAD of the picture (playhead 7925 ms, picture 7875 ms)
+17:45:19.557 playback: playhead is 0 ms AHEAD of the picture (playhead 7958 ms, picture 7958 ms)
+17:45:19.694 GUI thread unresponsive for 156 ms, "stalled somewhere unmarked": "no marked scope"
+17:45:19.722   GUI thread backtrace, innermost first (48 frames):
+17:45:19.722     #0  "msvcrt.dll!memcpy+0x92"
+17:45:19.722     #1  "Qt6Gui.dll!QWindowsFontEngineDirectWrite::getSfntTableData(unsigned int, unsigned char*, unsigned int*) const+0xd0"
+17:45:19.722     #2  "Qt6Gui.dll!QFontEngine::getSfntTable(unsigned int) const+0x15b"
+17:45:19.722     #3  "Qt6Gui.dll!QWindowsFontEngineDirectWrite::collectMetrics()+0x13b"
+17:45:19.722     #4  "Qt6Gui.dll!QWindowsFontEngineDirectWrite::QWindowsFontEngineDirectWrite(IDWriteFontFace*, double, QSharedPointer<QWindowsFontEngineData> const&)+0x1ac"
+17:45:19.722     #5  "Qt6Gui.dll!QWindowsDirectWriteFontDatabase::fontEngine(QFontDef const&, void*)+0x3a3"
+17:45:19.722     #6  "Qt6Gui.dll!QFontDatabasePrivate::loadSingleEngine(int, QFontDef const&, QtFontFamily*, QtFontFoundry*, QtFontStyle*, QtFontSize*)+0x20f"
+17:45:19.722     #7  "Qt6Gui.dll!QFontDatabasePrivate::loadEngine(int, QFontDef const&, QtFontFamily*, QtFontFoundry*, QtFontStyle*, QtFontSize*)+0x4f"
+17:45:19.722     #8  "Qt6Gui.dll!QFontDatabasePrivate::findFont(QFontDef const&, int, bool)+0x2fd"
+17:45:19.722     #9  "Qt6Gui.dll!QFontDatabasePrivate::load(QFontPrivate const*, int)+0x7fd"
+17:45:19.722     #10  "Qt6Gui.dll!QFontPrivate::engineForScript(int) const+0xc3"
+17:45:19.722     #11  "Qt6Gui.dll!QFontMetricsF::leading() const+0x15"
+17:45:19.722     #12  "Qt6Gui.dll!QPainter::~QPainter()+0xfb7"
+17:45:19.722     #13  "Qt6Gui.dll!QPainter::drawText(QRectF const&, QString const&, QTextOption const&)+0xa2"
+17:45:19.723     #14  "qwindows.dll+0x6dac4 (nearest export: qt_plugin_instance+0x6be24)"
+17:45:19.723     #15  "qwindows.dll+0x6e2c5 (nearest export: qt_plugin_instance+0x6c625)"
+17:45:19.723     #16  "qwindows.dll+0xb80de (nearest export: qt_plugin_instance+0xb643e)"
+17:45:19.723     #17  "qwindows.dll+0x752c (nearest export: qt_plugin_instance+0x588c)"
+17:45:19.723     #18  "USER32.dll!CallWindowProcW+0x6a6"
+17:45:19.723     #19  "USER32.dll!SendMessageW+0x935"
+17:45:19.723     #20  "USER32.dll!IsWindowEnabled+0x5bf"
+17:45:19.723     #21  "USER32.dll!IsWindowEnabled+0x244"
+17:45:19.723     #22  "UxTheme.dll+0x815b (nearest export: Ordinal75+0x475b)"
+17:45:19.723     #23  "UxTheme.dll+0x8091 (nearest export: Ordinal75+0x4691)"
+17:45:19.723     #24  "USER32.dll+0x179ba (nearest export: SendMessageW+0x12ba)"
+17:45:19.723     #25  "qwindows.dll+0x7c01 (nearest export: qt_plugin_instance+0x5f61)"
+17:45:19.723     #26  "USER32.dll!CallWindowProcW+0x6a6"
+17:45:19.723     #27  "USER32.dll+0x14b4c (nearest export: GetFocus+0x1e3c)"
+17:45:19.723     #28  "USER32.dll!EnumDisplayDevicesW+0x3a3"
+17:45:19.723     #29  "ntdll.dll!KiUserCallbackDispatcher+0x24"
+17:45:19.723     #30  "win32u.dll!NtUserMessageCall+0x14"
+17:45:19.723     #31  "USER32.dll!IsWindowEnabled+0x3ab"
+17:45:19.723     #32  "USER32.dll!IsWindowEnabled+0x244"
+17:45:19.723     #33  "UxTheme.dll+0x67bd (nearest export: Ordinal75+0x2dbd)"
+17:45:19.723     #34  "UxTheme.dll+0x589e6 (nearest export: Ordinal90+0x16e6)"
+17:45:19.723     #35  "UxTheme.dll+0x88d6 (nearest export: Ordinal75+0x4ed6)"
+17:45:19.723     #36  "UxTheme.dll+0x8091 (nearest export: Ordinal75+0x4691)"
+17:45:19.723     #37  "USER32.dll+0x179ba (nearest export: SendMessageW+0x12ba)"
+17:45:19.723     #38  "qwindows.dll+0x7c01 (nearest export: qt_plugin_instance+0x5f61)"
+17:45:19.723     #39  "USER32.dll!CallWindowProcW+0x6a6"
+17:45:19.723     #40  "USER32.dll+0x14b4c (nearest export: GetFocus+0x1e3c)"
+17:45:19.723     #41  "USER32.dll!GetWindowDpiAwarenessContext+0x4d3"
+17:45:19.723     #42  "ntdll.dll!KiUserCallbackDispatcher+0x24"
+17:45:19.723     #43  "win32u.dll!NtUserMessageCall+0x14"
+17:45:19.723     #44  "USER32.dll!IsWindowEnabled+0x3ab"
+17:45:19.723     #45  "USER32.dll!IsWindowEnabled+0x244"
+17:45:19.723     #46  "UxTheme.dll+0x67bd (nearest export: Ordinal75+0x2dbd)"
+17:45:19.723     #47  "UxTheme.dll!BufferedPaintUnInit+0x379"
+17:45:19.831 playback: playhead.jump 7958 -> 8208 ms (+250) [+5151 ms] from MonitorPanel.qml:938 (onTriggered)
+17:45:19.934 playback: playhead is 50 ms AHEAD of the picture (playhead 8341 ms, picture 8291 ms)
+17:45:19.991 playback: playhead is 0 ms AHEAD of the picture (playhead 8375 ms, picture 8375 ms)
+17:45:20.099 playback: playhead is 50 ms AHEAD of the picture (playhead 8508 ms, picture 8458 ms)
+17:45:20.150 playback: playhead is 0 ms AHEAD of the picture (playhead 8541 ms, picture 8541 ms)
+17:45:20.249 playback: playhead is 48 ms AHEAD of the picture (playhead 8673 ms, picture 8625 ms)
+17:45:20.298 playback: playhead is 0 ms AHEAD of the picture (playhead 8708 ms, picture 8708 ms)
+17:45:20.349 playback: playhead is 51 ms AHEAD of the picture (playhead 8759 ms, picture 8708 ms)
+17:45:20.398 playback: playhead is 0 ms AHEAD of the picture (playhead 8791 ms, picture 8791 ms)
+17:45:20.499 playback: playhead is 49 ms AHEAD of the picture (playhead 8924 ms, picture 8875 ms)
+17:45:20.549 playback: playhead is 0 ms AHEAD of the picture (playhead 8958 ms, picture 8958 ms)
+17:45:20.599 playback: playhead is 50 ms AHEAD of the picture (playhead 9008 ms, picture 8958 ms)
+17:45:20.657 playback: playhead is 0 ms AHEAD of the picture (playhead 9041 ms, picture 9041 ms)
+17:45:20.758 playback: playhead is 50 ms AHEAD of the picture (playhead 9175 ms, picture 9125 ms)
+17:45:20.807 playback: playhead is 0 ms AHEAD of the picture (playhead 9208 ms, picture 9208 ms)
+17:45:20.908 playback: playhead is 49 ms AHEAD of the picture (playhead 9340 ms, picture 9291 ms)
+17:45:20.957 playback: playhead is 0 ms AHEAD of the picture (playhead 9375 ms, picture 9375 ms)
+17:45:21.008 playback: playhead is 50 ms AHEAD of the picture (playhead 9425 ms, picture 9375 ms)
+17:45:21.056 playback: playhead is 0 ms AHEAD of the picture (playhead 9458 ms, picture 9458 ms)
+17:45:21.158 playback: playhead is 50 ms AHEAD of the picture (playhead 9591 ms, picture 9541 ms)
+17:45:21.208 playback: playhead is 0 ms AHEAD of the picture (playhead 9625 ms, picture 9625 ms)
+17:45:21.256 playback: playhead is 50 ms AHEAD of the picture (playhead 9675 ms, picture 9625 ms)
+17:45:21.307 playback: playhead is 0 ms AHEAD of the picture (playhead 9708 ms, picture 9708 ms)
+17:45:21.407 playback: playhead is 50 ms AHEAD of the picture (playhead 9841 ms, picture 9791 ms)
+17:45:21.457 playback: playhead is 0 ms AHEAD of the picture (playhead 9875 ms, picture 9875 ms)
+17:45:21.507 playback: playhead is 50 ms AHEAD of the picture (playhead 9925 ms, picture 9875 ms)
+17:45:21.557 playback: playhead is 0 ms AHEAD of the picture (playhead 9958 ms, picture 9958 ms)
+17:45:21.656 playback: playhead is 50 ms AHEAD of the picture (playhead 10091 ms, picture 10041 ms)
+17:45:21.708 playback: playhead is 0 ms AHEAD of the picture (playhead 10125 ms, picture 10125 ms)
+17:45:21.760 playback: playhead is 54 ms AHEAD of the picture (playhead 10179 ms, picture 10125 ms)
+17:45:21.819 playback: playhead is 0 ms AHEAD of the picture (playhead 10208 ms, picture 10208 ms)
+17:45:21.918 playback: playhead is 51 ms AHEAD of the picture (playhead 10342 ms, picture 10291 ms)
+17:45:21.965 playback: playhead is 0 ms AHEAD of the picture (playhead 10375 ms, picture 10375 ms)
+17:45:22.015 playback: playhead is 51 ms AHEAD of the picture (playhead 10426 ms, picture 10375 ms)
+17:45:22.066 playback: playhead is 1 ms AHEAD of the picture (playhead 10459 ms, picture 10458 ms)
+17:45:22.166 playback: playhead is 49 ms AHEAD of the picture (playhead 10590 ms, picture 10541 ms)
+17:45:22.215 playback: playhead is 0 ms AHEAD of the picture (playhead 10625 ms, picture 10625 ms)
+17:45:22.265 playback: playhead is 50 ms AHEAD of the picture (playhead 10675 ms, picture 10625 ms)
+17:45:22.315 playback: playhead is 0 ms AHEAD of the picture (playhead 10708 ms, picture 10708 ms)
+17:45:22.415 playback: playhead is 51 ms AHEAD of the picture (playhead 10842 ms, picture 10791 ms)
+17:45:22.464 playback: playhead is 0 ms AHEAD of the picture (playhead 10875 ms, picture 10875 ms)
+17:45:22.515 playback: playhead is 51 ms AHEAD of the picture (playhead 10926 ms, picture 10875 ms)
+17:45:22.565 playback: playhead is 0 ms AHEAD of the picture (playhead 10958 ms, picture 10958 ms)
+17:45:22.666 playback: playhead is 47 ms AHEAD of the picture (playhead 11088 ms, picture 11041 ms)
+17:45:22.715 playback: playhead is 0 ms AHEAD of the picture (playhead 11125 ms, picture 11125 ms)
+17:45:22.765 playback: playhead is 50 ms AHEAD of the picture (playhead 11175 ms, picture 11125 ms)
+17:45:22.815 playback: playhead is 0 ms AHEAD of the picture (playhead 11208 ms, picture 11208 ms)
+17:45:22.915 playback: playhead is 50 ms AHEAD of the picture (playhead 11341 ms, picture 11291 ms)
+17:45:22.965 playback: playhead is 0 ms AHEAD of the picture (playhead 11375 ms, picture 11375 ms)
+17:45:23.015 playback: playhead is 50 ms AHEAD of the picture (playhead 11425 ms, picture 11375 ms)
+17:45:23.065 playback: playhead is 0 ms AHEAD of the picture (playhead 11458 ms, picture 11458 ms)
+17:45:23.165 playback: playhead is 43 ms AHEAD of the picture (playhead 11584 ms, picture 11541 ms)
+17:45:23.216 playback: playhead is 0 ms AHEAD of the picture (playhead 11625 ms, picture 11625 ms)
+17:45:23.265 playback: playhead is 48 ms AHEAD of the picture (playhead 11673 ms, picture 11625 ms)
+17:45:23.315 playback: playhead is 0 ms AHEAD of the picture (playhead 11708 ms, picture 11708 ms)
+17:45:23.418 playback: playhead is 53 ms AHEAD of the picture (playhead 11844 ms, picture 11791 ms)
+17:45:23.464 playback: playhead is 0 ms AHEAD of the picture (playhead 11875 ms, picture 11875 ms)
+17:45:23.515 playback: playhead is 50 ms AHEAD of the picture (playhead 11925 ms, picture 11875 ms)
+17:45:23.565 playback: playhead is 0 ms AHEAD of the picture (playhead 11958 ms, picture 11958 ms)
+17:45:23.665 playback: playhead is 44 ms AHEAD of the picture (playhead 12085 ms, picture 12041 ms)
+17:45:23.715 playback: playhead is 0 ms AHEAD of the picture (playhead 12125 ms, picture 12125 ms)
+17:45:23.765 playback: playhead is 50 ms AHEAD of the picture (playhead 12175 ms, picture 12125 ms)
+17:45:23.815 playback: playhead is 0 ms AHEAD of the picture (playhead 12208 ms, picture 12208 ms)
+17:45:23.918 playback: playhead is 52 ms AHEAD of the picture (playhead 12343 ms, picture 12291 ms)
+17:45:23.964 playback: playhead is 0 ms AHEAD of the picture (playhead 12375 ms, picture 12375 ms)
+17:45:24.015 playback: playhead is 50 ms AHEAD of the picture (playhead 12425 ms, picture 12375 ms)
+17:45:24.065 playback: playhead is 0 ms AHEAD of the picture (playhead 12458 ms, picture 12458 ms)
+17:45:24.165 playback: playhead is 51 ms AHEAD of the picture (playhead 12592 ms, picture 12541 ms)
+17:45:24.215 playback: playhead is 0 ms AHEAD of the picture (playhead 12625 ms, picture 12625 ms)
+17:45:24.265 playback: playhead is 50 ms AHEAD of the picture (playhead 12675 ms, picture 12625 ms)
+17:45:24.316 playback: playhead is 0 ms AHEAD of the picture (playhead 12708 ms, picture 12708 ms)
+17:45:24.417 playback: playhead is 51 ms AHEAD of the picture (playhead 12842 ms, picture 12791 ms)
+17:45:24.470 playback: playhead is 0 ms AHEAD of the picture (playhead 12875 ms, picture 12875 ms)
+17:45:24.514 playback: playhead is 49 ms AHEAD of the picture (playhead 12924 ms, picture 12875 ms)
+17:45:24.565 playback: playhead is 0 ms AHEAD of the picture (playhead 12958 ms, picture 12958 ms)
+17:45:24.665 playback: playhead is 48 ms AHEAD of the picture (playhead 13089 ms, picture 13041 ms)
+17:45:24.715 playback: playhead is 0 ms AHEAD of the picture (playhead 13125 ms, picture 13125 ms)
+17:45:24.765 playback: playhead is 50 ms AHEAD of the picture (playhead 13175 ms, picture 13125 ms)
+17:45:24.815 playback: playhead is 0 ms AHEAD of the picture (playhead 13208 ms, picture 13208 ms)
+17:45:24.916 playback: playhead is 50 ms AHEAD of the picture (playhead 13341 ms, picture 13291 ms)
+17:45:24.965 playback: playhead is 0 ms AHEAD of the picture (playhead 13375 ms, picture 13375 ms)
+17:45:25.015 playback: playhead is 49 ms AHEAD of the picture (playhead 13424 ms, picture 13375 ms)
+17:45:25.064 playback: playhead is 0 ms AHEAD of the picture (playhead 13458 ms, picture 13458 ms)
+17:45:25.165 playback: playhead is 52 ms AHEAD of the picture (playhead 13593 ms, picture 13541 ms)
+17:45:25.215 playback: playhead is 0 ms AHEAD of the picture (playhead 13625 ms, picture 13625 ms)
+17:45:25.267 playback: playhead is 52 ms AHEAD of the picture (playhead 13677 ms, picture 13625 ms)
+17:45:25.315 playback: playhead is 0 ms AHEAD of the picture (playhead 13708 ms, picture 13708 ms)
+17:45:25.415 playback: playhead is 49 ms AHEAD of the picture (playhead 13840 ms, picture 13791 ms)
+17:45:25.464 playback: playhead is 0 ms AHEAD of the picture (playhead 13875 ms, picture 13875 ms)
+17:45:25.515 playback: playhead is 50 ms AHEAD of the picture (playhead 13925 ms, picture 13875 ms)
+17:45:25.565 playback: playhead is 0 ms AHEAD of the picture (playhead 13958 ms, picture 13958 ms)
+17:45:25.665 playback: playhead is 50 ms AHEAD of the picture (playhead 14091 ms, picture 14041 ms)
+17:45:25.715 playback: playhead is 0 ms AHEAD of the picture (playhead 14125 ms, picture 14125 ms)
+17:45:25.766 playback: playhead is 50 ms AHEAD of the picture (playhead 14175 ms, picture 14125 ms)
+17:45:25.815 playback: playhead is 0 ms AHEAD of the picture (playhead 14208 ms, picture 14208 ms)
+17:45:25.915 playback: playhead is 50 ms AHEAD of the picture (playhead 14341 ms, picture 14291 ms)
+17:45:25.965 playback: playhead is 0 ms AHEAD of the picture (playhead 14375 ms, picture 14375 ms)
+17:45:26.015 playback: playhead is 50 ms AHEAD of the picture (playhead 14425 ms, picture 14375 ms)
+17:45:26.065 playback: playhead is 0 ms AHEAD of the picture (playhead 14458 ms, picture 14458 ms)
+17:45:26.164 playback: playhead is 50 ms AHEAD of the picture (playhead 14591 ms, picture 14541 ms)
+17:45:26.215 playback: playhead is 0 ms AHEAD of the picture (playhead 14625 ms, picture 14625 ms)
+17:45:26.265 playback: playhead is 51 ms AHEAD of the picture (playhead 14676 ms, picture 14625 ms)
+17:45:26.315 playback: playhead is 0 ms AHEAD of the picture (playhead 14708 ms, picture 14708 ms)
+17:45:26.415 playback: playhead is 50 ms AHEAD of the picture (playhead 14841 ms, picture 14791 ms)
+17:45:26.466 playback: playhead is 0 ms AHEAD of the picture (playhead 14875 ms, picture 14875 ms)
+17:45:26.515 playback: playhead is 50 ms AHEAD of the picture (playhead 14925 ms, picture 14875 ms)
+17:45:26.565 playback: playhead is 0 ms AHEAD of the picture (playhead 14958 ms, picture 14958 ms)
+17:45:26.665 playback: playhead is 51 ms AHEAD of the picture (playhead 15092 ms, picture 15041 ms)
+17:45:26.724 playback: playhead is 0 ms AHEAD of the picture (playhead 15125 ms, picture 15125 ms)
+17:45:26.823 playback: playhead is 49 ms AHEAD of the picture (playhead 15257 ms, picture 15208 ms)
+17:45:26.874 playback: playhead is 0 ms AHEAD of the picture (playhead 15291 ms, picture 15291 ms)
+17:45:26.923 playback: playhead is 50 ms AHEAD of the picture (playhead 15341 ms, picture 15291 ms)
+17:45:26.973 playback: playhead is 0 ms AHEAD of the picture (playhead 15375 ms, picture 15375 ms)
+17:45:27.074 playback: playhead is 51 ms AHEAD of the picture (playhead 15509 ms, picture 15458 ms)
+17:45:27.124 playback: playhead is 0 ms AHEAD of the picture (playhead 15541 ms, picture 15541 ms)
+17:45:27.173 playback: playhead is 48 ms AHEAD of the picture (playhead 15589 ms, picture 15541 ms)
+17:45:27.224 playback: playhead is 0 ms AHEAD of the picture (playhead 15625 ms, picture 15625 ms)
+17:45:27.325 playback: playhead is 51 ms AHEAD of the picture (playhead 15759 ms, picture 15708 ms)
+17:45:27.373 playback: playhead is 0 ms AHEAD of the picture (playhead 15791 ms, picture 15791 ms)
+17:45:27.422 playback: playhead is 51 ms AHEAD of the picture (playhead 15842 ms, picture 15791 ms)
+17:45:27.474 playback: playhead is 0 ms AHEAD of the picture (playhead 15875 ms, picture 15875 ms)
+17:45:27.580 playback: playhead is 51 ms AHEAD of the picture (playhead 16009 ms, picture 15958 ms)
+17:45:27.624 playback: playhead is 0 ms AHEAD of the picture (playhead 16041 ms, picture 16041 ms)
+17:45:27.672 playback: playhead is 48 ms AHEAD of the picture (playhead 16089 ms, picture 16041 ms)
+17:45:27.723 playback: playhead is 0 ms AHEAD of the picture (playhead 16125 ms, picture 16125 ms)
+17:45:27.823 playback: playhead is 50 ms AHEAD of the picture (playhead 16258 ms, picture 16208 ms)
+17:45:27.873 playback: playhead is 0 ms AHEAD of the picture (playhead 16291 ms, picture 16291 ms)
+17:45:27.923 playback: playhead is 50 ms AHEAD of the picture (playhead 16341 ms, picture 16291 ms)
+17:45:27.973 playback: playhead is 0 ms AHEAD of the picture (playhead 16375 ms, picture 16375 ms)
+17:45:28.075 playback: playhead is 50 ms AHEAD of the picture (playhead 16508 ms, picture 16458 ms)
+17:45:28.124 playback: playhead is 0 ms AHEAD of the picture (playhead 16541 ms, picture 16541 ms)
+17:45:28.173 playback: playhead is 49 ms AHEAD of the picture (playhead 16590 ms, picture 16541 ms)
+17:45:28.224 playback: playhead is 0 ms AHEAD of the picture (playhead 16625 ms, picture 16625 ms)
+17:45:28.324 playback: playhead is 49 ms AHEAD of the picture (playhead 16757 ms, picture 16708 ms)
+17:45:28.373 playback: playhead is 0 ms AHEAD of the picture (playhead 16791 ms, picture 16791 ms)
+17:45:28.423 playback: playhead is 50 ms AHEAD of the picture (playhead 16841 ms, picture 16791 ms)
+17:45:28.473 playback: playhead is 0 ms AHEAD of the picture (playhead 16875 ms, picture 16875 ms)
+17:45:28.572 playback: playhead is 49 ms AHEAD of the picture (playhead 17007 ms, picture 16958 ms)
+17:45:28.622 playback: playhead is 0 ms AHEAD of the picture (playhead 17041 ms, picture 17041 ms)
+17:45:28.672 playback: playhead is 50 ms AHEAD of the picture (playhead 17091 ms, picture 17041 ms)
+17:45:28.723 playback: playhead is 0 ms AHEAD of the picture (playhead 17125 ms, picture 17125 ms)
+17:45:28.823 playback: playhead is 50 ms AHEAD of the picture (playhead 17258 ms, picture 17208 ms)
+17:45:28.874 playback: playhead is 0 ms AHEAD of the picture (playhead 17291 ms, picture 17291 ms)
+17:45:28.924 playback: playhead is 49 ms AHEAD of the picture (playhead 17340 ms, picture 17291 ms)
+17:45:28.973 playback: playhead is 0 ms AHEAD of the picture (playhead 17375 ms, picture 17375 ms)
+17:45:29.073 playback: playhead is 48 ms AHEAD of the picture (playhead 17506 ms, picture 17458 ms)
+17:45:29.121 playback: playhead is 0 ms AHEAD of the picture (playhead 17541 ms, picture 17541 ms)
+17:45:29.172 playback: playhead is 50 ms AHEAD of the picture (playhead 17591 ms, picture 17541 ms)
+17:45:29.222 playback: playhead is 0 ms AHEAD of the picture (playhead 17625 ms, picture 17625 ms)
+17:45:29.341 playback: playhead is 47 ms AHEAD of the picture (playhead 17755 ms, picture 17708 ms)
+17:45:29.384 playback: playhead is 0 ms AHEAD of the picture (playhead 17791 ms, picture 17791 ms)
+17:45:29.432 playback: playhead is 46 ms AHEAD of the picture (playhead 17837 ms, picture 17791 ms)
+17:45:29.482 playback: playhead is 0 ms AHEAD of the picture (playhead 17875 ms, picture 17875 ms)
+17:45:29.581 playback: playhead is 49 ms AHEAD of the picture (playhead 18007 ms, picture 17958 ms)
+17:45:29.631 playback: playhead is 0 ms AHEAD of the picture (playhead 18041 ms, picture 18041 ms)
+17:45:29.681 playback: playhead is 49 ms AHEAD of the picture (playhead 18090 ms, picture 18041 ms)
+17:45:29.732 playback: playhead is 0 ms AHEAD of the picture (playhead 18125 ms, picture 18125 ms)
+17:45:29.830 playback: playhead is 49 ms AHEAD of the picture (playhead 18257 ms, picture 18208 ms)
+17:45:29.882 playback: playhead is 1 ms AHEAD of the picture (playhead 18292 ms, picture 18291 ms)
+17:45:29.932 playback: playhead is 49 ms AHEAD of the picture (playhead 18340 ms, picture 18291 ms)
+17:45:29.980 playback: playhead is 0 ms AHEAD of the picture (playhead 18375 ms, picture 18375 ms)
+17:45:30.081 playback: playhead is 50 ms AHEAD of the picture (playhead 18508 ms, picture 18458 ms)
+17:45:30.133 playback: playhead is 0 ms AHEAD of the picture (playhead 18541 ms, picture 18541 ms)
+17:45:30.182 playback: playhead is 48 ms AHEAD of the picture (playhead 18589 ms, picture 18541 ms)
+17:45:30.231 playback: playhead is 0 ms AHEAD of the picture (playhead 18625 ms, picture 18625 ms)
+17:45:30.332 playback: playhead is 47 ms AHEAD of the picture (playhead 18755 ms, picture 18708 ms)
+17:45:30.381 playback: playhead is 0 ms AHEAD of the picture (playhead 18791 ms, picture 18791 ms)
+17:45:30.431 playback: playhead is 49 ms AHEAD of the picture (playhead 18840 ms, picture 18791 ms)
+17:45:30.481 playback: playhead is 0 ms AHEAD of the picture (playhead 18875 ms, picture 18875 ms)
+17:45:30.580 playback: playhead is 49 ms AHEAD of the picture (playhead 19007 ms, picture 18958 ms)
+17:45:30.631 playback: playhead is 0 ms AHEAD of the picture (playhead 19041 ms, picture 19041 ms)
+17:45:30.689 playback: playhead is 50 ms AHEAD of the picture (playhead 19091 ms, picture 19041 ms)
+17:45:30.769 playback: playhead is 0 ms AHEAD of the picture (playhead 19125 ms, picture 19125 ms)
+17:45:30.906 playback: playhead is 49 ms AHEAD of the picture (playhead 19340 ms, picture 19291 ms)
+17:45:31.005 playback: playhead is 0 ms AHEAD of the picture (playhead 19375 ms, picture 19375 ms)
+17:45:31.156 playback: playhead is 49 ms AHEAD of the picture (playhead 19590 ms, picture 19541 ms)
+17:45:31.207 playback: playhead is 0 ms AHEAD of the picture (playhead 19625 ms, picture 19625 ms)
+17:45:31.257 playback: playhead is 49 ms AHEAD of the picture (playhead 19674 ms, picture 19625 ms)
+17:45:31.305 playback: playhead is 0 ms AHEAD of the picture (playhead 19708 ms, picture 19708 ms)
+17:45:31.407 playback: playhead is 50 ms AHEAD of the picture (playhead 19841 ms, picture 19791 ms)
+17:45:31.599 playback: playhead is 0 ms AHEAD of the picture (playhead 19958 ms, picture 19958 ms)
+17:45:31.621 playback: session.stop decoder running, picture at 20041 ms [+11789 ms] from MonitorPanel.qml:1060 (onDestruction)

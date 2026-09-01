@@ -68,11 +68,8 @@ Item {
     function mediaForClip(clip) {
         if (!clip || !clip.mediaId)
             return null
-        for (var i = 0; i < Backend.media.length; ++i) {
-            if (Backend.media[i].id === clip.mediaId)
-                return Backend.media[i]
-        }
-        return null
+        var media = Backend.mediaById(String(clip.mediaId))
+        return media && media.id ? media : null
     }
 
     function compatible(definition) {

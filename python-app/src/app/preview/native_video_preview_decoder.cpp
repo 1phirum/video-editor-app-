@@ -192,6 +192,8 @@ bool NativeVideoPreviewDecoder::start(const QString &path,
   // and then asks what frame was on screen, so the answer has to outlive the
   // session that produced it.
   m_presentedSourceMs.store(-1, std::memory_order_release);
+  m_presentedWidth.store(0, std::memory_order_release);
+
   emit stateChanged();
   m_thread = std::thread([this, request]() { decode(request); });
   return true;
@@ -240,6 +242,8 @@ void NativeVideoPreviewDecoder::publishFrame(QImage image, quint64 generation,
     m_droppedFrames.fetch_add(1, std::memory_order_relaxed);
     return;
   }
+  const int width = image.width();
+
   {
     QMutexLocker locker(&m_frameMutex);
     // Re-check under the lock: stop() may have bumped the generation between
@@ -254,6 +258,8 @@ void NativeVideoPreviewDecoder::publishFrame(QImage image, quint64 generation,
   // Only frames that reach the screen move this. A dropped or superseded frame
   // leaves it alone, so it always names the picture the user is looking at.
   m_presentedSourceMs.store(sourceMs, std::memory_order_release);
+  m_presentedWidth.store(width, std::memory_order_release);
+
   // Called from the decode thread, which is why the trace never evaluates
   // JavaScript here: it records the pacing of the picture, and only lines that
   // break the expected one-frame-per-interval rhythm are emitted.
@@ -481,8 +487,39 @@ void NativeVideoPreviewDecoder::decode(Request request) {
   const double maximumFps = qMax(1.0, profile.maximumFrameRate);
   const double minimumFrameDelta = 1.0 / maximumFps;
   double firstOutputSeconds = -1.0;
-  double lastOutputSeconds = -1000.0;
-  const auto playbackStart = std::chrono::steady_clock::now();
+  // Phase of the output cadence, not the timestamp of the last frame shown.
+  //
+  // The rule used to be "skip anything closer than 90% of the interval to the
+  // last frame published", and on a 24 fps source with a 20 fps ceiling that
+  // skips *every other frame*: 41.7 ms is under the 45 ms gate, so one frame in
+  // two is dropped and the preview runs at 12 fps - the "playing is very slow"
+  // report, measured as a picture that advanced in exact 83 ms steps. Carrying
+  // the phase forward instead drops one frame in six, which is the 20 fps that
+  // was actually asked for.
+  double nextOutputSeconds = -1.0;
+  // Decoded but not published because of that cadence. The work they cost
+  // belongs to the frame that follows them, and dividing by it keeps a
+  // rate-capped session from reporting two frames of decode as the price of one
+  // - which would be the model bidding its own advice down.
+  int decodedSinceOutput = 0;
+  qint64 publishedFrames = 0;
+  // Wall clock the output cadence is paced against.
+  //
+  // It used to be stamped only here, which is before the catch-up decode from
+  // the keyframe back up to the requested position. That decode costs 140 to
+  // 470 ms on this machine, so by the time the first frame was published the
+  // pacing already owed that much media time - and the loop paid the debt the
+  // only way it could, by publishing the next five or six frames back to back.
+  // The playback trace measured it as the playhead jumping +125 to +209 ms
+  // within 60 ms of every press of play: the picture fast-forwarding a quarter
+  // of a second each time playback starts.
+  //
+  // Re-stamped at the first published frame instead, so the cadence is measured
+  // from the moment there is a picture rather than from the moment the decoder
+  // was asked for one. Debt accumulated mid-stream is still paid the old way -
+  // that keeps the video with the audio, and it is bounded by one slow frame
+  // rather than by a container open.
+  auto playbackAnchor = std::chrono::steady_clock::now();
   int packetsWithoutOutput = 0;
   int hardwareTransferFailures = 0;
   bool retryInSoftware = false;
@@ -558,8 +595,9 @@ void NativeVideoPreviewDecoder::decode(Request request) {
         done = true;
         break;
       }
-      if (!request.singleFrame &&
-          seconds - lastOutputSeconds < minimumFrameDelta * 0.90) {
+      if (!request.singleFrame && nextOutputSeconds >= 0.0 &&
+          seconds + 0.0005 < nextOutputSeconds) {
+        ++decodedSinceOutput;
         av_frame_unref(decodedFrame);
         continue;
       }
@@ -629,6 +667,8 @@ void NativeVideoPreviewDecoder::decode(Request request) {
       packetsWithoutOutput = 0;
       if (firstOutputSeconds < 0) {
         firstOutputSeconds = seconds;
+        // There is a picture now; this is when playback really begins.
+        playbackAnchor = std::chrono::steady_clock::now();
         if (!request.singleFrame)
           qCInfo(previewFfmpegLog).nospace()
               << "preview playback: first frame after " << sessionTimer.elapsed()
@@ -636,12 +676,29 @@ void NativeVideoPreviewDecoder::decode(Request request) {
               << " (requested " << request.sourcePositionMs << " ms)";
       }
       if (!request.singleFrame)
+        ++publishedFrames;
+      // The first published frame of a session is not a measurement of what a
+      // frame costs. It carries the container open, the seek, and every frame
+      // between the keyframe and the requested position - 245 to 455 ms on this
+      // machine for a file that then decodes in single digits. Feeding it to the
+      // cost model set the average to that number, and since the average needs
+      // ~19 frames to decay back under budget while the model downgrades after
+      // 8, every first press of play talked the preview down to 960 px and
+      // 20 fps. On a 720p 579 kbit/s H.264 file. That was the slow playback.
+      //
+      // Divided by the frames that were decoded to produce this one, so a
+      // session that is already capped reports the cost of one frame rather than
+      // of the whole cadence.
+      if (!request.singleFrame && publishedFrames > 1) {
+        const int decodes = qMax(1, decodedSinceOutput + 1);
         DecodeCostModel::instance().notePlaybackFrame(
-            request.path, double(frameWorkTimer.elapsed()),
+            request.path, double(frameWorkTimer.elapsed()) / decodes,
             qint64(image.width()) * qint64(image.height()));
+      }
+      decodedSinceOutput = 0;
       if (request.realtime && !request.singleFrame) {
         const auto target =
-            playbackStart +
+            playbackAnchor +
             std::chrono::duration_cast<std::chrono::steady_clock::duration>(
                 std::chrono::duration<double>(seconds - firstOutputSeconds));
         // Pacing sleeps in short slices so a seek or stop is honoured within a
@@ -654,7 +711,18 @@ void NativeVideoPreviewDecoder::decode(Request request) {
       // Restarted after the pacing sleep so the next measurement is decode cost
       // only.
       frameWorkTimer.restart();
-      lastOutputSeconds = seconds;
+      // Advanced by exactly one interval so the cadence keeps its phase against
+      // the source. Re-phased only when the stream has already moved past it -
+      // after a seek, or a gap longer than one interval - because adding
+      // intervals to a stale phase would publish the next several frames back to
+      // back and then stall.
+      if (nextOutputSeconds < 0.0)
+        nextOutputSeconds = seconds + minimumFrameDelta;
+      else {
+        nextOutputSeconds += minimumFrameDelta;
+        if (nextOutputSeconds < seconds + 0.0005)
+          nextOutputSeconds = seconds + minimumFrameDelta;
+      }
       if (request.singleFrame) {
         done = true;
         break;

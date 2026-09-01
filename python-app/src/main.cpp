@@ -15,11 +15,13 @@
 #include "app/diagnostics/crash_channel.h"
 #include "app/diagnostics/crash_reporter_host.h"
 #include "app/diagnostics/diagnostics_bridge.h"
+#include "app/diagnostics/diagnostics_cli.h"
 #include "app/diagnostics/item_tree_census.h"
 #include "app/diagnostics/playback_trace.h"
 #include "app/diagnostics/model_guard.h"
 #include "app/preview/gui_dispatch.h"
 #include "app/preview/gui_thread_watchdog.h"
+#include "app/preview/gui_turn_monitor.h"
 #include "app/preview/startup_warmup.h"
 #include "app/preview/timeline_thumbnail_provider.h"
 #include "app/preview/waveform_window_provider.h"
@@ -66,12 +68,27 @@ int main(int argc, char* argv[]) {
     app.setOrganizationDomain("antigravity.ai");
     app.setApplicationName("Cut Pro");
 
+    // `cutpro --diagnose` prints the newest report and exits: no window, no
+    // engine, no crash reporter. Handled here because it needs the application
+    // name (the report directory is derived from it) and nothing else - starting
+    // the editor to read a text file would change the state being asked about.
+    {
+        int cliExit = 0;
+        if (DiagnosticsCli::handleCommandLine(app.arguments(), &cliExit))
+            return cliExit;
+    }
+
     // Both have to be established on the GUI thread before anything can post to
     // it. install() fixes the dispatcher's queue, and start() records this thread
     // as the one whose responsiveness is being measured, so every later
     // GuiThreadWatchdog::onGuiThread() answer is correct.
     GuiDispatch::install();
     GuiThreadWatchdog::instance().start();
+    // The frame-scale instrument, installed in the same breath as the freeze-scale
+    // one: a dropped frame is 17-34 ms, two orders of magnitude below the smallest
+    // thing the watchdog can see, which is why every "the video is slow" report so
+    // far arrived with a clean log.
+    GuiTurnMonitor::install();
 
     // Before anything can stall, and before the window exists: the reporter has
     // to already be watching when the first freeze happens, not started in
@@ -155,11 +172,29 @@ int main(int argc, char* argv[]) {
     }
     if (engine.rootObjects().isEmpty())
         return -1;
-    // Started once there is a tree to walk. Every sample is published into the
-    // crash channel, so a hang report carries the item histogram as of a second
-    // or two before the freeze - which is the only time it can be taken, since
-    // the walk runs on the thread that gets wedged.
-    diagnostics.attach(&engine, ItemTreeCensus::kDefaultIntervalMs);
+    // Registered for on-demand sampling, with the repeating walk off by default.
+    //
+    // It used to run every 2 s. The walk visits every QObject and QQuickItem in
+    // the scene, on the GUI thread, and this window measured 9801 items at 38 ms
+    // per walk - two dropped frames of a 30 fps preview, twice a second, for the
+    // whole session. That is diagnostics cost charged to every frame budget, and
+    // it was turning up in the same stutter it was installed to explain.
+    //
+    // Ctrl+Shift+D still walks on demand, one baseline walk still lands a few
+    // seconds in so a hang report has a histogram, and CUTPRO_CENSUS_MS brings
+    // the timer back for a session that is specifically hunting scene growth.
+    int censusIntervalMs = 0;
+    {
+        bool ok = false;
+        const int requested = qgetenv("CUTPRO_CENSUS_MS").trimmed().toInt(&ok);
+        // Below ~250 ms the sampler spends more of the frame budget than the app.
+        if (ok && requested > 0)
+            censusIntervalMs = qMax(250, requested);
+    }
+    diagnostics.attach(&engine, censusIntervalMs);
+    // The console replacement for the F12 overlay: off unless asked for, one line
+    // per tick, no scene walk.
+    DiagnosticsCli::startTicker(&diagnostics, &engine);
     // From here a stall is a visibly frozen window rather than a slow launch, and
     // the watchdog's reports should say so.
     GuiThreadWatchdog::instance().markWindowShown();

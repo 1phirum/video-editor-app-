@@ -60,6 +60,11 @@ public slots:
   // local re-arm instead of a service round trip.
   void warm();
   void begin(double volume);
+  // Live, while the sink is running. Muting a track used to be a start() argument
+  // and nothing else, so toggling it during playback changed the icon and left the
+  // audio playing; and un-muting had nothing to reach, because the stream was
+  // never opened. The level moves instead of the stream.
+  void setVolume(double volume);
   // Drops queued PCM and re-arms; the device stays open. What a scrub or a seek
   // wants, and what used to cost 845 ms to undo when the sink was destroyed.
   void resetQueue();
@@ -95,6 +100,7 @@ public:
   void configure(const QAudioDevice &device, const QAudioFormat &format);
   void warm();
   void begin(double volume);
+  void setVolume(double volume);
   void reset();
   void enqueue(const QByteArray &pcm);
   qint64 queuedBytes() const;

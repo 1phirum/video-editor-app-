@@ -52,10 +52,10 @@ Rectangle {
     Connections {
         target: Backend
         function onMediaChanged() {
-            root.syncTranscriptionSelection()
+            root.transcriptionSelectionSync.restart()
         }
         function onClipsChanged() {
-            root.syncTranscriptionSelection()
+            root.transcriptionSelectionSync.restart()
         }
         function onTranscriptionFinished(success, mediaId) {
             if (root.transcriptionCurrentId !== "") {
@@ -86,11 +86,24 @@ Rectangle {
         root.syncTranscriptionSelection()
     }
 
+    // The transcription list is rebuilt after the timeline stops changing, not
+    // during. Importing a generated voice track publishes its progress once per
+    // event-loop turn for thousands of turns, and this list is the same list
+    // every time until the import ends.
+    property alias transcriptionSelectionSync: transcriptionSelectionSyncTimer
+    Timer {
+        id: transcriptionSelectionSyncTimer
+        interval: 120
+        repeat: false
+        onTriggered: root.syncTranscriptionSelection()
+    }
+
     function timelineSourceIds() {
         var ids = []
         var seen = {}
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var clip = Backend.clips[i]
+        var clips = Backend.mediaClips
+        for (var i = 0; i < clips.length; ++i) {
+            var clip = clips[i]
             var kind = String(clip.kind || "")
             var mediaId = String(clip.mediaId || "")
             if ((kind === "video" || kind === "audio") && mediaId !== ""
@@ -103,33 +116,31 @@ Rectangle {
     }
 
     function isHumanSpeechSource(mediaId) {
-        for (var i = 0; i < Backend.media.length; ++i) {
-            var media = Backend.media[i]
-            if (String(media.id || "") !== mediaId)
-                continue
-            var kind = String(media.kind || "")
-            var path = String(media.path || "").replace(/\\/g, "/").toLowerCase()
-            return (kind === "video" || kind === "audio")
-                    && media.excludeFromTranscript !== true
-                    && String(media.generatedBy || "") !== "text_to_speech"
-                    && path.indexOf("/generated-speech/") < 0
-        }
-        return false
+        // Answered in C++ from a cached set. This used to scan Backend.media
+        // looking for the id, which converted a QVariantMap into a fresh JS
+        // object per bin entry - and syncTranscriptionSelection() called it once
+        // per bin entry, so a generated voice track made it quadratic.
+        return Backend.isTranscribableMedia(mediaId)
     }
 
     function timelineSourceDuration(mediaId) {
         var total = 0
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var clip = Backend.clips[i]
+        // Cues have no media of their own, so this only ever needs the real
+        // clips - and on a transcribed timeline that is two entries, not
+        // twenty thousand.
+        var clips = Backend.mediaClips
+        for (var i = 0; i < clips.length; ++i) {
+            var clip = clips[i]
             if (String(clip.mediaId || "") === mediaId
                     && (clip.kind === "video" || clip.kind === "audio"))
                 total += Math.max(0, Number(clip.durationMs || 0))
         }
         if (total > 0)
             return total
-        for (var j = 0; j < Backend.media.length; ++j)
-            if (Backend.media[j].id === mediaId)
-                return Number(Backend.media[j].durationMs || 0)
+        var media = Backend.media
+        for (var j = 0; j < media.length; ++j)
+            if (media[j].id === mediaId)
+                return Number(media[j].durationMs || 0)
         return 0
     }
 
@@ -165,21 +176,27 @@ Rectangle {
         var sources = []
         root.timelineTranscriptionMode = false
         var all = []
-        for (var i = 0; i < Backend.media.length; ++i) {
-            var media = Backend.media[i]
-            if (root.isHumanSpeechSource(String(media.id || ""))) {
-                all.push(media.id)
-                sources.push(root.timelineAwareSource(media))
-            }
+        // Pre-filtered in C++: real video and audio only, generated speech
+        // already removed. Reading Backend.media here meant walking thousands of
+        // voice entries to find the two files a user can actually transcribe.
+        var candidates = Backend.transcribableMedia
+        for (var i = 0; i < candidates.length; ++i) {
+            var media = candidates[i]
+            all.push(media.id)
+            sources.push(root.timelineAwareSource(media))
         }
         root.transcriptionSourceMedia = sources
         root.selectedMediaForTranscription = all
     }
 
     function mediaName(mediaId) {
-        for (var i = 0; i < Backend.media.length; ++i)
-            if (Backend.media[i].id === mediaId)
-                return Backend.media[i].name
+        // The list is read once into a local. `Backend.media.length` in the loop
+        // condition re-read the property - and re-converted the list - on every
+        // single iteration.
+        var media = Backend.media
+        for (var i = 0; i < media.length; ++i)
+            if (media[i].id === mediaId)
+                return media[i].name
         return mediaId
     }
 
@@ -187,9 +204,10 @@ Rectangle {
         var editedDuration = root.timelineSourceDuration(mediaId)
         if (editedDuration > 0)
             return editedDuration
-        for (var i = 0; i < Backend.media.length; ++i)
-            if (Backend.media[i].id === mediaId)
-                return Number(Backend.media[i].durationMs || 0)
+        var media = Backend.media
+        for (var i = 0; i < media.length; ++i)
+            if (media[i].id === mediaId)
+                return Number(media[i].durationMs || 0)
         return 0
     }
 

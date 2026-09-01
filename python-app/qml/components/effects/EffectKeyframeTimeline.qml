@@ -19,7 +19,10 @@ import "../timeline"
 Item {
     id: root
 
-    property var rows: []
+    // The panel's row model, handed over rather than copied into an array: the
+    // lanes and the parameter tree have to stay index-aligned, and the model is
+    // patched in place so a rebuild does not re-incubate every lane here as well.
+    property var laneModel: null
     property string clipId: ""
     property string clipLabel: ""
     property real startMs: 0
@@ -92,24 +95,24 @@ Item {
         spacing: 0
 
         Repeater {
-            model: root.rows
-            // Recorded rather than clamped. rows is the parameter list of one
+            model: root.laneModel
+            // Recorded rather than clamped. The model is the parameter list of one
             // effect stack, so this cannot be capped without hiding parameters
             // the user needs - but if it is ever the model that explodes, the
             // count is the evidence, and note() costs one integer store.
             onCountChanged: ModelGuard.note("keyframes.lanes", count)
             delegate: Item {
                 id: lane
-                required property var modelData
+                required property var row
                 width: laneColumn.width
                 height: Theme.ecRowHeight
 
-                readonly property string kind: String(lane.modelData.kind || "")
+                readonly property string kind: String(lane.row.kind || "")
                 readonly property bool isBand: lane.kind === "band"
                 readonly property string channel:
-                    String(lane.modelData.channel || lane.modelData.id || "")
+                    String(lane.row.channel || lane.row.id || "")
                 readonly property bool keyframable:
-                    lane.kind === "param" && lane.modelData.kf === true
+                    lane.kind === "param" && lane.row.kf === true
                 readonly property var frames:
                     (root.revision >= 0 && lane.keyframable && root.clipId !== "")
                     ? Backend.keyframeEngine.keyframesFor(root.clipId, lane.channel)

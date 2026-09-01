@@ -70,6 +70,15 @@ public:
   qint64 presentedSourceMs() const {
     return m_presentedSourceMs.load(std::memory_order_acquire);
   }
+  // Pixel width of that frame. Playback resolution moves with the frame budget -
+  // this file drops to 960 px and climbs back to 1500 - and the still drawn on
+  // pause is decoded at the source's own resolution instead, so the monitor
+  // needs to know whether swapping one for the other would change anything the
+  // user can see.
+  int presentedWidth() const {
+    return m_presentedWidth.load(std::memory_order_acquire);
+  }
+
   qint64 frameMemoryBytes() const {
     return m_pool ? m_pool->allocatedBytes() : 0;
   }
@@ -123,4 +132,6 @@ private:
   std::atomic<quint64> m_droppedFrames{0};
   std::atomic<quint64> m_revision{0};
   std::atomic<qint64> m_presentedSourceMs{-1};
+  std::atomic<int> m_presentedWidth{0};
+
 };

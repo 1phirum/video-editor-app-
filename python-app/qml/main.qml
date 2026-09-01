@@ -51,20 +51,6 @@ ApplicationWindow {
     }
 
 
-    // Parented to the overlay layer rather than to the window's ColumnLayout so
-    // that it draws over every panel without taking part in the layout, and so a
-    // panel that is mid-rebuild cannot push it around. Top-right because the
-    // freeze it exists to explain is usually reported from the timeline, which is
-    // along the bottom.
-    DiagnosticsOverlay {
-        id: diagnosticsOverlay
-        parent: Overlay.overlay
-        width: Math.min(460, window.width - 24)
-        height: Math.min(520, window.height - 24)
-        x: window.width - width - 12
-        y: 12
-    }
-
     function toggleFullScreen() {
         // Full-screen playback owns the window state while it is on, so F11 gives
         // that up first instead of leaving a black picture layer over a windowed
@@ -150,27 +136,22 @@ ApplicationWindow {
         }
     }
 
-    // The two keys that make the instrumentation reachable. Everything the
-    // watchdog, the item census and the model guard measure was already being
-    // recorded and none of it could be read without a debugger attached, which is
-    // how a freeze stayed unexplained across a dozen attempts at fixing it.
+    // Ctrl+Shift+D prints the whole diagnosis to the console and writes the same
+    // text to a file. Deliberately no window and no overlay any more.
     //
-    // F12 rather than a menu item on purpose: it has to work while the window is
-    // not finishing frames, and a menu needs a paint to open.
-    Shortcut {
-        sequence: "F12"
-        onActivated: diagnosticsOverlay.active = !diagnosticsOverlay.active
-    }
-
-    // Writes the same numbers to a file next to the crash reports, for the case
-    // where the window is too wedged to read them off the screen. Shows the
-    // overlay first so the path it wrote to is visible.
+    // Both of those existed, and both were measured making the app they were
+    // measuring slower: the overlay polled three C++ reports on a 700 ms timer
+    // into ~40 live Text items, and the report window's wrapping text blocks cost
+    // a 400 ms GUI-thread stall on every resize. An instrument that changes the
+    // reading is worse than no instrument. The console form carries everything
+    // they showed - the same DiagnosticAnalyzer verdict, findings and raw
+    // sections - and costs one keypress, nothing per frame.
+    //
+    // `cutpro --diagnose` prints the file back afterwards, so evidence outlives
+    // the terminal that was scrolling.
     Shortcut {
         sequence: "Ctrl+Shift+D"
-        onActivated: {
-            diagnosticsOverlay.active = true
-            diagnosticsOverlay.writeSnapshot()
-        }
+        onActivated: Diagnostics.printReport("manual, Ctrl+Shift+D")
     }
 
     FileDialog {
@@ -181,6 +162,21 @@ ApplicationWindow {
         onAccepted: {
             Backend.importMediaAsync(selectedFiles.map(function(url) { return url.toString() }))
             Backend.activeWorkspace = "Edit"
+        }
+    }
+
+    // Add a logo / graphic as an overlay clip that composites on top of the
+    // base video. It lands on a fresh V track above everything and can be
+    // dragged and resized directly in the program monitor.
+    FileDialog {
+        id: logoDialog
+        title: "Add logo / image overlay"
+        fileMode: FileDialog.OpenFile
+        nameFilters: ["Images (*.png *.jpg *.jpeg *.webp *.bmp *.gif)", "All files (*)"]
+        onAccepted: {
+            var cid = Backend.addImageOverlay(selectedFile.toString())
+            if (cid !== "")
+                Backend.activeWorkspace = "Edit"
         }
     }
 
@@ -253,6 +249,31 @@ ApplicationWindow {
                 }
 
                 Item { Layout.fillWidth: true }
+
+                // Add a logo / image overlay in one click.
+                Button {
+                    id: addLogoBtn
+                    HoverHandler { cursorShape: Qt.PointingHandCursor }
+                    implicitHeight: 26
+                    implicitWidth: addLogoLabel.implicitWidth + 20
+                    flat: true
+                    hoverEnabled: true
+                    background: Rectangle {
+                        radius: Theme.radiusSm
+                        color: addLogoBtn.hovered ? Theme.hover : "transparent"
+                        border.color: Theme.border
+                    }
+                    contentItem: Text {
+                        id: addLogoLabel
+                        text: "+ Logo"
+                        color: Theme.textSecondary
+                        font.pixelSize: Theme.fsSm
+                        font.weight: Font.DemiBold
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: logoDialog.open()
+                }
 
                 // Right: workspace preset + tool icons
                 Button {

@@ -1,0 +1,194 @@
+11:52:04.223 GUI turn monitor on, budget 20 ms - every event-loop turn longer than this is reported with its marked scope (CUTPRO_TURN_BUDGET_MS=0 turns it off)
+11:52:04.616 CrashReporterHost: watching pid 6268 from pid 21416 | reports -> C:/Users/USER/AppData/Local/Antigravity/Cut Pro/crash-reports
+11:52:04.639 Cut Pro: native C++/Qt backend, coreVersion = 0.1.2 | built = Sep  1 2026 11:12:47 | executable = C:/premier-pro/python-app/dist/Cut Pro 2026/cutpro.exe
+11:52:04.661 GUI thread unresponsive for 438 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+11:52:04.662   the innermost frame has only been open 18 ms of the 438 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+11:52:05.166 GUI thread unresponsive for 943 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+11:52:05.166   the innermost frame has only been open 523 ms of the 943 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+11:52:05.220   GUI thread backtrace, innermost first (14 frames):
+11:52:05.221     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+11:52:05.221     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+11:52:05.221     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+11:52:05.221     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+11:52:05.221     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+11:52:05.221     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+11:52:05.221     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+11:52:05.221     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+11:52:05.221     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+11:52:05.221     #9  "cutpro.exe+0x2d8e"
+11:52:05.221     #10  "cutpro.exe+0x12ef"
+11:52:05.221     #11  "cutpro.exe+0x1406"
+11:52:05.221     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+11:52:05.222     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+11:52:06.162 GUI thread unresponsive for 1939 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+11:52:06.163   the innermost frame has only been open 1519 ms of the 1939 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+11:52:06.164   GUI thread backtrace, innermost first (14 frames):
+11:52:06.164     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+11:52:06.164     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+11:52:06.164     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+11:52:06.164     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+11:52:06.164     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+11:52:06.164     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+11:52:06.165     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+11:52:06.165     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+11:52:06.165     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+11:52:06.165     #9  "cutpro.exe+0x2d8e"
+11:52:06.165     #10  "cutpro.exe+0x12ef"
+11:52:06.165     #11  "cutpro.exe+0x1406"
+11:52:06.165     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+11:52:06.165     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+11:52:06.289 GUI thread STILL blocked after 2066 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)" - during launch, before any window exists: this delays startup but cannot show as "Not Responding".
+11:52:06.289   the innermost frame has only been open 1646 ms of the 2066 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+11:52:06.290   GUI thread backtrace, innermost first (14 frames):
+11:52:06.290     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+11:52:06.290     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+11:52:06.290     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+11:52:06.290     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+11:52:06.290     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+11:52:06.290     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+11:52:06.290     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+11:52:06.290     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+11:52:06.290     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+11:52:06.290     #9  "cutpro.exe+0x2d8e"
+11:52:06.290     #10  "cutpro.exe+0x12ef"
+11:52:06.290     #11  "cutpro.exe+0x1406"
+11:52:06.290     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+11:52:06.290     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+11:52:07.180 Using Qt multimedia with FFmpeg version 7.1.3 LGPL version 2.1 or later
+11:52:08.410 GUI thread STILL blocked after 4186 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)" - during launch, before any window exists: this delays startup but cannot show as "Not Responding".
+11:52:08.472   GUI thread backtrace, innermost first (25 frames):
+11:52:08.472     #0  "Qt6Core.dll!QtSharedPointer::ExternalRefCountData::getAndRef(QObject const*)"
+11:52:08.472     #1  "Qt6Quick.dll!QQuickItemPrivate::_q_createJSWrapper(QV4::ExecutionEngine*)+0xd0"
+11:52:08.472     #2  "Qt6Quick.dll!QQuickItem::qt_static_metacall(QObject*, QMetaObject::Call, int, void**)+0xb06"
+11:52:08.472     #3  "Qt6Qml.dll!QV4::QObjectWrapper::create(QV4::ExecutionEngine*, QObject*)+0xeb"
+11:52:08.472     #4  "Qt6Qml.dll!QV4::QObjectWrapper::wrap_slowPath(QV4::ExecutionEngine*, QObject*)+0xcb"
+11:52:08.472     #5  "Qt6Qml.dll!QQmlObjectCreator::createComponent(QQmlEngine*, QV4::ExecutableCompilationUnit*, int, QObject*, QQmlRefPointer<QQmlContextData> const&)+0x2fd"
+11:52:08.472     #6  "Qt6Qml.dll!QQmlObjectCreator::createInstance(int, QObject*, bool)+0x46d"
+11:52:08.472     #7  "Qt6Qml.dll!QQmlObjectCreator::populateDeferredInstance(QObject*, int, int, QObject*, QObject*, QQmlPropertyData const*, QV4::CompiledData::Binding const*)+0x4c1"
+11:52:08.472     #8  "Qt6Qml.dll!QQmlIncubatorPrivate::incubate(QQmlInstantiationInterrupt&)+0x5bd"
+11:52:08.472     #9  "Qt6Qml.dll!QQmlEnginePrivate::incubate(QQmlIncubator&, QQmlRefPointer<QQmlContextData> const&)+0x246"
+11:52:08.472     #10  "Qt6QmlModels.dll!QQmlDelegateModel::cancel(int)+0xba2"
+11:52:08.472     #11  "Qt6Quick.dll!QQuickRepeater::clear()+0x370"
+11:52:08.472     #12  "Qt6Quick.dll!QQuickRepeater::componentComplete()+0x34"
+11:52:08.472     #13  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+11:52:08.472     #14  "Qt6Qml.dll!QQmlComponentPrivate::complete(QQmlEnginePrivate*, QQmlComponentPrivate::ConstructionState*)+0x74"
+11:52:08.472     #15  "Qt6Qml.dll!QQmlComponentPrivate::completeCreate()+0x2ae"
+11:52:08.472     #16  "Qt6Qml.dll!QQmlComponentPrivate::createWithProperties(QObject*, QMap<QString, QVariant> const&, QQmlContext*, QQmlComponentPrivate::CreateBehavior, bool)+0xc4"
+11:52:08.472     #17  "Qt6Qml.dll!QQmlComponent::create(QQmlContext*)+0x46"
+11:52:08.472     #18  "Qt6Qml.dll!QQmlApplicationEnginePrivate::finishLoad(QQmlComponent*)+0x92"
+11:52:08.472     #19  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+11:52:08.472     #20  "cutpro.exe+0x2d8e"
+11:52:08.472     #21  "cutpro.exe+0x12ef"
+11:52:08.472     #22  "cutpro.exe+0x1406"
+11:52:08.472     #23  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+11:52:08.472     #24  "ntdll.dll!RtlUserThreadStart+0x2c"
+11:52:28.995 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224ccc0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:52:28.996 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224ccc0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:52:29.162 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224ca00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:52:29.162 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224ca00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:52:29.555 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224da40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:52:29.555 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224da40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:52:29.837 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224cf80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:52:29.837 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224cf80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:52:31.377 monitor: source key  -> clip_87fbc443d740|D:/capcut/He Secretly Trained His Body in a Magic Academy And Humiliates Everyone - manhwa recap_2.mp4|video|0|0|25867633|
+11:52:31.379 playback: session.stop decoder idle, picture at -1 ms, published -1 ms from MonitorPanel.qml:1166 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1766
+11:52:31.508 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224d200] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:52:31.508 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224d200] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:52:31.683 playback: still.publish 1920 px wide, playback picture was 0 px at -1 ms [+304 ms] from C++
+11:52:31.916 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224d4c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:52:31.916 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224d4c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:52:31.948 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224ccc0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:52:31.948 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224ccc0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:52:32.025 playback: still.publish 1920 px wide, playback picture was 0 px at -1 ms [+342 ms] from C++
+11:52:32.671 playback: playing false -> true at playhead 0 ms [+646 ms] from MonitorPanel.qml:588 (startPlayback) <- MonitorPanel.qml:2202 (onClicked)
+11:52:32.671 monitor: playing -> true at 0
+11:52:32.671 monitor: playback session at playhead 0 clip clip_87fbc443d740
+11:52:32.671 playback: session.start He Secretly Trained His Body in a Magic Academy And Humiliates Everyone - manhwa recap_2.mp4 at source 0 ms, kind video [+1 ms] from MonitorPanel.qml:727 (startProcessPlayback) <- MonitorPanel.qml:1071 (onPlayingChanged) <- MonitorPanel.qml:588 (startPlayback) <- MonitorPanel.qml:2202 (onClicked)
+11:52:32.848 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224e240] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:52:32.848 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224e240] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:52:33.063 [h264 @ 0000016812790040] Late SEI
+11:52:33.064 [h264 @ 0000016812790040]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+11:52:33.064 [h264 @ 0000016812790040] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+11:52:33.201 preview playback: first frame after 524 ms, at source 0 ms (requested 0 ms)
+11:52:33.201 playback: frame at source 0 ms, advanced 0 ms of media in -1 ms of wall clock
+11:52:33.246 playback: playhead is 5 ms AHEAD of the picture (playhead 38 ms, picture 33 ms)
+11:52:33.389 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224df80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:52:33.389 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224df80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:52:34.257 playback: playhead is 18 ms AHEAD of the picture (playhead 1051 ms, picture 1033 ms)
+11:52:35.154 playback: playing true -> false at playhead 1907 ms [+2480 ms] from MonitorPanel.qml:2200 (onClicked)
+11:52:35.155 monitor: playing -> false at 1907
+11:52:35.155 playback: session.stop decoder running, picture at 1933 ms, published 1933 ms [+1 ms] from MonitorPanel.qml:1096 (onPlayingChanged) <- MonitorPanel.qml:2200 (onClicked)
+11:52:36.005 playback: playing false -> true at playhead 1933 ms [+850 ms] from MonitorPanel.qml:588 (startPlayback) <- MonitorPanel.qml:2202 (onClicked)
+11:52:36.006 monitor: playing -> true at 1933
+11:52:36.006 monitor: playback session at playhead 1933 clip clip_87fbc443d740
+11:52:36.007 playback: session.start He Secretly Trained His Body in a Magic Academy And Humiliates Everyone - manhwa recap_2.mp4 at source 1933 ms, kind video [+1 ms] from MonitorPanel.qml:727 (startProcessPlayback) <- MonitorPanel.qml:1071 (onPlayingChanged) <- MonitorPanel.qml:588 (startPlayback) <- MonitorPanel.qml:2202 (onClicked)
+11:52:36.260 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224e240] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:52:36.260 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224e240] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:52:36.437 [h264 @ 000001681278fc80] Late SEI
+11:52:36.438 [h264 @ 000001681278fc80]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+11:52:36.438 [h264 @ 000001681278fc80] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+11:52:36.827 preview playback: first frame after 815 ms, at source 1933 ms (requested 1933 ms)
+11:52:36.827 playback: frame at source 1933 ms, advanced 0 ms of media in 1690 ms of wall clock
+11:52:36.885 playback: playhead is 22 ms AHEAD of the picture (playhead 1988 ms, picture 1966 ms)
+11:52:37.904 playback: playhead is 6 ms AHEAD of the picture (playhead 3006 ms, picture 3000 ms)
+11:52:38.945 playback: playhead is 15 ms AHEAD of the picture (playhead 4048 ms, picture 4033 ms)
+11:52:39.699 [h264 @ 000001681278fc80] Late SEI
+11:52:39.699 [h264 @ 000001681278fc80]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+11:52:39.699 [h264 @ 000001681278fc80] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+11:52:39.888 playback: playing true -> false at playhead 4988 ms [+3881 ms] from MonitorPanel.qml:2200 (onClicked)
+11:52:39.889 monitor: playing -> false at 4988
+11:52:39.889 playback: session.stop decoder running, picture at 4966 ms, published 4966 ms [+0 ms] from MonitorPanel.qml:1096 (onPlayingChanged) <- MonitorPanel.qml:2200 (onClicked)
+11:52:46.333 playback: still.publish 1920 px wide, playback picture was 1920 px at 4966 ms [+6444 ms] from C++
+11:52:48.737 monitor: source key clip_87fbc443d740|D:/capcut/He Secretly Trained His Body in a Magic Academy And Humiliates Everyone - manhwa recap_2.mp4|video|0|0|25867633| -> clip_df50c012d0cf|D:/capcut/He Secretly Trained His Body in a Magic Academy And Humiliates Everyone - manhwa recap_2.mp4|video|0|0|5000|
+11:52:48.739 playback: session.stop decoder idle, picture at 4966 ms, published 4966 ms [+2404 ms] from MonitorPanel.qml:1166 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1766
+11:52:48.742 monitor: source key clip_df50c012d0cf|D:/capcut/He Secretly Trained His Body in a Magic Academy And Humiliates Everyone - manhwa recap_2.mp4|video|0|0|5000| -> clip_df50c012d0cf|D:/USER/Pictures/ps_ebmastercard-eng.jpg|image|0|0|5000|
+11:52:48.742 playback: session.stop decoder idle, picture at 4966 ms, published 4966 ms [+6 ms] from MonitorPanel.qml:1166 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1766
+11:52:51.339 monitor: source key clip_df50c012d0cf|D:/USER/Pictures/ps_ebmastercard-eng.jpg|image|0|0|5000| -> clip_df50c012d0cf|D:/USER/Pictures/ps_ebmastercard-eng.jpg|image|0|0|3637668|
+11:52:51.339 playback: session.stop decoder idle, picture at 4966 ms, published 4966 ms [+2595 ms] from MonitorPanel.qml:1166 (onActiveSourceKeyChanged) <- TimelinePanel.qml:2500 (onReleased)
+11:53:06.727 playback: playing false -> true at playhead 4966 ms [+15389 ms] from MonitorPanel.qml:588 (startPlayback) <- MonitorPanel.qml:2202 (onClicked)
+11:53:06.727 monitor: playing -> true at 4966
+11:53:09.445 playback: playing true -> false at playhead 7666 ms [+2716 ms] from MonitorPanel.qml:2200 (onClicked)
+11:53:09.445 monitor: playing -> false at 7666
+11:53:09.445 playback: session.stop decoder idle, picture at 4966 ms, published 4966 ms [+0 ms] from MonitorPanel.qml:1096 (onPlayingChanged) <- MonitorPanel.qml:2200 (onClicked)
+11:53:29.324 monitor: source key clip_df50c012d0cf|D:/USER/Pictures/ps_ebmastercard-eng.jpg|image|0|0|3637668| -> clip_87fbc443d740|D:/USER/Pictures/ps_ebmastercard-eng.jpg|image|0|0|25867633|
+11:53:29.324 playback: session.stop decoder idle, picture at 4966 ms, published 4966 ms [+19886 ms] from MonitorPanel.qml:1166 (onActiveSourceKeyChanged) <- TimelinePanel.qml:714 (deleteSelectedClips) <- TimelinePanel.qml:972 (onClicked)
+11:53:29.339 monitor: source key clip_87fbc443d740|D:/USER/Pictures/ps_ebmastercard-eng.jpg|image|0|0|25867633| -> clip_87fbc443d740|D:/capcut/He Secretly Trained His Body in a Magic Academy And Humiliates Everyone - manhwa recap_2.mp4|video|0|0|25867633|
+11:53:29.339 playback: session.stop decoder idle, picture at 4966 ms, published 4966 ms [+12 ms] from MonitorPanel.qml:1166 (onActiveSourceKeyChanged) <- TimelinePanel.qml:714 (deleteSelectedClips) <- TimelinePanel.qml:972 (onClicked)
+11:53:30.005 playback: still.publish 1920 px wide, playback picture was 1920 px at 4966 ms [+659 ms] from C++
+11:53:31.755 playback: playing false -> true at playhead 7666 ms [+1750 ms] from MonitorPanel.qml:588 (startPlayback) <- MonitorPanel.qml:2202 (onClicked)
+11:53:31.755 monitor: playing -> true at 7666
+11:53:31.755 monitor: playback session at playhead 7666 clip clip_87fbc443d740
+11:53:31.755 playback: session.start He Secretly Trained His Body in a Magic Academy And Humiliates Everyone - manhwa recap_2.mp4 at source 7666 ms, kind video [+1 ms] from MonitorPanel.qml:727 (startProcessPlayback) <- MonitorPanel.qml:1071 (onPlayingChanged) <- MonitorPanel.qml:588 (startPlayback) <- MonitorPanel.qml:2202 (onClicked)
+11:53:31.941 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224da40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+11:53:31.941 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001681224da40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+11:53:32.040 [h264 @ 00000168127b3900] Late SEI
+11:53:32.040 [h264 @ 00000168127b3900]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+11:53:32.040 [h264 @ 00000168127b3900] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+11:53:32.273 preview playback: first frame after 514 ms, at source 7666 ms (requested 7666 ms)
+11:53:32.273 playback: frame at source 7666 ms, advanced 2700 ms of media in 52411 ms of wall clock
+11:53:32.283 playback: playhead is 10 ms AHEAD of the picture (playhead 7676 ms, picture 7666 ms)
+11:53:33.333 playback: playhead is 23 ms AHEAD of the picture (playhead 8723 ms, picture 8700 ms)
+11:53:34.386 playback: playhead is 7 ms AHEAD of the picture (playhead 9773 ms, picture 9766 ms)
+11:53:34.410 [h264 @ 00000168127b3900] Late SEI
+11:53:34.410 [h264 @ 00000168127b3900]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+11:53:34.410 [h264 @ 00000168127b3900] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+11:53:34.520 playback: playing true -> false at playhead 9874 ms [+2763 ms] from MonitorPanel.qml:2200 (onClicked)
+11:53:34.520 monitor: playing -> false at 9874
+11:53:34.520 playback: session.stop decoder running, picture at 9900 ms, published 9900 ms [+0 ms] from MonitorPanel.qml:1096 (onPlayingChanged) <- MonitorPanel.qml:2200 (onClicked)
+11:53:42.335 playback: still.publish 1920 px wide, playback picture was 1920 px at 9900 ms [+7824 ms] from C++
+11:53:42.401 playback: still.publish 1920 px wide, playback picture was 1920 px at 9900 ms [+61 ms] from MonitorPanel.qml:621 (requestProcessFrame) <- MonitorPanel.qml:948 (onTriggered)
+11:53:46.460 monitor: source key clip_87fbc443d740|D:/capcut/He Secretly Trained His Body in a Magic Academy And Humiliates Everyone - manhwa recap_2.mp4|video|0|0|25867633| -> clip_f29174732713|D:/capcut/He Secretly Trained His Body in a Magic Academy And Humiliates Everyone - manhwa recap_2.mp4|video|0|0|4831480|
+11:53:46.460 playback: session.stop decoder idle, picture at 9900 ms, published 9900 ms [+4054 ms] from MonitorPanel.qml:1166 (onActiveSourceKeyChanged) <- TimelinePanel.qml:2500 (onReleased)
+11:53:46.464 monitor: source key clip_f29174732713|D:/capcut/He Secretly Trained His Body in a Magic Academy And Humiliates Everyone - manhwa recap_2.mp4|video|0|0|4831480| -> clip_f29174732713|D:/USER/Pictures/ps_ebmastercard-eng.jpg|image|0|0|4831480|
+11:53:46.464 playback: session.stop decoder idle, picture at 9900 ms, published 9900 ms [+3 ms] from MonitorPanel.qml:1166 (onActiveSourceKeyChanged) <- TimelinePanel.qml:2500 (onReleased)
+11:53:46.466 playback: still.publish 1920 px wide, playback picture was 1920 px at 9900 ms [+2 ms] from C++
+11:54:28.240 playback: playing false -> true at playhead 1630679 ms [+41783 ms] from MonitorPanel.qml:588 (startPlayback) <- MonitorPanel.qml:2202 (onClicked)
+11:54:28.240 monitor: playing -> true at 1630679
+11:55:21.528 GUI turn 23 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+11:55:21.997 GUI turn 39 ms (budget 20 ms, ~1 frames of 30 fps lost): "no marked scope"""
+11:55:25.341 GUI turn 21 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+11:55:29.467 GUI turn 23 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+11:55:31.121 GUI turn 26 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+11:55:50.474 GUI turn 21 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+11:55:58.150 playback: session.stop decoder idle, picture at 9900 ms, published 9900 ms [+89900 ms] from MonitorPanel.qml:1192 (onDestruction)
+11:56:17.537 QWaitCondition: Destroyed while threads are still waiting

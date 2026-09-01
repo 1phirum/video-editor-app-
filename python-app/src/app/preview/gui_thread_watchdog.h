@@ -108,6 +108,13 @@ public:
   // not frozen". Clamped to the report threshold below, since a stall that is
   // never reported cannot be traced either.
   static qint64 traceThresholdMs();
+  // The stall size that gets reported at all, and the beat that measures it.
+  // CUTPRO_STALL_REPORT_MS lowers both together: a 30 fps preview drops four
+  // frames in 130 ms, which is the whole of what "the video is slow" means, and
+  // the 400 ms default cannot see it. Clamped to 120 ms, below which the
+  // heartbeat's own resolution would dominate the reading.
+  static qint64 reportThresholdMs();
+  static int heartbeatIntervalMs();
 
 private:
   GuiThreadWatchdog() = default;
@@ -120,6 +127,9 @@ private:
 
   std::atomic_bool m_running{false};
   std::atomic_bool m_windowShown{false};
+  // When the first window appeared, on the same monotonic clock as the heartbeat.
+  // Zero until it does.
+  std::atomic<qint64> m_windowShownAtMs{0};
   std::atomic<quint64> m_heartbeat{0};
   std::atomic<qint64> m_heartbeatAtMs{0};
 
@@ -127,6 +137,10 @@ private:
   std::atomic<quint64> m_severeStalls{0};
   std::atomic<qint64> m_worstStallMs{0};
   std::atomic<const char *> m_worstScope{nullptr};
+  // Whether the worst stall so far happened before the first window was shown.
+  // Startup cost and a freeze look identical in the numbers; only this tells them
+  // apart, and it has to be sampled when the stall is seen.
+  std::atomic_bool m_worstBeforeWindow{false};
   std::atomic<quint64> m_traceCaptures{0};
 
   // Read by statistics() on the GUI thread, written by the monitor. Small enough

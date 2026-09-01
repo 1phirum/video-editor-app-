@@ -1,0 +1,838 @@
+12:19:08.275 GUI turn monitor on, budget 20 ms - every event-loop turn longer than this is reported with its marked scope (CUTPRO_TURN_BUDGET_MS=0 turns it off)
+12:19:08.336 CrashReporterHost: watching pid 25532 from pid 19620 | reports -> C:/Users/USER/AppData/Local/Antigravity/Cut Pro/crash-reports
+12:19:08.362 Cut Pro: native C++/Qt backend, coreVersion = 0.1.2 | built = Sep  1 2026 11:12:47 | executable = C:/premier-pro/python-app/dist/Cut Pro 2026/cutpro.exe
+12:19:08.702 GUI thread unresponsive for 428 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+12:19:08.702   the innermost frame has only been open 325 ms of the 428 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+12:19:09.144 GUI thread unresponsive for 870 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+12:19:09.205   GUI thread backtrace, innermost first (14 frames):
+12:19:09.205     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+12:19:09.205     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+12:19:09.205     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+12:19:09.205     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+12:19:09.205     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+12:19:09.205     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+12:19:09.205     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+12:19:09.205     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+12:19:09.205     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+12:19:09.205     #9  "cutpro.exe+0x2d8e"
+12:19:09.205     #10  "cutpro.exe+0x12ef"
+12:19:09.205     #11  "cutpro.exe+0x1406"
+12:19:09.205     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+12:19:09.205     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+12:19:09.950 Using Qt multimedia with FFmpeg version 7.1.3 LGPL version 2.1 or later
+12:19:10.022 GUI thread unresponsive for 1748 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+12:19:10.036   GUI thread backtrace, innermost first (27 frames):
+12:19:10.036     #0  "Qt6Qml.dll!QQmlData::flushPendingBinding(int)+0x190"
+12:19:10.036     #1  "Qt6Qml.dll!QQmlData::releaseDeferredData()+0xa8"
+12:19:10.036     #2  "Qt6QuickTemplates2.dll!QtQuickPrivate::beginDeferred(QObject*, QString const&, QQuickUntypedDeferredPointer*, bool, QQmlEngine*)+0x826"
+12:19:10.036     #3  "Qt6QuickTemplates2.dll!QQuickControlPrivate::executeContentItem(bool)+0xca"
+12:19:10.036     #4  "Qt6QuickTemplates2.dll!QQuickControl::componentComplete()+0x46"
+12:19:10.036     #5  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+12:19:10.036     #6  "Qt6Qml.dll!QQmlIncubatorPrivate::incubate(QQmlInstantiationInterrupt&)+0x4b8"
+12:19:10.036     #7  "Qt6Qml.dll!QQmlEnginePrivate::incubate(QQmlIncubator&, QQmlRefPointer<QQmlContextData> const&)+0x246"
+12:19:10.036     #8  "Qt6Qml.dll!QQmlComponent::create(QQmlIncubator&, QQmlContext*, QQmlContext*)+0x2d8"
+12:19:10.036     #9  "Qt6Quick.dll!QQuickLoader::QQuickLoader(QQuickItem*)+0x613"
+12:19:10.038     #10  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+12:19:10.038     #11  "Qt6Qml.dll!QQmlIncubatorPrivate::incubate(QQmlInstantiationInterrupt&)+0x4b8"
+12:19:10.038     #12  "Qt6Qml.dll!QQmlEnginePrivate::incubate(QQmlIncubator&, QQmlRefPointer<QQmlContextData> const&)+0x246"
+12:19:10.038     #13  "Qt6Qml.dll!QQmlComponent::create(QQmlIncubator&, QQmlContext*, QQmlContext*)+0x2d8"
+12:19:10.038     #14  "Qt6Quick.dll!QQuickLoader::QQuickLoader(QQuickItem*)+0x613"
+12:19:10.038     #15  "Qt6Qml.dll!QQmlObjectCreator::finalize(QQmlInstantiationInterrupt&)+0x6da"
+12:19:10.038     #16  "Qt6Qml.dll!QQmlComponentPrivate::complete(QQmlEnginePrivate*, QQmlComponentPrivate::ConstructionState*)+0x74"
+12:19:10.038     #17  "Qt6Qml.dll!QQmlComponentPrivate::completeCreate()+0x2ae"
+12:19:10.038     #18  "Qt6Qml.dll!QQmlComponentPrivate::createWithProperties(QObject*, QMap<QString, QVariant> const&, QQmlContext*, QQmlComponentPrivate::CreateBehavior, bool)+0xc4"
+12:19:10.038     #19  "Qt6Qml.dll!QQmlComponent::create(QQmlContext*)+0x46"
+12:19:10.038     #20  "Qt6Qml.dll!QQmlApplicationEnginePrivate::finishLoad(QQmlComponent*)+0x92"
+12:19:10.038     #21  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+12:19:10.038     #22  "cutpro.exe+0x2d8e"
+12:19:10.038     #23  "cutpro.exe+0x12ef"
+12:19:10.038     #24  "cutpro.exe+0x1406"
+12:19:10.038     #25  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+12:19:10.038     #26  "ntdll.dll!RtlUserThreadStart+0x2c"
+12:19:10.282 GUI thread STILL blocked after 2008 ms, "stalled somewhere unmarked": "no marked scope" - this is the state Windows shows as "Not Responding".
+12:19:10.332   GUI thread backtrace, innermost first (11 frames):
+12:19:10.332     #0  "win32u.dll!NtUserDispatchMessage+0x14"
+12:19:10.332     #1  "USER32.dll!IsWindowUnicode+0x378"
+12:19:10.332     #2  "Qt6Core.dll!QEventDispatcherWin32::processEvents(QFlags<QEventLoop::ProcessEventsFlag>)+0x692"
+12:19:10.332     #3  "Qt6Gui.dll!QWindowsGuiEventDispatcher::processEvents(QFlags<QEventLoop::ProcessEventsFlag>)+0x19"
+12:19:10.332     #4  "Qt6Core.dll!QEventLoop::exec(QFlags<QEventLoop::ProcessEventsFlag>)+0x232"
+12:19:10.332     #5  "Qt6Core.dll!QCoreApplication::exec()+0x96"
+12:19:10.332     #6  "cutpro.exe+0x2f0a"
+12:19:10.332     #7  "cutpro.exe+0x12ef"
+12:19:10.332     #8  "cutpro.exe+0x1406"
+12:19:10.332     #9  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+12:19:10.332     #10  "ntdll.dll!RtlUserThreadStart+0x2c"
+12:19:27.100 monitor: source key  -> clip_817a55cd1587|D:/USER/Pictures/ps_ebvisacard-eng.jpg|image|0|0|5000|
+12:19:27.100 playback: session.stop decoder idle, picture at -1 ms, published -1 ms from MonitorPanel.qml:1189 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1766
+12:19:39.528 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8c800] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:19:39.528 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8c800] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:19:39.675 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8e2c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:19:39.675 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8e2c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:19:40.081 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8e2c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:19:40.081 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8e2c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:19:40.691 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8e2c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:19:40.691 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8e2c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:19:42.603 monitor: source key clip_817a55cd1587|D:/USER/Pictures/ps_ebvisacard-eng.jpg|image|0|0|5000| -> clip_8bd6bc06cff9|D:/USER/Pictures/ps_ebvisacard-eng.jpg|image|0|0|58452241|
+12:19:42.606 playback: session.stop decoder idle, picture at -1 ms, published -1 ms [+15502 ms] from MonitorPanel.qml:1189 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1766
+12:19:42.608 monitor: source key clip_8bd6bc06cff9|D:/USER/Pictures/ps_ebvisacard-eng.jpg|image|0|0|58452241| -> clip_8bd6bc06cff9|D:/capcut/F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4|video|0|0|58452241|
+12:19:42.608 playback: session.stop decoder idle, picture at -1 ms, published -1 ms [+2 ms] from MonitorPanel.qml:1189 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1766
+12:19:42.879 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8c800] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:19:42.881 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8c800] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:19:43.151 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8ca80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:19:43.151 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8ca80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:19:43.353 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8cd40] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:19:43.353 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8cd40] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:19:43.544 playback: still.publish 1920 px wide, playback picture was 0 px at -1 ms [+937 ms] from C++
+12:19:44.561 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:19:44.566 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:19:45.201 playback: playing false -> true at playhead 0 ms [+1656 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:19:45.201 monitor: playing -> true at 0
+12:19:45.204 monitor: playback session at playhead 0 clip clip_8bd6bc06cff9
+12:19:45.204 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 0 ms, kind video [+1 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:19:45.593 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d2c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:19:45.593 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d2c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:19:45.919 [h264 @ 000001f7d5e702c0] Late SEI
+12:19:45.919 [h264 @ 000001f7d5e702c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:19:45.919 [h264 @ 000001f7d5e702c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:19:46.052 preview playback: first frame after 846 ms, at source 0 ms (requested 0 ms)
+12:19:46.052 playback: frame at source 0 ms, advanced 0 ms of media in -1 ms of wall clock
+12:19:46.097 playback: playhead is 40 ms AHEAD of the picture (playhead 40 ms, picture 0 ms)
+12:19:46.302 preview cost: frame is 25 ms against a 18 ms budget at 30 fps - lowering the preview to 1640 px
+12:19:47.109 playback: playhead is 18 ms AHEAD of the picture (playhead 1051 ms, picture 1033 ms)
+12:19:48.112 playback: playhead is 20 ms AHEAD of the picture (playhead 2053 ms, picture 2033 ms)
+12:19:49.169 playback: playhead is 11 ms AHEAD of the picture (playhead 3111 ms, picture 3100 ms)
+12:19:49.469 preview cost: frame is 24 ms against a 18 ms budget at 30 fps - lowering the preview to 1426 px
+12:19:49.750 preview cost: frame is 25 ms against a 18 ms budget at 30 fps - lowering the preview to 1208 px
+12:19:50.154 [h264 @ 000001f7d5e71180] Late SEI
+12:19:50.155 [h264 @ 000001f7d5e71180]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:19:50.155 [h264 @ 000001f7d5e71180] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:19:50.248 playback: playhead is 24 ms AHEAD of the picture (playhead 4190 ms, picture 4166 ms)
+12:19:50.555 preview cost: frame is 26 ms against a 18 ms budget at 30 fps - lowering the preview to 1012 px
+12:19:50.809 preview cost: frame is 24 ms and the picture is already at 960 px - pacing the preview at 24 fps instead of 30
+12:19:51.213 playback: playing true -> false at playhead 5089 ms [+6008 ms] from MonitorPanel.qml:2234 (onClicked)
+12:19:51.215 monitor: playing -> false at 5089
+12:19:51.215 playback: session.stop decoder running, picture at 5133 ms, published 5133 ms [+2 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:19:52.043 playback: playing false -> true at playhead 5133 ms [+831 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:19:52.043 monitor: playing -> true at 5133
+12:19:52.043 monitor: playback session at playhead 5133 clip clip_8bd6bc06cff9
+12:19:52.043 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 5133 ms, kind video [+1 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:19:52.487 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d800] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:19:52.487 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d800] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:19:52.696 [h264 @ 000001f7d5e71540] Late SEI
+12:19:52.697 [h264 @ 000001f7d5e71540]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:19:52.697 [h264 @ 000001f7d5e71540] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:19:52.851 preview playback: first frame after 793 ms, at source 5133 ms (requested 5133 ms)
+12:19:52.851 playback: frame at source 5133 ms, advanced 0 ms of media in 1664 ms of wall clock
+12:19:52.894 playback: playhead is 39 ms AHEAD of the picture (playhead 5172 ms, picture 5133 ms)
+12:19:53.900 playback: playhead is 47 ms AHEAD of the picture (playhead 6180 ms, picture 6133 ms)
+12:19:54.160 playback: playhead is 5 ms AHEAD of the picture (playhead 6438 ms, picture 6433 ms)
+12:19:54.411 playback: playhead is 55 ms AHEAD of the picture (playhead 6688 ms, picture 6633 ms)
+12:19:54.461 playback: playhead is 6 ms AHEAD of the picture (playhead 6739 ms, picture 6733 ms)
+12:19:54.686 playback: playing true -> false at playhead 6939 ms [+2637 ms] from MonitorPanel.qml:2234 (onClicked)
+12:19:54.686 monitor: playing -> false at 6939
+12:19:54.687 playback: session.stop decoder running, picture at 6933 ms, published 6966 ms [+1 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:19:55.341 playback: playing false -> true at playhead 6933 ms [+656 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:19:55.341 monitor: playing -> true at 6933
+12:19:55.341 monitor: playback session at playhead 6933 clip clip_8bd6bc06cff9
+12:19:55.341 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 6933 ms, kind video [+1 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:19:55.719 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d2c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:19:55.720 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d2c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:19:55.897 [h264 @ 000001f7d5e70a00] Late SEI
+12:19:55.897 [h264 @ 000001f7d5e70a00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:19:55.897 [h264 @ 000001f7d5e70a00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:19:56.145 preview playback: first frame after 798 ms, at source 6933 ms (requested 6933 ms)
+12:19:56.145 playback: frame at source 6933 ms, advanced -33 ms of media in 1460 ms of wall clock
+12:19:56.164 playback: playhead is 12 ms AHEAD of the picture (playhead 6945 ms, picture 6933 ms)
+12:19:56.209 playback: playhead is 62 ms AHEAD of the picture (playhead 6995 ms, picture 6933 ms)
+12:19:56.261 playback: playhead is 8 ms AHEAD of the picture (playhead 7041 ms, picture 7033 ms)
+12:19:56.709 playback: playhead is 59 ms AHEAD of the picture (playhead 7492 ms, picture 7433 ms)
+12:19:56.765 playback: playhead is 15 ms AHEAD of the picture (playhead 7548 ms, picture 7533 ms)
+12:19:57.579 [h264 @ 000001f7d5e70680] Late SEI
+12:19:57.580 [h264 @ 000001f7d5e70680]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:19:57.580 [h264 @ 000001f7d5e70680] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:19:57.709 playback: playhead is 61 ms AHEAD of the picture (playhead 8494 ms, picture 8433 ms)
+12:19:57.767 playback: playhead is 19 ms AHEAD of the picture (playhead 8552 ms, picture 8533 ms)
+12:19:57.879 playback: playhead is 63 ms AHEAD of the picture (playhead 8663 ms, picture 8600 ms)
+12:19:57.932 playback: playhead is 13 ms AHEAD of the picture (playhead 8713 ms, picture 8700 ms)
+12:19:58.209 playback: playhead is 59 ms AHEAD of the picture (playhead 8992 ms, picture 8933 ms)
+12:19:58.266 playback: playhead is 17 ms AHEAD of the picture (playhead 9050 ms, picture 9033 ms)
+12:19:58.542 playback: playhead is 60 ms AHEAD of the picture (playhead 9326 ms, picture 9266 ms)
+12:19:58.605 playback: playhead is 20 ms AHEAD of the picture (playhead 9386 ms, picture 9366 ms)
+12:19:59.379 playback: playhead is 63 ms AHEAD of the picture (playhead 10163 ms, picture 10100 ms)
+12:19:59.425 playback: playhead is 11 ms AHEAD of the picture (playhead 10211 ms, picture 10200 ms)
+12:20:00.208 playback: playhead is 54 ms AHEAD of the picture (playhead 10987 ms, picture 10933 ms)
+12:20:00.323 playback: playhead is 8 ms AHEAD of the picture (playhead 11108 ms, picture 11100 ms)
+12:20:00.368 playback: playhead is 54 ms AHEAD of the picture (playhead 11154 ms, picture 11100 ms)
+12:20:00.658 playback: playhead is 10 ms AHEAD of the picture (playhead 11443 ms, picture 11433 ms)
+12:20:00.709 playback: playhead is 62 ms AHEAD of the picture (playhead 11495 ms, picture 11433 ms)
+12:20:00.769 playback: playhead is 20 ms AHEAD of the picture (playhead 11553 ms, picture 11533 ms)
+12:20:00.881 playback: playhead is 64 ms AHEAD of the picture (playhead 11664 ms, picture 11600 ms)
+12:20:00.941 playback: playhead is 23 ms AHEAD of the picture (playhead 11723 ms, picture 11700 ms)
+12:20:01.814 [h264 @ 000001f7d5e71180] Late SEI
+12:20:01.814 [h264 @ 000001f7d5e71180]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:20:01.814 [h264 @ 000001f7d5e71180] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:20:01.943 playback: playhead is 28 ms AHEAD of the picture (playhead 12728 ms, picture 12700 ms)
+12:20:02.770 playback: playing true -> false at playhead 13552 ms [+7425 ms] from TimelinePanel.qml:176 (beginPlayheadScrub) <- TimelinePanel.qml:1412
+12:20:02.770 monitor: playing -> false at 13552
+12:20:02.770 playback: session.stop decoder running, picture at 13533 ms, published 13533 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- TimelinePanel.qml:176 (beginPlayheadScrub) <- TimelinePanel.qml:1412
+12:20:02.980 playback: still.publish 1920 px wide, playback picture was 960 px at 13533 ms [+211 ms] from C++
+12:20:03.092 playback: playing false -> true at playhead 205254 ms [+115 ms] from TimelinePanel.qml:190
+12:20:03.092 monitor: playing -> true at 205254
+12:20:03.092 monitor: playback session at playhead 205254 clip clip_8bd6bc06cff9
+12:20:03.092 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 205254 ms, kind video [+1 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- TimelinePanel.qml:190
+12:20:03.460 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8e2c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:20:03.460 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8e2c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:20:03.696 [h264 @ 000001f7d5afba80] Late SEI
+12:20:03.696 [h264 @ 000001f7d5afba80]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:20:03.696 [h264 @ 000001f7d5afba80] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:20:03.880 preview playback: first frame after 779 ms, at source 205266 ms (requested 205254 ms)
+12:20:03.880 playback: frame at source 205266 ms, advanced 191733 ms of media in 1133 ms of wall clock
+12:20:03.909 playback: playhead is 27 ms AHEAD of the picture (playhead 205293 ms, picture 205266 ms)
+12:20:04.026 playback: playing true -> false at playhead 205390 ms [+928 ms] from TimelinePanel.qml:176 (beginPlayheadScrub) <- TimelinePanel.qml:1412
+12:20:04.026 monitor: playing -> false at 205390
+12:20:04.026 playback: session.stop decoder running, picture at 205400 ms, published 205400 ms [+1 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- TimelinePanel.qml:176 (beginPlayheadScrub) <- TimelinePanel.qml:1412
+12:20:04.244 playback: still.publish 1920 px wide, playback picture was 960 px at 205400 ms [+227 ms] from C++
+12:20:04.361 playback: playing false -> true at playhead 439829 ms [+106 ms] from TimelinePanel.qml:190
+12:20:04.361 monitor: playing -> true at 439829
+12:20:04.361 monitor: playback session at playhead 439829 clip clip_8bd6bc06cff9
+12:20:04.361 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 439829 ms, kind video [+0 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- TimelinePanel.qml:190
+12:20:04.751 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d540] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:20:04.752 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d540] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:20:05.011 [h264 @ 000001f7d5e70680] Late SEI
+12:20:05.011 [h264 @ 000001f7d5e70680]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:20:05.011 [h264 @ 000001f7d5e70680] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:20:05.208 preview playback: first frame after 845 ms, at source 439833 ms (requested 439829 ms)
+12:20:05.208 playback: frame at source 439833 ms, advanced 234433 ms of media in 1192 ms of wall clock
+12:20:05.260 playback: playhead is 48 ms AHEAD of the picture (playhead 439881 ms, picture 439833 ms)
+12:20:05.717 playback: playhead is 5 ms AHEAD of the picture (playhead 440338 ms, picture 440333 ms)
+12:20:05.770 playback: playhead is 57 ms AHEAD of the picture (playhead 440390 ms, picture 440333 ms)
+12:20:05.825 playback: playhead is 9 ms AHEAD of the picture (playhead 440442 ms, picture 440433 ms)
+12:20:05.938 playback: playhead is 58 ms AHEAD of the picture (playhead 440558 ms, picture 440500 ms)
+12:20:06.060 playback: playhead is 15 ms AHEAD of the picture (playhead 440681 ms, picture 440666 ms)
+12:20:06.112 playback: playhead is 64 ms AHEAD of the picture (playhead 440730 ms, picture 440666 ms)
+12:20:06.218 playback: playhead is 6 ms AHEAD of the picture (playhead 440839 ms, picture 440833 ms)
+12:20:06.270 playback: playhead is 58 ms AHEAD of the picture (playhead 440891 ms, picture 440833 ms)
+12:20:06.317 playback: playhead is 5 ms AHEAD of the picture (playhead 440938 ms, picture 440933 ms)
+12:20:06.578 playback: playing true -> false at playhead 441187 ms [+2216 ms] from MonitorPanel.qml:2234 (onClicked)
+12:20:06.578 monitor: playing -> false at 441187
+12:20:06.579 playback: session.stop decoder running, picture at 441166 ms, published 441166 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:20:08.222 playback: still.publish 1920 px wide, playback picture was 960 px at 441166 ms [+1649 ms] from C++
+12:20:08.433 playback: still.publish 1920 px wide, playback picture was 960 px at 441166 ms [+205 ms] from C++
+12:20:08.816 playback: still.publish 1920 px wide, playback picture was 960 px at 441166 ms [+384 ms] from C++
+12:20:09.829 playback: playing false -> true at playhead 9774 ms [+1012 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:20:09.829 monitor: playing -> true at 9774
+12:20:09.829 monitor: playback session at playhead 9774 clip clip_8bd6bc06cff9
+12:20:09.829 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 9774 ms, kind video [+1 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:20:10.201 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:20:10.201 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:20:10.430 [h264 @ 000001f7d5afc580] Late SEI
+12:20:10.430 [h264 @ 000001f7d5afc580]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:20:10.430 [h264 @ 000001f7d5afc580] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:20:10.642 preview playback: first frame after 808 ms, at source 9800 ms (requested 9774 ms)
+12:20:10.643 playback: frame at source 9800 ms, advanced -431366 ms of media in 4098 ms of wall clock
+12:20:10.684 playback: playhead is 38 ms AHEAD of the picture (playhead 9838 ms, picture 9800 ms)
+12:20:11.730 playback: playhead is 16 ms AHEAD of the picture (playhead 10882 ms, picture 10866 ms)
+12:20:11.874 playback: playhead is 63 ms AHEAD of the picture (playhead 11029 ms, picture 10966 ms)
+12:20:11.933 playback: playhead is 19 ms AHEAD of the picture (playhead 11085 ms, picture 11066 ms)
+12:20:12.146 playback: playing true -> false at playhead 11297 ms [+2316 ms] from MonitorPanel.qml:2234 (onClicked)
+12:20:12.147 monitor: playing -> false at 11297
+12:20:12.147 playback: session.stop decoder running, picture at 11266 ms, published 11300 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:20:13.488 playback: still.publish 1920 px wide, playback picture was 960 px at 11266 ms [+1350 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:20:14.633 playback: playing false -> true at playhead 0 ms [+1138 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:20:14.633 monitor: playing -> true at 0
+12:20:14.633 monitor: playback session at playhead 0 clip clip_8bd6bc06cff9
+12:20:14.633 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 0 ms, kind video [+1 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:20:14.973 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:20:14.974 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:20:15.171 [h264 @ 000001f7d5e70dc0] Late SEI
+12:20:15.171 [h264 @ 000001f7d5e70dc0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:20:15.171 [h264 @ 000001f7d5e70dc0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:20:15.292 preview playback: first frame after 652 ms, at source 0 ms (requested 0 ms)
+12:20:15.292 playback: frame at source 0 ms, advanced -11300 ms of media in 3148 ms of wall clock
+12:20:15.343 playback: playhead is 47 ms AHEAD of the picture (playhead 47 ms, picture 0 ms)
+12:20:15.864 playback: playhead is 2 ms AHEAD of the picture (playhead 568 ms, picture 566 ms)
+12:20:16.018 playback: playhead is 53 ms AHEAD of the picture (playhead 719 ms, picture 666 ms)
+12:20:16.068 playback: playhead is 5 ms AHEAD of the picture (playhead 771 ms, picture 766 ms)
+12:20:16.153 playback: playing true -> false at playhead 828 ms [+1515 ms] from MonitorPanel.qml:2234 (onClicked)
+12:20:16.153 monitor: playing -> false at 828
+12:20:16.153 playback: session.stop decoder running, picture at 833 ms, published 833 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:20:20.906 playback: still.publish 1920 px wide, playback picture was 960 px at 833 ms [+4752 ms] from C++
+12:20:21.156 playback: still.publish 1920 px wide, playback picture was 960 px at 833 ms [+253 ms] from C++
+12:20:23.891 playback: still.publish 1920 px wide, playback picture was 960 px at 833 ms [+2735 ms] from C++
+12:20:23.970 playback: still.publish 1920 px wide, playback picture was 960 px at 833 ms [+85 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:20:25.723 playback: still.publish 1920 px wide, playback picture was 960 px at 833 ms [+1754 ms] from C++
+12:20:25.818 playback: still.publish 1920 px wide, playback picture was 960 px at 833 ms [+87 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:20:28.520 playback: still.publish 1920 px wide, playback picture was 960 px at 833 ms [+2705 ms] from C++
+12:20:28.613 playback: still.publish 1920 px wide, playback picture was 960 px at 833 ms [+86 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:20:30.323 playback: playing false -> true at playhead 833 ms [+1711 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:20:30.323 monitor: playing -> true at 833
+12:20:30.323 monitor: playback session at playhead 833 clip clip_8bd6bc06cff9
+12:20:30.323 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 833 ms, kind video [+1 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:20:30.720 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:20:30.721 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:20:30.928 [h264 @ 000001f7d5afc940] Late SEI
+12:20:30.929 [h264 @ 000001f7d5afc940]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:20:30.929 [h264 @ 000001f7d5afc940] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:20:31.116 preview playback: first frame after 786 ms, at source 833 ms (requested 833 ms)
+12:20:31.116 playback: frame at source 833 ms, advanced 0 ms of media in 14988 ms of wall clock
+12:20:31.148 playback: playhead is 31 ms AHEAD of the picture (playhead 864 ms, picture 833 ms)
+12:20:32.159 playback: playhead is 38 ms AHEAD of the picture (playhead 1871 ms, picture 1833 ms)
+12:20:33.165 playback: playhead is 45 ms AHEAD of the picture (playhead 2878 ms, picture 2833 ms)
+12:20:33.525 playback: playhead is 4 ms AHEAD of the picture (playhead 3237 ms, picture 3233 ms)
+12:20:33.673 playback: playhead is 55 ms AHEAD of the picture (playhead 3388 ms, picture 3333 ms)
+12:20:33.726 playback: playhead is 6 ms AHEAD of the picture (playhead 3439 ms, picture 3433 ms)
+12:20:34.177 playback: playhead is 54 ms AHEAD of the picture (playhead 3887 ms, picture 3833 ms)
+12:20:34.224 playback: playhead is 4 ms AHEAD of the picture (playhead 3937 ms, picture 3933 ms)
+12:20:34.386 [h264 @ 000001f7d5af9940] Late SEI
+12:20:34.387 [h264 @ 000001f7d5af9940]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:20:34.387 [h264 @ 000001f7d5af9940] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:20:34.675 playback: playhead is 57 ms AHEAD of the picture (playhead 4390 ms, picture 4333 ms)
+12:20:34.725 playback: playhead is 6 ms AHEAD of the picture (playhead 4439 ms, picture 4433 ms)
+12:20:35.184 playback: playhead is 63 ms AHEAD of the picture (playhead 4896 ms, picture 4833 ms)
+12:20:35.242 playback: playhead is 23 ms AHEAD of the picture (playhead 4956 ms, picture 4933 ms)
+12:20:36.257 playback: playhead is 4 ms AHEAD of the picture (playhead 5970 ms, picture 5966 ms)
+12:20:36.505 playback: playhead is 52 ms AHEAD of the picture (playhead 6218 ms, picture 6166 ms)
+12:20:36.558 playback: playhead is 5 ms AHEAD of the picture (playhead 6271 ms, picture 6266 ms)
+12:20:37.010 playback: playhead is 54 ms AHEAD of the picture (playhead 6720 ms, picture 6666 ms)
+12:20:37.061 playback: playhead is 8 ms AHEAD of the picture (playhead 6774 ms, picture 6766 ms)
+12:20:37.507 playback: playhead is 54 ms AHEAD of the picture (playhead 7220 ms, picture 7166 ms)
+12:20:37.558 playback: playhead is 4 ms AHEAD of the picture (playhead 7270 ms, picture 7266 ms)
+12:20:37.869 playback: playing true -> false at playhead 7570 ms [+7540 ms] from MonitorPanel.qml:2234 (onClicked)
+12:20:37.869 monitor: playing -> false at 7570
+12:20:37.869 playback: session.stop decoder running, picture at 7566 ms, published 7566 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:20:42.411 playback: still.publish 1920 px wide, playback picture was 960 px at 7566 ms [+4548 ms] from C++
+12:20:43.190 playback: still.publish 1920 px wide, playback picture was 960 px at 7566 ms [+776 ms] from C++
+12:20:43.748 playback: playing false -> true at playhead 7566 ms [+566 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:20:43.748 monitor: playing -> true at 7566
+12:20:43.748 monitor: playback session at playhead 7566 clip clip_8bd6bc06cff9
+12:20:43.762 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 7566 ms, kind video [+0 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:20:44.152 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d540] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:20:44.153 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d540] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:20:44.335 [h264 @ 000001f7d5e70a00] Late SEI
+12:20:44.335 [h264 @ 000001f7d5e70a00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:20:44.335 [h264 @ 000001f7d5e70a00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:20:44.588 preview playback: first frame after 824 ms, at source 7566 ms (requested 7566 ms)
+12:20:44.589 playback: frame at source 7566 ms, advanced 0 ms of media in 6737 ms of wall clock
+12:20:44.626 playback: playhead is 35 ms AHEAD of the picture (playhead 7601 ms, picture 7566 ms)
+12:20:45.391 [h264 @ 000001f7d5afbe00] Late SEI
+12:20:45.392 [h264 @ 000001f7d5afbe00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:20:45.392 [h264 @ 000001f7d5afbe00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:20:45.634 playback: playhead is 41 ms AHEAD of the picture (playhead 8607 ms, picture 8566 ms)
+12:20:46.682 playback: playhead is 24 ms AHEAD of the picture (playhead 9657 ms, picture 9633 ms)
+12:20:47.732 playback: playhead is 6 ms AHEAD of the picture (playhead 10706 ms, picture 10700 ms)
+12:20:47.984 playback: playhead is 57 ms AHEAD of the picture (playhead 10957 ms, picture 10900 ms)
+12:20:48.032 playback: playhead is 6 ms AHEAD of the picture (playhead 11006 ms, picture 11000 ms)
+12:20:48.482 playback: playhead is 56 ms AHEAD of the picture (playhead 11456 ms, picture 11400 ms)
+12:20:48.533 playback: playhead is 7 ms AHEAD of the picture (playhead 11507 ms, picture 11500 ms)
+12:20:48.982 playback: playhead is 56 ms AHEAD of the picture (playhead 11956 ms, picture 11900 ms)
+12:20:49.037 playback: playhead is 11 ms AHEAD of the picture (playhead 12011 ms, picture 12000 ms)
+12:20:49.490 playback: playhead is 65 ms AHEAD of the picture (playhead 12465 ms, picture 12400 ms)
+12:20:49.541 playback: playhead is 16 ms AHEAD of the picture (playhead 12516 ms, picture 12500 ms)
+12:20:49.662 [h264 @ 000001f7d5afc940] Late SEI
+12:20:49.663 [h264 @ 000001f7d5afc940]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:20:49.663 [h264 @ 000001f7d5afc940] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:20:50.552 playback: playhead is 25 ms AHEAD of the picture (playhead 13525 ms, picture 13500 ms)
+12:20:51.599 playback: playhead is 8 ms AHEAD of the picture (playhead 14574 ms, picture 14566 ms)
+12:20:51.651 playback: playhead is 58 ms AHEAD of the picture (playhead 14624 ms, picture 14566 ms)
+12:20:51.700 playback: playhead is 8 ms AHEAD of the picture (playhead 14674 ms, picture 14666 ms)
+12:20:52.160 playback: playhead is 65 ms AHEAD of the picture (playhead 15131 ms, picture 15066 ms)
+12:20:52.206 playback: playhead is 14 ms AHEAD of the picture (playhead 15180 ms, picture 15166 ms)
+12:20:52.825 playback: playhead is 65 ms AHEAD of the picture (playhead 15798 ms, picture 15733 ms)
+12:20:52.875 playback: playhead is 16 ms AHEAD of the picture (playhead 15849 ms, picture 15833 ms)
+12:20:53.489 playback: playhead is 66 ms AHEAD of the picture (playhead 16466 ms, picture 16400 ms)
+12:20:53.549 playback: playhead is 25 ms AHEAD of the picture (playhead 16525 ms, picture 16500 ms)
+12:20:53.924 [h264 @ 000001f7d5e70a00] Late SEI
+12:20:53.924 [h264 @ 000001f7d5e70a00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:20:53.925 [h264 @ 000001f7d5e70a00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:20:54.565 playback: playhead is 5 ms AHEAD of the picture (playhead 17538 ms, picture 17533 ms)
+12:20:54.815 playback: playhead is 57 ms AHEAD of the picture (playhead 17790 ms, picture 17733 ms)
+12:20:54.868 playback: playhead is 10 ms AHEAD of the picture (playhead 17843 ms, picture 17833 ms)
+12:20:55.481 playback: playhead is 56 ms AHEAD of the picture (playhead 18456 ms, picture 18400 ms)
+12:20:55.532 playback: playhead is 6 ms AHEAD of the picture (playhead 18506 ms, picture 18500 ms)
+12:20:55.990 playback: playhead is 64 ms AHEAD of the picture (playhead 18964 ms, picture 18900 ms)
+12:20:56.050 playback: playhead is 24 ms AHEAD of the picture (playhead 19024 ms, picture 19000 ms)
+12:20:56.992 playback: playhead is 67 ms AHEAD of the picture (playhead 19967 ms, picture 19900 ms)
+12:20:57.100 playback: playhead is 5 ms AHEAD of the picture (playhead 20071 ms, picture 20066 ms)
+12:20:57.148 playback: playhead is 54 ms AHEAD of the picture (playhead 20120 ms, picture 20066 ms)
+12:20:57.199 playback: playhead is 9 ms AHEAD of the picture (playhead 20175 ms, picture 20166 ms)
+12:20:57.647 playback: playhead is 55 ms AHEAD of the picture (playhead 20621 ms, picture 20566 ms)
+12:20:57.699 playback: playhead is 6 ms AHEAD of the picture (playhead 20672 ms, picture 20666 ms)
+12:20:57.817 playback: playhead is 56 ms AHEAD of the picture (playhead 20789 ms, picture 20733 ms)
+12:20:57.864 playback: playhead is 5 ms AHEAD of the picture (playhead 20838 ms, picture 20833 ms)
+12:20:58.193 [h264 @ 000001f7d5afbe00] Late SEI
+12:20:58.194 [h264 @ 000001f7d5afbe00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:20:58.194 [h264 @ 000001f7d5afbe00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:20:58.314 playback: playhead is 55 ms AHEAD of the picture (playhead 21288 ms, picture 21233 ms)
+12:20:58.363 playback: playhead is 5 ms AHEAD of the picture (playhead 21338 ms, picture 21333 ms)
+12:20:58.817 playback: playhead is 56 ms AHEAD of the picture (playhead 21789 ms, picture 21733 ms)
+12:20:58.867 playback: playhead is 4 ms AHEAD of the picture (playhead 21837 ms, picture 21833 ms)
+12:20:58.973 playback: playhead is 47 ms AHEAD of the picture (playhead 21947 ms, picture 21900 ms)
+12:20:59.230 playback: playhead is 6 ms AHEAD of the picture (playhead 22206 ms, picture 22200 ms)
+12:20:59.479 playback: playhead is 54 ms AHEAD of the picture (playhead 22454 ms, picture 22400 ms)
+12:20:59.535 playback: playhead is 10 ms AHEAD of the picture (playhead 22510 ms, picture 22500 ms)
+12:20:59.990 playback: playhead is 64 ms AHEAD of the picture (playhead 22964 ms, picture 22900 ms)
+12:21:00.046 playback: playhead is 22 ms AHEAD of the picture (playhead 23022 ms, picture 23000 ms)
+12:21:00.489 playback: playhead is 64 ms AHEAD of the picture (playhead 23464 ms, picture 23400 ms)
+12:21:00.545 playback: playhead is 20 ms AHEAD of the picture (playhead 23520 ms, picture 23500 ms)
+12:21:01.156 playback: playhead is 64 ms AHEAD of the picture (playhead 24130 ms, picture 24066 ms)
+12:21:01.212 playback: playhead is 22 ms AHEAD of the picture (playhead 24188 ms, picture 24166 ms)
+12:21:01.656 playback: playhead is 65 ms AHEAD of the picture (playhead 24631 ms, picture 24566 ms)
+12:21:01.710 playback: playhead is 16 ms AHEAD of the picture (playhead 24682 ms, picture 24666 ms)
+12:21:02.316 playback: playhead is 56 ms AHEAD of the picture (playhead 25289 ms, picture 25233 ms)
+12:21:02.366 playback: playhead is 7 ms AHEAD of the picture (playhead 25340 ms, picture 25333 ms)
+12:21:02.428 [h264 @ 000001f7d5afc940] Late SEI
+12:21:02.429 [h264 @ 000001f7d5afc940]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:21:02.429 [h264 @ 000001f7d5afc940] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:21:02.974 playback: playhead is 48 ms AHEAD of the picture (playhead 25948 ms, picture 25900 ms)
+12:21:03.370 playback: playing true -> false at playhead 26297 ms [+19608 ms] from MonitorPanel.qml:2234 (onClicked)
+12:21:03.370 monitor: playing -> false at 26297
+12:21:03.370 playback: session.stop decoder running, picture at 26333 ms, published 26333 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:21:10.128 playback: playing false -> true at playhead 26333 ms [+6771 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:21:10.128 monitor: playing -> true at 26333
+12:21:10.128 monitor: playback session at playhead 26333 clip clip_8bd6bc06cff9
+12:21:10.128 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 26333 ms, kind video [+0 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:21:10.424 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d800] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:21:10.424 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d800] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:21:10.565 [h264 @ 000001f7d5afd080] Late SEI
+12:21:10.565 [h264 @ 000001f7d5afd080]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:21:10.565 [h264 @ 000001f7d5afd080] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:21:10.653 preview playback: first frame after 509 ms, at source 26333 ms (requested 26333 ms)
+12:21:10.653 playback: frame at source 26333 ms, advanced 0 ms of media in 7295 ms of wall clock
+12:21:10.697 playback: playhead is 40 ms AHEAD of the picture (playhead 26373 ms, picture 26333 ms)
+12:21:11.749 playback: playhead is 25 ms AHEAD of the picture (playhead 27425 ms, picture 27400 ms)
+12:21:11.998 playback: playing true -> false at playhead 27621 ms [+1854 ms] from MonitorPanel.qml:2234 (onClicked)
+12:21:11.998 monitor: playing -> false at 27621
+12:21:11.999 playback: session.stop decoder running, picture at 27666 ms, published 27666 ms [+1 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:21:12.457 playback: playing false -> true at playhead 27666 ms [+462 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:21:12.457 monitor: playing -> true at 27666
+12:21:12.457 monitor: playback session at playhead 27666 clip clip_8bd6bc06cff9
+12:21:12.457 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 27666 ms, kind video [+0 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:21:12.800 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:21:12.800 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:21:12.952 [h264 @ 000001f7d5e71180] Late SEI
+12:21:12.952 [h264 @ 000001f7d5e71180]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:21:12.952 [h264 @ 000001f7d5e71180] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:21:13.090 preview playback: first frame after 626 ms, at source 27666 ms (requested 27666 ms)
+12:21:13.090 playback: frame at source 27666 ms, advanced 0 ms of media in 1102 ms of wall clock
+12:21:13.123 playback: playhead is 32 ms AHEAD of the picture (playhead 27698 ms, picture 27666 ms)
+12:21:13.864 playback: playing true -> false at playhead 28395 ms [+1403 ms] from MonitorPanel.qml:2234 (onClicked)
+12:21:13.865 monitor: playing -> false at 28395
+12:21:13.865 playback: session.stop decoder running, picture at 28433 ms, published 28433 ms [+0 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:21:14.644 playback: playing false -> true at playhead 28433 ms [+783 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:21:14.644 monitor: playing -> true at 28433
+12:21:14.644 monitor: playback session at playhead 28433 clip clip_8bd6bc06cff9
+12:21:14.644 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 28433 ms, kind video [+0 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:21:14.960 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8e2c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:21:14.960 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8e2c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:21:15.093 [h264 @ 000001f7d5afb6c0] Late SEI
+12:21:15.093 [h264 @ 000001f7d5afb6c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:21:15.093 [h264 @ 000001f7d5afb6c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:21:15.252 preview playback: first frame after 601 ms, at source 28433 ms (requested 28433 ms)
+12:21:15.252 playback: frame at source 28433 ms, advanced 0 ms of media in 1393 ms of wall clock
+12:21:15.256 playback: playhead is 3 ms AHEAD of the picture (playhead 28436 ms, picture 28433 ms)
+12:21:15.305 playback: playhead is 52 ms AHEAD of the picture (playhead 28485 ms, picture 28433 ms)
+12:21:15.357 playback: playhead is 2 ms AHEAD of the picture (playhead 28535 ms, picture 28533 ms)
+12:21:15.657 playback: playhead is 68 ms AHEAD of the picture (playhead 28834 ms, picture 28766 ms)
+12:21:15.707 playback: playhead is 18 ms AHEAD of the picture (playhead 28884 ms, picture 28866 ms)
+12:21:16.521 [h264 @ 000001f7d5afd440] Late SEI
+12:21:16.523 [h264 @ 000001f7d5afd440]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:21:16.523 [h264 @ 000001f7d5afd440] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:21:16.757 playback: playhead is 3 ms AHEAD of the picture (playhead 29936 ms, picture 29933 ms)
+12:21:16.805 playback: playhead is 51 ms AHEAD of the picture (playhead 29984 ms, picture 29933 ms)
+12:21:17.063 playback: playhead is 5 ms AHEAD of the picture (playhead 30238 ms, picture 30233 ms)
+12:21:17.316 playback: playhead is 58 ms AHEAD of the picture (playhead 30491 ms, picture 30433 ms)
+12:21:17.365 playback: playhead is 9 ms AHEAD of the picture (playhead 30542 ms, picture 30533 ms)
+12:21:17.816 playback: playhead is 61 ms AHEAD of the picture (playhead 30994 ms, picture 30933 ms)
+12:21:17.865 playback: playhead is 10 ms AHEAD of the picture (playhead 31043 ms, picture 31033 ms)
+12:21:17.906 playback: playing true -> false at playhead 31043 ms [+3255 ms] from MonitorPanel.qml:2234 (onClicked)
+12:21:17.906 monitor: playing -> false at 31043
+12:21:17.907 playback: session.stop decoder running, picture at 31066 ms, published 31066 ms [+1 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:21:31.957 GUI turn 21 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+12:22:08.574 GUI turn 44 ms (budget 20 ms, ~1 frames of 30 fps lost): "no marked scope"""
+12:24:16.836 GUI turn 20 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+12:24:17.375 GUI turn 27 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+12:24:18.122 GUI turn 24 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+12:25:23.339 GUI turn 20 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"" [+1 more since the last line]"
+12:25:23.904 GUI turn 51 ms (budget 20 ms, ~1 frames of 30 fps lost): "no marked scope"""
+12:25:46.598 GUI turn 36 ms (budget 20 ms, ~1 frames of 30 fps lost): "no marked scope"""
+12:26:02.641 GUI turn 20 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+12:29:59.122 GUI turn 40 ms (budget 20 ms, ~1 frames of 30 fps lost): "no marked scope"""
+12:30:02.276 GUI turn 29 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+12:30:03.182 GUI turn 27 ms (budget 20 ms, ~0 frames of 30 fps lost): "no marked scope"""
+12:30:23.524 playback: playing false -> true at playhead 31066 ms [+545621 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:30:23.524 monitor: playing -> true at 31066
+12:30:23.524 monitor: playback session at playhead 31066 clip clip_8bd6bc06cff9
+12:30:23.524 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 31066 ms, kind video [+0 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:30:24.020 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:30:24.021 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:30:24.283 [h264 @ 000001f7d5e71540] Late SEI
+12:30:24.284 [h264 @ 000001f7d5e71540]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:30:24.284 [h264 @ 000001f7d5e71540] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:30:24.526 preview playback: first frame after 995 ms, at source 31066 ms (requested 31066 ms)
+12:30:24.526 playback: frame at source 31066 ms, advanced 0 ms of media in 546637 ms of wall clock
+12:30:24.536 playback: playhead is 9 ms AHEAD of the picture (playhead 31075 ms, picture 31066 ms)
+12:30:24.584 playback: playhead is 55 ms AHEAD of the picture (playhead 31121 ms, picture 31066 ms)
+12:30:24.631 playback: playhead is 4 ms AHEAD of the picture (playhead 31170 ms, picture 31166 ms)
+12:30:25.082 playback: playhead is 54 ms AHEAD of the picture (playhead 31620 ms, picture 31566 ms)
+12:30:25.134 playback: playhead is 5 ms AHEAD of the picture (playhead 31671 ms, picture 31666 ms)
+12:30:25.592 playback: playhead is 63 ms AHEAD of the picture (playhead 32129 ms, picture 32066 ms)
+12:30:25.648 playback: playhead is 20 ms AHEAD of the picture (playhead 32186 ms, picture 32166 ms)
+12:30:26.658 playback: playhead is 28 ms AHEAD of the picture (playhead 33194 ms, picture 33166 ms)
+12:30:27.429 [h264 @ 000001f7d5afb6c0] Late SEI
+12:30:27.431 [h264 @ 000001f7d5afb6c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:30:27.431 [h264 @ 000001f7d5afb6c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:30:27.666 playback: playhead is 4 ms AHEAD of the picture (playhead 34204 ms, picture 34200 ms)
+12:30:27.915 playback: playhead is 53 ms AHEAD of the picture (playhead 34453 ms, picture 34400 ms)
+12:30:27.965 playback: playhead is 2 ms AHEAD of the picture (playhead 34502 ms, picture 34500 ms)
+12:30:28.428 playback: playhead is 66 ms AHEAD of the picture (playhead 34966 ms, picture 34900 ms)
+12:30:28.473 playback: playhead is 10 ms AHEAD of the picture (playhead 35010 ms, picture 35000 ms)
+12:30:28.926 playback: playhead is 65 ms AHEAD of the picture (playhead 35465 ms, picture 35400 ms)
+12:30:28.983 playback: playhead is 20 ms AHEAD of the picture (playhead 35520 ms, picture 35500 ms)
+12:30:29.592 playback: playhead is 63 ms AHEAD of the picture (playhead 36129 ms, picture 36066 ms)
+12:30:29.650 playback: playhead is 22 ms AHEAD of the picture (playhead 36188 ms, picture 36166 ms)
+12:30:30.683 playback: playhead is 22 ms AHEAD of the picture (playhead 37222 ms, picture 37200 ms)
+12:30:31.694 [h264 @ 000001f7d5af9940] Late SEI
+12:30:31.694 [h264 @ 000001f7d5af9940]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:30:31.694 [h264 @ 000001f7d5af9940] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:30:31.700 playback: playhead is 4 ms AHEAD of the picture (playhead 38237 ms, picture 38233 ms)
+12:30:31.751 playback: playhead is 55 ms AHEAD of the picture (playhead 38288 ms, picture 38233 ms)
+12:30:31.803 playback: playhead is 7 ms AHEAD of the picture (playhead 38340 ms, picture 38333 ms)
+12:30:31.912 playback: playhead is 50 ms AHEAD of the picture (playhead 38450 ms, picture 38400 ms)
+12:30:32.541 playback: playhead is 10 ms AHEAD of the picture (playhead 39076 ms, picture 39066 ms)
+12:30:32.590 playback: playhead is 61 ms AHEAD of the picture (playhead 39127 ms, picture 39066 ms)
+12:30:32.640 playback: playhead is 13 ms AHEAD of the picture (playhead 39179 ms, picture 39166 ms)
+12:30:33.253 playback: playhead is 54 ms AHEAD of the picture (playhead 39787 ms, picture 39733 ms)
+12:30:33.300 playback: playhead is 5 ms AHEAD of the picture (playhead 39838 ms, picture 39833 ms)
+12:30:33.752 playback: playhead is 56 ms AHEAD of the picture (playhead 40289 ms, picture 40233 ms)
+12:30:33.801 playback: playhead is 6 ms AHEAD of the picture (playhead 40339 ms, picture 40333 ms)
+12:30:34.250 playback: playhead is 55 ms AHEAD of the picture (playhead 40788 ms, picture 40733 ms)
+12:30:34.298 playback: playhead is 4 ms AHEAD of the picture (playhead 40837 ms, picture 40833 ms)
+12:30:35.088 playback: playhead is 53 ms AHEAD of the picture (playhead 41619 ms, picture 41566 ms)
+12:30:35.134 playback: playhead is 3 ms AHEAD of the picture (playhead 41669 ms, picture 41666 ms)
+12:30:35.582 playback: playhead is 53 ms AHEAD of the picture (playhead 42119 ms, picture 42066 ms)
+12:30:35.635 playback: playhead is 4 ms AHEAD of the picture (playhead 42170 ms, picture 42166 ms)
+12:30:35.961 [h264 @ 000001f7d5e71540] Late SEI
+12:30:35.961 [h264 @ 000001f7d5e71540]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:30:35.961 [h264 @ 000001f7d5e71540] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:30:36.083 playback: playhead is 54 ms AHEAD of the picture (playhead 42620 ms, picture 42566 ms)
+12:30:36.136 playback: playhead is 6 ms AHEAD of the picture (playhead 42672 ms, picture 42666 ms)
+12:30:36.582 playback: playhead is 54 ms AHEAD of the picture (playhead 43120 ms, picture 43066 ms)
+12:30:36.633 playback: playhead is 5 ms AHEAD of the picture (playhead 43171 ms, picture 43166 ms)
+12:30:37.083 playback: playhead is 52 ms AHEAD of the picture (playhead 43618 ms, picture 43566 ms)
+12:30:37.133 playback: playhead is 3 ms AHEAD of the picture (playhead 43669 ms, picture 43666 ms)
+12:30:37.583 playback: playhead is 51 ms AHEAD of the picture (playhead 44117 ms, picture 44066 ms)
+12:30:37.636 playback: playhead is 5 ms AHEAD of the picture (playhead 44171 ms, picture 44166 ms)
+12:30:38.083 playback: playhead is 56 ms AHEAD of the picture (playhead 44622 ms, picture 44566 ms)
+12:30:38.132 playback: playhead is 5 ms AHEAD of the picture (playhead 44671 ms, picture 44666 ms)
+12:30:38.582 playback: playhead is 53 ms AHEAD of the picture (playhead 45119 ms, picture 45066 ms)
+12:30:38.632 playback: playhead is 4 ms AHEAD of the picture (playhead 45170 ms, picture 45166 ms)
+12:30:39.081 playback: playhead is 54 ms AHEAD of the picture (playhead 45620 ms, picture 45566 ms)
+12:30:39.132 playback: playhead is 4 ms AHEAD of the picture (playhead 45670 ms, picture 45666 ms)
+12:30:39.582 playback: playhead is 55 ms AHEAD of the picture (playhead 46121 ms, picture 46066 ms)
+12:30:39.632 playback: playhead is 3 ms AHEAD of the picture (playhead 46169 ms, picture 46166 ms)
+12:30:40.082 playback: playhead is 53 ms AHEAD of the picture (playhead 46619 ms, picture 46566 ms)
+12:30:40.133 playback: playhead is 5 ms AHEAD of the picture (playhead 46671 ms, picture 46666 ms)
+12:30:40.197 [h264 @ 000001f7d5afb6c0] Late SEI
+12:30:40.197 [h264 @ 000001f7d5afb6c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:30:40.197 [h264 @ 000001f7d5afb6c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:30:40.583 playback: playhead is 54 ms AHEAD of the picture (playhead 47120 ms, picture 47066 ms)
+12:30:40.635 playback: playhead is 3 ms AHEAD of the picture (playhead 47169 ms, picture 47166 ms)
+12:30:41.083 playback: playhead is 55 ms AHEAD of the picture (playhead 47621 ms, picture 47566 ms)
+12:30:41.131 playback: playhead is 3 ms AHEAD of the picture (playhead 47669 ms, picture 47666 ms)
+12:30:41.240 playback: playhead is 45 ms AHEAD of the picture (playhead 47778 ms, picture 47733 ms)
+12:30:41.834 playback: playhead is 5 ms AHEAD of the picture (playhead 48371 ms, picture 48366 ms)
+12:30:42.082 playback: playhead is 53 ms AHEAD of the picture (playhead 48619 ms, picture 48566 ms)
+12:30:42.132 playback: playhead is 4 ms AHEAD of the picture (playhead 48670 ms, picture 48666 ms)
+12:30:42.581 playback: playhead is 52 ms AHEAD of the picture (playhead 49118 ms, picture 49066 ms)
+12:30:42.631 playback: playhead is 3 ms AHEAD of the picture (playhead 49169 ms, picture 49166 ms)
+12:30:43.082 playback: playhead is 53 ms AHEAD of the picture (playhead 49619 ms, picture 49566 ms)
+12:30:43.133 playback: playhead is 5 ms AHEAD of the picture (playhead 49671 ms, picture 49666 ms)
+12:30:43.583 playback: playhead is 55 ms AHEAD of the picture (playhead 50121 ms, picture 50066 ms)
+12:30:43.633 playback: playhead is 3 ms AHEAD of the picture (playhead 50169 ms, picture 50166 ms)
+12:30:44.081 playback: playhead is 53 ms AHEAD of the picture (playhead 50619 ms, picture 50566 ms)
+12:30:44.132 playback: playhead is 5 ms AHEAD of the picture (playhead 50671 ms, picture 50666 ms)
+12:30:44.495 [h264 @ 000001f7d5af9940] Late SEI
+12:30:44.495 [h264 @ 000001f7d5af9940]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:30:44.496 [h264 @ 000001f7d5af9940] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:30:44.583 playback: playhead is 53 ms AHEAD of the picture (playhead 51119 ms, picture 51066 ms)
+12:30:44.632 playback: playhead is 2 ms AHEAD of the picture (playhead 51168 ms, picture 51166 ms)
+12:30:45.085 playback: playhead is 56 ms AHEAD of the picture (playhead 51622 ms, picture 51566 ms)
+12:30:45.132 playback: playhead is 2 ms AHEAD of the picture (playhead 51668 ms, picture 51666 ms)
+12:30:45.583 playback: playhead is 55 ms AHEAD of the picture (playhead 52121 ms, picture 52066 ms)
+12:30:45.633 playback: playhead is 4 ms AHEAD of the picture (playhead 52170 ms, picture 52166 ms)
+12:30:46.082 playback: playhead is 52 ms AHEAD of the picture (playhead 52618 ms, picture 52566 ms)
+12:30:46.133 playback: playhead is 3 ms AHEAD of the picture (playhead 52669 ms, picture 52666 ms)
+12:30:46.591 playback: playhead is 61 ms AHEAD of the picture (playhead 53127 ms, picture 53066 ms)
+12:30:46.641 playback: playhead is 12 ms AHEAD of the picture (playhead 53178 ms, picture 53166 ms)
+12:30:47.090 playback: playhead is 64 ms AHEAD of the picture (playhead 53630 ms, picture 53566 ms)
+12:30:47.141 playback: playhead is 13 ms AHEAD of the picture (playhead 53679 ms, picture 53666 ms)
+12:30:47.599 playback: playhead is 68 ms AHEAD of the picture (playhead 54134 ms, picture 54066 ms)
+12:30:47.650 playback: playhead is 21 ms AHEAD of the picture (playhead 54187 ms, picture 54166 ms)
+12:30:48.700 playback: playhead is 4 ms AHEAD of the picture (playhead 55237 ms, picture 55233 ms)
+12:30:48.752 playback: playhead is 55 ms AHEAD of the picture (playhead 55288 ms, picture 55233 ms)
+12:30:48.762 [h264 @ 000001f7d5e71540] Late SEI
+12:30:48.763 [h264 @ 000001f7d5e71540]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:30:48.763 [h264 @ 000001f7d5e71540] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:30:48.802 playback: playhead is 4 ms AHEAD of the picture (playhead 55337 ms, picture 55333 ms)
+12:30:49.249 playback: playhead is 54 ms AHEAD of the picture (playhead 55787 ms, picture 55733 ms)
+12:30:49.299 playback: playhead is 5 ms AHEAD of the picture (playhead 55838 ms, picture 55833 ms)
+12:30:49.761 playback: playhead is 67 ms AHEAD of the picture (playhead 56300 ms, picture 56233 ms)
+12:30:49.802 playback: playhead is 7 ms AHEAD of the picture (playhead 56340 ms, picture 56333 ms)
+12:30:50.249 playback: playhead is 52 ms AHEAD of the picture (playhead 56785 ms, picture 56733 ms)
+12:30:50.639 playback: playhead is 7 ms AHEAD of the picture (playhead 57173 ms, picture 57166 ms)
+12:30:51.091 playback: playhead is 64 ms AHEAD of the picture (playhead 57630 ms, picture 57566 ms)
+12:30:51.141 playback: playhead is 10 ms AHEAD of the picture (playhead 57676 ms, picture 57666 ms)
+12:30:51.748 playback: playhead is 52 ms AHEAD of the picture (playhead 58285 ms, picture 58233 ms)
+12:30:51.801 playback: playhead is 4 ms AHEAD of the picture (playhead 58337 ms, picture 58333 ms)
+12:30:51.913 playback: playhead is 50 ms AHEAD of the picture (playhead 58450 ms, picture 58400 ms)
+12:30:52.168 playback: playhead is 5 ms AHEAD of the picture (playhead 58704 ms, picture 58699 ms)
+12:30:52.425 playback: playhead is 63 ms AHEAD of the picture (playhead 58963 ms, picture 58900 ms)
+12:30:52.475 playback: playhead is 11 ms AHEAD of the picture (playhead 59011 ms, picture 59000 ms)
+12:30:52.926 playback: playhead is 63 ms AHEAD of the picture (playhead 59463 ms, picture 59400 ms)
+12:30:52.984 playback: playhead is 22 ms AHEAD of the picture (playhead 59522 ms, picture 59500 ms)
+12:30:53.027 [h264 @ 000001f7d5afb6c0] Late SEI
+12:30:53.027 [h264 @ 000001f7d5afb6c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:30:53.027 [h264 @ 000001f7d5afb6c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:30:53.990 playback: playhead is 27 ms AHEAD of the picture (playhead 60527 ms, picture 60500 ms)
+12:30:55.006 playback: playhead is 13 ms AHEAD of the picture (playhead 61546 ms, picture 61533 ms)
+12:30:55.425 playback: playhead is 64 ms AHEAD of the picture (playhead 61964 ms, picture 61900 ms)
+12:30:55.475 playback: playhead is 14 ms AHEAD of the picture (playhead 62014 ms, picture 62000 ms)
+12:30:55.924 playback: playhead is 62 ms AHEAD of the picture (playhead 62462 ms, picture 62400 ms)
+12:30:55.973 playback: playhead is 11 ms AHEAD of the picture (playhead 62511 ms, picture 62500 ms)
+12:30:56.085 playback: playhead is 55 ms AHEAD of the picture (playhead 62621 ms, picture 62566 ms)
+12:30:56.131 playback: playhead is 3 ms AHEAD of the picture (playhead 62669 ms, picture 62666 ms)
+12:30:56.590 playback: playhead is 59 ms AHEAD of the picture (playhead 63125 ms, picture 63066 ms)
+12:30:56.644 playback: playhead is 17 ms AHEAD of the picture (playhead 63183 ms, picture 63166 ms)
+12:30:57.260 playback: playhead is 65 ms AHEAD of the picture (playhead 63798 ms, picture 63733 ms)
+12:30:57.295 [h264 @ 000001f7d5af9940] Late SEI
+12:30:57.295 [h264 @ 000001f7d5af9940]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:30:57.295 [h264 @ 000001f7d5af9940] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:30:57.316 playback: playhead is 20 ms AHEAD of the picture (playhead 63853 ms, picture 63833 ms)
+12:30:58.323 playback: playhead is 29 ms AHEAD of the picture (playhead 64862 ms, picture 64833 ms)
+12:30:59.324 playback: playhead is 29 ms AHEAD of the picture (playhead 65862 ms, picture 65833 ms)
+12:31:00.377 playback: playhead is 14 ms AHEAD of the picture (playhead 66914 ms, picture 66900 ms)
+12:31:00.428 playback: playhead is 64 ms AHEAD of the picture (playhead 66964 ms, picture 66900 ms)
+12:31:00.477 playback: playhead is 11 ms AHEAD of the picture (playhead 67011 ms, picture 67000 ms)
+12:31:00.582 playback: playhead is 52 ms AHEAD of the picture (playhead 67118 ms, picture 67066 ms)
+12:31:01.270 playback: playhead is 5 ms AHEAD of the picture (playhead 67805 ms, picture 67800 ms)
+12:31:01.528 [h264 @ 000001f7d5e71540] Late SEI
+12:31:01.528 [h264 @ 000001f7d5e71540]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:31:01.528 [h264 @ 000001f7d5e71540] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:31:01.581 playback: playhead is 54 ms AHEAD of the picture (playhead 68120 ms, picture 68066 ms)
+12:31:01.631 playback: playhead is 3 ms AHEAD of the picture (playhead 68169 ms, picture 68166 ms)
+12:31:02.081 playback: playhead is 52 ms AHEAD of the picture (playhead 68618 ms, picture 68566 ms)
+12:31:02.132 playback: playhead is 4 ms AHEAD of the picture (playhead 68670 ms, picture 68666 ms)
+12:31:02.241 playback: playhead is 46 ms AHEAD of the picture (playhead 68779 ms, picture 68733 ms)
+12:31:02.299 playback: playhead is 5 ms AHEAD of the picture (playhead 68838 ms, picture 68833 ms)
+12:31:02.757 playback: playhead is 61 ms AHEAD of the picture (playhead 69294 ms, picture 69233 ms)
+12:31:02.810 playback: playhead is 15 ms AHEAD of the picture (playhead 69348 ms, picture 69333 ms)
+12:31:03.257 playback: playhead is 62 ms AHEAD of the picture (playhead 69795 ms, picture 69733 ms)
+12:31:03.308 playback: playhead is 13 ms AHEAD of the picture (playhead 69846 ms, picture 69833 ms)
+12:31:03.756 playback: playhead is 62 ms AHEAD of the picture (playhead 70295 ms, picture 70233 ms)
+12:31:03.808 playback: playhead is 11 ms AHEAD of the picture (playhead 70344 ms, picture 70333 ms)
+12:31:04.284 playback: playhead.jump 70546 -> 70822 ms (+276) [+40753 ms] from MonitorPanel.qml:1064 (onTriggered)
+12:31:04.581 playback: playhead is 52 ms AHEAD of the picture (playhead 71118 ms, picture 71066 ms)
+12:31:04.633 playback: playhead is 5 ms AHEAD of the picture (playhead 71171 ms, picture 71166 ms)
+12:31:05.086 playback: playhead is 54 ms AHEAD of the picture (playhead 71620 ms, picture 71566 ms)
+12:31:05.141 playback: playhead is 10 ms AHEAD of the picture (playhead 71676 ms, picture 71666 ms)
+12:31:05.592 playback: playhead is 60 ms AHEAD of the picture (playhead 72126 ms, picture 72066 ms)
+12:31:05.643 playback: playhead is 14 ms AHEAD of the picture (playhead 72180 ms, picture 72166 ms)
+12:31:05.827 [h264 @ 000001f7d5afb6c0] Late SEI
+12:31:05.828 [h264 @ 000001f7d5afb6c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:31:05.828 [h264 @ 000001f7d5afb6c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:31:06.669 playback: playhead is 7 ms AHEAD of the picture (playhead 73207 ms, picture 73200 ms)
+12:31:07.249 playback: playhead is 52 ms AHEAD of the picture (playhead 73785 ms, picture 73733 ms)
+12:31:07.305 playback: playhead is 5 ms AHEAD of the picture (playhead 73838 ms, picture 73833 ms)
+12:31:07.416 playback: playhead is 52 ms AHEAD of the picture (playhead 73952 ms, picture 73900 ms)
+12:31:07.467 playback: playhead is 5 ms AHEAD of the picture (playhead 74005 ms, picture 74000 ms)
+12:31:08.092 playback: playhead is 61 ms AHEAD of the picture (playhead 74627 ms, picture 74566 ms)
+12:31:08.143 playback: playhead is 12 ms AHEAD of the picture (playhead 74678 ms, picture 74666 ms)
+12:31:08.759 playback: playhead is 64 ms AHEAD of the picture (playhead 75297 ms, picture 75233 ms)
+12:31:08.813 playback: playhead is 16 ms AHEAD of the picture (playhead 75349 ms, picture 75333 ms)
+12:31:09.825 playback: playhead is 29 ms AHEAD of the picture (playhead 76362 ms, picture 76333 ms)
+12:31:10.096 [h264 @ 000001f7d5af9940] Late SEI
+12:31:10.096 [h264 @ 000001f7d5af9940]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:31:10.096 [h264 @ 000001f7d5af9940] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:31:10.198 playback: session.stop decoder running, picture at 76733 ms, published 76733 ms [+5915 ms] from MonitorPanel.qml:1215 (onDestruction) <- main.qml:238 (onTapped)
+12:31:10.362 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+163 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:546 (text) <- main.qml:238 (onTapped)
+12:31:10.362 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+1 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:258 (onActiveClipIdChanged) <- main.qml:238 (onTapped)
+12:31:10.512 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+150 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:12.328 playback: playing true -> false at playhead 78652 ms [+1814 ms] from ExportPreviewPlayer.qml:213 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:31:12.328 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+1 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:213 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:31:12.398 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+77 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:12.900 playback: playing false -> true at playhead 78652 ms [+495 ms] from ExportPreviewPlayer.qml:208 (startPlayback) <- ExportPreviewPlayer.qml:215 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:31:12.900 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+1 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:208 (startPlayback) <- ExportPreviewPlayer.qml:215 (togglePlayback)
+12:31:13.999 playback: playing true -> false at playhead 79733 ms [+1106 ms] from ExportPreviewPlayer.qml:213 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:31:13.999 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+0 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:213 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:31:14.079 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+71 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:15.535 playback: playing false -> true at playhead 79733 ms [+1456 ms] from ExportPreviewPlayer.qml:208 (startPlayback) <- ExportPreviewPlayer.qml:215 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:31:15.535 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+0 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:208 (startPlayback) <- ExportPreviewPlayer.qml:215 (togglePlayback)
+12:31:16.641 playback: playing true -> false at playhead 80817 ms [+1104 ms] from ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:31:16.641 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+0 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:31:16.707 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+70 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:17.107 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+399 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:17.157 playback: playing false -> true at playhead 7625888 ms [+46 ms] from ExportPreviewPlayer.qml:208 (startPlayback)
+12:31:17.157 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+0 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:208 (startPlayback)
+12:31:18.428 playback: playing true -> false at playhead 7627143 ms [+1274 ms] from ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:31:18.428 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+0 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:31:19.080 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+644 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:20.555 playback: still.publish 1920 px wide, playback picture was 960 px at 76733 ms [+1475 ms] from C++
+12:31:20.990 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+434 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:22.748 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+1764 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:22.990 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+240 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:23.375 playback: playing false -> true at playhead 12116259 ms [+379 ms] from ExportPreviewPlayer.qml:208 (startPlayback)
+12:31:23.375 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+0 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:208 (startPlayback)
+12:31:24.505 playback: playing true -> false at playhead 12117373 ms [+1135 ms] from ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:31:24.505 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+0 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:31:24.568 playback: session.stop decoder idle, picture at 76733 ms, published 76733 ms [+67 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:25.240 playback: playing false -> true at playhead 36581038 ms [+665 ms] from ExportPreviewPlayer.qml:208 (startPlayback)
+12:31:25.240 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 36581038 ms, kind video [+0 ms] from ExportPreviewPlayer.qml:184 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:208 (startPlayback)
+12:31:25.516 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d800] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:31:25.516 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d800] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:31:25.707 [h264 @ 000001f7d5afc940] Late SEI
+12:31:25.707 [h264 @ 000001f7d5afc940]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:31:25.707 [h264 @ 000001f7d5afc940] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:31:25.964 preview playback: first frame after 717 ms, at source 36581066 ms (requested 36581038 ms)
+12:31:25.964 playback: frame at source 36581066 ms, advanced 36504333 ms of media in 15770 ms of wall clock
+12:31:27.127 playback: playing true -> false at playhead 36582919 ms [+1881 ms] from ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:31:27.127 playback: session.stop decoder running, picture at 36582200 ms, published 36582200 ms [+0 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:31:27.480 playback: playing false -> true at playhead 24193808 ms [+353 ms] from ExportPreviewPlayer.qml:208 (startPlayback)
+12:31:27.480 playback: session.stop decoder idle, picture at 36582200 ms, published 36582200 ms [+0 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:208 (startPlayback)
+12:31:27.504 playback: session.stop decoder idle, picture at 36582200 ms, published 36582200 ms [+24 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:28.674 playback: playing true -> false at playhead 24195002 ms [+1176 ms] from ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:31:28.674 playback: session.stop decoder idle, picture at 36582200 ms, published 36582200 ms [+0 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:31:29.099 playback: session.stop decoder idle, picture at 36582200 ms, published 36582200 ms [+421 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:29.368 playback: playing false -> true at playhead 0 ms [+269 ms] from ExportPreviewPlayer.qml:208 (startPlayback)
+12:31:29.368 playback: session.stop decoder idle, picture at 36582200 ms, published 36582200 ms [+0 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:208 (startPlayback)
+12:31:30.798 playback: playing true -> false at playhead 1412 ms [+1436 ms] from ExportPreviewPlayer.qml:213 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:31:30.798 playback: session.stop decoder idle, picture at 36582200 ms, published 36582200 ms [+0 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:213 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:31:30.879 playback: session.stop decoder idle, picture at 36582200 ms, published 36582200 ms [+68 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:34.015 playback: playing false -> true at playhead 1412 ms [+3137 ms] from ExportPreviewPlayer.qml:208 (startPlayback) <- ExportPreviewPlayer.qml:215 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:31:34.015 playback: session.stop decoder idle, picture at 36582200 ms, published 36582200 ms [+0 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:208 (startPlayback) <- ExportPreviewPlayer.qml:215 (togglePlayback)
+12:31:34.504 playback: playhead.jump 1649 -> 1899 ms (+250) [+487 ms] from ExportPreviewPlayer.qml:302 (onTriggered)
+12:31:34.710 playback: playing true -> false at playhead 2074 ms [+208 ms] from ExportPreviewPlayer.qml:213 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:31:34.710 playback: session.stop decoder idle, picture at 36582200 ms, published 36582200 ms [+0 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:213 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:31:34.774 playback: session.stop decoder idle, picture at 36582200 ms, published 36582200 ms [+73 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:31:38.289 playback: session.stop decoder idle, picture at 36582200 ms, published 36582200 ms [+3501 ms] from ExportPreviewPlayer.qml:276 (onDestruction) <- main.qml:238 (onTapped)
+12:31:38.327 monitor: source key  -> clip_8bd6bc06cff9|D:/capcut/F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4|video|0|0|58452241|
+12:31:38.327 playback: session.stop decoder idle, picture at 36582200 ms, published 36582200 ms [+48 ms] from MonitorPanel.qml:1189 (onActiveSourceKeyChanged) <- main.qml:238 (onTapped)
+12:31:38.543 playback: still.publish 1920 px wide, playback picture was 960 px at 36582200 ms [+220 ms] from C++
+12:31:39.098 playback: still.publish 1920 px wide, playback picture was 960 px at 36582200 ms [+544 ms] from C++
+12:31:39.905 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d2c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:31:39.905 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d2c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:31:40.511 playback: still.publish 1920 px wide, playback picture was 960 px at 36582200 ms [+1411 ms] from C++
+12:31:40.621 playback: still.publish 1920 px wide, playback picture was 960 px at 36582200 ms [+108 ms] from MonitorPanel.qml:644 (requestProcessFrame) <- MonitorPanel.qml:971 (onTriggered)
+12:31:40.898 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:31:40.899 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:31:41.104 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8e2c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:31:41.104 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8e2c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:31:42.332 playback: playing false -> true at playhead 2074 ms [+1718 ms] from MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:31:42.332 monitor: playing -> true at 2074
+12:31:42.332 monitor: playback session at playhead 2074 clip clip_8bd6bc06cff9
+12:31:42.332 playback: session.start F-TIER Tamer's BROKEN BEASTMASTER SYSTEM Drops MYTHICAL STARTER PACK! Manhwa Recap.mp4 at source 2074 ms, kind video [+1 ms] from MonitorPanel.qml:750 (startProcessPlayback) <- MonitorPanel.qml:1094 (onPlayingChanged) <- MonitorPanel.qml:611 (startPlayback) <- MonitorPanel.qml:2236 (onClicked)
+12:31:42.760 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+12:31:42.760 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001f7d5a8d000] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+12:31:42.903 [h264 @ 000001f7d5e6db40] Late SEI
+12:31:42.903 [h264 @ 000001f7d5e6db40]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:31:42.903 [h264 @ 000001f7d5e6db40] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:31:43.071 preview playback: first frame after 728 ms, at source 2100 ms (requested 2074 ms)
+12:31:43.072 playback: frame at source 2100 ms, advanced -36580100 ms of media in 15972 ms of wall clock
+12:31:43.116 playback: playhead is 9 ms AHEAD of the picture (playhead 2142 ms, picture 2133 ms)
+12:31:44.123 playback: playhead is 14 ms AHEAD of the picture (playhead 3147 ms, picture 3133 ms)
+12:31:45.073 [h264 @ 000001f7e069d780] Late SEI
+12:31:45.074 [h264 @ 000001f7e069d780]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:31:45.074 [h264 @ 000001f7e069d780] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:31:45.125 playback: playhead is 11 ms AHEAD of the picture (playhead 4144 ms, picture 4133 ms)
+12:31:46.186 playback: playhead is 4 ms AHEAD of the picture (playhead 5204 ms, picture 5200 ms)
+12:31:47.194 playback: playhead is 18 ms AHEAD of the picture (playhead 6218 ms, picture 6200 ms)
+12:31:48.218 playback: playhead is 10 ms AHEAD of the picture (playhead 7243 ms, picture 7233 ms)
+12:31:48.892 playback: playhead.jump 7697 -> 7886 ms (+189) [+6551 ms] from MonitorPanel.qml:1064 (onTriggered)
+12:31:48.893 playback: playhead is 120 ms AHEAD of the picture (playhead 7886 ms, picture 7766 ms)
+12:31:48.955 playback: playhead is 4 ms AHEAD of the picture (playhead 7970 ms, picture 7966 ms)
+12:31:49.339 [h264 @ 000001f7e069b640] Late SEI
+12:31:49.340 [h264 @ 000001f7e069b640]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:31:49.340 [h264 @ 000001f7e069b640] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:31:49.994 playback: playhead is 20 ms AHEAD of the picture (playhead 9020 ms, picture 9000 ms)
+12:31:51.017 playback: playhead is 7 ms AHEAD of the picture (playhead 10040 ms, picture 10033 ms)
+12:31:52.062 playback: playhead is 21 ms AHEAD of the picture (playhead 11087 ms, picture 11066 ms)
+12:31:53.119 playback: playhead is 13 ms AHEAD of the picture (playhead 12146 ms, picture 12133 ms)
+12:31:53.606 [h264 @ 000001f7d5e6e2c0] Late SEI
+12:31:53.608 [h264 @ 000001f7d5e6e2c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:31:53.608 [h264 @ 000001f7d5e6e2c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:31:54.164 playback: playhead is 23 ms AHEAD of the picture (playhead 13189 ms, picture 13166 ms)
+12:31:55.172 playback: playhead is 29 ms AHEAD of the picture (playhead 14195 ms, picture 14166 ms)
+12:31:56.199 playback: playhead is 22 ms AHEAD of the picture (playhead 15222 ms, picture 15200 ms)
+12:31:57.217 playback: playhead is 8 ms AHEAD of the picture (playhead 16241 ms, picture 16233 ms)
+12:31:57.872 [h264 @ 000001f7e069d780] Late SEI
+12:31:57.872 [h264 @ 000001f7e069d780]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:31:57.873 [h264 @ 000001f7e069d780] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:31:58.231 playback: playhead is 21 ms AHEAD of the picture (playhead 17254 ms, picture 17233 ms)
+12:31:59.263 playback: playhead is 17 ms AHEAD of the picture (playhead 18283 ms, picture 18266 ms)
+12:32:00.286 playback: playhead is 8 ms AHEAD of the picture (playhead 19308 ms, picture 19300 ms)
+12:32:01.307 playback: playhead is 26 ms AHEAD of the picture (playhead 20326 ms, picture 20300 ms)
+12:32:02.140 [h264 @ 000001f7e069b640] Late SEI
+12:32:02.140 [h264 @ 000001f7e069b640]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:32:02.140 [h264 @ 000001f7e069b640] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:32:02.352 playback: playhead is 12 ms AHEAD of the picture (playhead 21378 ms, picture 21366 ms)
+12:32:03.354 playback: playhead is 6 ms AHEAD of the picture (playhead 22372 ms, picture 22366 ms)
+12:32:04.399 playback: playhead is 23 ms AHEAD of the picture (playhead 23423 ms, picture 23400 ms)
+12:32:05.399 playback: playhead is 23 ms AHEAD of the picture (playhead 24423 ms, picture 24400 ms)
+12:32:06.407 [h264 @ 000001f7d5e6e2c0] Late SEI
+12:32:06.407 [h264 @ 000001f7d5e6e2c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:32:06.407 [h264 @ 000001f7d5e6e2c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:32:06.461 playback: playhead is 11 ms AHEAD of the picture (playhead 25477 ms, picture 25466 ms)
+12:32:07.493 playback: playhead is 16 ms AHEAD of the picture (playhead 26516 ms, picture 26500 ms)
+12:32:08.520 playback: playhead is 10 ms AHEAD of the picture (playhead 27543 ms, picture 27533 ms)
+12:32:09.554 playback: playhead is 7 ms AHEAD of the picture (playhead 28573 ms, picture 28566 ms)
+12:32:10.575 playback: playhead is 32 ms AHEAD of the picture (playhead 29598 ms, picture 29566 ms)
+12:32:10.672 [h264 @ 000001f7e069d780] Late SEI
+12:32:10.672 [h264 @ 000001f7e069d780]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:32:10.673 [h264 @ 000001f7e069d780] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:32:11.587 playback: playhead is 9 ms AHEAD of the picture (playhead 30608 ms, picture 30599 ms)
+12:32:12.625 playback: playhead is 17 ms AHEAD of the picture (playhead 31650 ms, picture 31633 ms)
+12:32:13.651 playback: playhead is 10 ms AHEAD of the picture (playhead 32676 ms, picture 32666 ms)
+12:32:14.706 playback: playhead is 29 ms AHEAD of the picture (playhead 33729 ms, picture 33700 ms)
+12:32:14.942 [h264 @ 000001f7e069b640] Late SEI
+12:32:14.942 [h264 @ 000001f7e069b640]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:32:14.942 [h264 @ 000001f7e069b640] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:32:15.741 playback: playhead is 31 ms AHEAD of the picture (playhead 34764 ms, picture 34733 ms)
+12:32:16.800 playback: playhead is 25 ms AHEAD of the picture (playhead 35825 ms, picture 35800 ms)
+12:32:17.832 playback: playhead is 23 ms AHEAD of the picture (playhead 36856 ms, picture 36833 ms)
+12:32:18.857 playback: playhead is 17 ms AHEAD of the picture (playhead 37883 ms, picture 37866 ms)
+12:32:19.207 [h264 @ 000001f7d5e6e2c0] Late SEI
+12:32:19.208 [h264 @ 000001f7d5e6e2c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+12:32:19.208 [h264 @ 000001f7d5e6e2c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+12:32:19.723 playback: playing true -> false at playhead 38694 ms [+30831 ms] from MonitorPanel.qml:2234 (onClicked)
+12:32:19.724 monitor: playing -> false at 38694
+12:32:19.724 playback: session.stop decoder running, picture at 38733 ms, published 38733 ms [+1 ms] from MonitorPanel.qml:1119 (onPlayingChanged) <- MonitorPanel.qml:2234 (onClicked)
+12:32:37.208 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+17485 ms] from MonitorPanel.qml:1215 (onDestruction) <- main.qml:238 (onTapped)
+12:32:37.368 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+161 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:32:39.150 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+1789 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:32:39.844 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+682 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:32:40.279 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+434 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:32:41.507 playback: playing false -> true at playhead 44477897 ms [+1228 ms] from ExportPreviewPlayer.qml:208 (startPlayback) <- ExportPreviewPlayer.qml:215 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:32:41.507 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+0 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:208 (startPlayback) <- ExportPreviewPlayer.qml:215 (togglePlayback)
+12:32:42.144 playback: playing true -> false at playhead 44478524 ms [+637 ms] from ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:32:42.144 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+0 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:32:42.220 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+74 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:32:42.259 playback: playing false -> true at playhead 46026301 ms [+39 ms] from ExportPreviewPlayer.qml:208 (startPlayback)
+12:32:42.259 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+0 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:208 (startPlayback)
+12:32:42.453 playback: playing true -> false at playhead 46026482 ms [+193 ms] from ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:32:42.453 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+0 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:32:42.983 playback: playing false -> true at playhead 6696846 ms [+528 ms] from ExportPreviewPlayer.qml:208 (startPlayback)
+12:32:42.983 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+0 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:208 (startPlayback)
+12:32:42.993 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+18 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:32:43.563 playback: playing true -> false at playhead 6697413 ms [+564 ms] from ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:32:43.563 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+0 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:228 (beginScrub) <- ExportPreviewPlayer.qml:493
+12:32:43.679 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+111 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:32:43.768 playback: playing false -> true at playhead 0 ms [+88 ms] from ExportPreviewPlayer.qml:208 (startPlayback)
+12:32:43.768 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+0 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:208 (startPlayback)
+12:32:44.983 playback: playing true -> false at playhead 1201 ms [+1215 ms] from ExportPreviewPlayer.qml:213 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:32:44.983 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+0 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:213 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:32:45.046 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+67 ms] from ExportPreviewPlayer.qml:195 (requestCurrentFrame) <- ExportPreviewPlayer.qml:283 (onTriggered)
+12:32:45.290 playback: playing false -> true at playhead 1201 ms [+249 ms] from ExportPreviewPlayer.qml:208 (startPlayback) <- ExportPreviewPlayer.qml:215 (togglePlayback) <- ExportPreviewPlayer.qml:544 (onClicked)
+12:32:45.290 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+0 ms] from ExportPreviewPlayer.qml:179 (startCurrentDecode) <- ExportPreviewPlayer.qml:266 (onPlayingChanged) <- ExportPreviewPlayer.qml:208 (startPlayback) <- ExportPreviewPlayer.qml:215 (togglePlayback)
+12:32:50.579 playback: playhead.jump 6350 -> 6489 ms (+139) [+5277 ms] from ExportPreviewPlayer.qml:302 (onTriggered)
+12:32:50.618 playback: playing true -> false at playhead 6489 ms [+37 ms] from ExportPreviewPlayer.qml:275 (onDestruction)
+12:32:50.618 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+0 ms] from ExportPreviewPlayer.qml:268 (onPlayingChanged) <- ExportPreviewPlayer.qml:275 (onDestruction)
+12:32:50.621 playback: session.stop decoder idle, picture at 38733 ms, published 38733 ms [+3 ms] from ExportPreviewPlayer.qml:276 (onDestruction)

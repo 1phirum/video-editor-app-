@@ -150,7 +150,16 @@ Item {
     // Split between the parameter tree and the keyframe lanes.
     property real dividerX: 336
     // Flat row model shared by both halves of the panel.
+    //
+    // `rows` is the plain array the builders produce and the only thing anything
+    // reads for arithmetic (row count, lane heights). `rowModel` is what the two
+    // Repeaters bind, and it is patched rather than replaced - see applyRows().
     property var rows: []
+    // Kept beside the model so a rebuild can tell which rows actually changed
+    // without asking the model back for anything: the keys give the structure and
+    // the signatures give the contents.
+    property var rowKeys: []
+    property var rowSigs: []
     property var expandedMap: ({})
     // One live gesture at a time: the row being dragged reads its value from
     // here so the backend (and the undo stack) only sees the finished edit.
@@ -160,11 +169,8 @@ Item {
     function mediaForClip(clip) {
         if (!clip || !clip.mediaId)
             return null
-        for (var i = 0; i < Backend.media.length; ++i) {
-            if (Backend.media[i].id === clip.mediaId)
-                return Backend.media[i]
-        }
-        return null
+        var media = Backend.mediaById(String(clip.mediaId))
+        return media && media.id ? media : null
     }
 
     function settingValue(key, fallback) {
@@ -390,10 +396,84 @@ Item {
         root.rebuildRows()
     }
 
+    // The model both Repeaters bind. dynamicRoles because a row is one whole
+    // object in one role rather than a fixed set of typed roles - the builders
+    // above emit eight different row shapes and a static-role model would have to
+    // declare the union of their fields.
+    ListModel {
+        id: rowModel
+        dynamicRoles: true
+    }
+
+    // Patches rowModel towards `list` instead of handing a Repeater a new array.
+    //
+    // This is the frame-drop fix. Writing a Repeater's model runs
+    // QQuickRepeater::setModel -> clear() -> QQmlDelegateModel::cancel(), which
+    // force-completes every pending asynchronous incubation and then re-creates
+    // every delegate synchronously on the GUI thread; with two Repeaters over the
+    // same array that is two full delegate sets per rebuild. The watchdog caught
+    // it at 176 ms, and earlier runs at 154, 312 and 637 ms - five to nineteen
+    // dropped frames for a structure change that usually moves one row.
+    //
+    // An expand, a collapse or an effect appearing changes one contiguous run, so
+    // the diff is a common prefix, a common suffix and one insert/remove in
+    // between. Rows outside that run keep their delegates and are only re-set
+    // when their contents changed, because a set() the delegate did not need is
+    // still a re-evaluation of all of its bindings.
+    function applyRows(list) {
+        var n = list.length
+        var oldKeys = root.rowKeys
+        var oldSigs = root.rowSigs
+        var m = oldKeys.length
+        var keys = []
+        var sigs = []
+        for (var i = 0; i < n; ++i) {
+            keys.push(String(list[i].key))
+            sigs.push(JSON.stringify(list[i]))
+        }
+
+        var prefix = 0
+        while (prefix < n && prefix < m && oldKeys[prefix] === keys[prefix])
+            ++prefix
+        var suffix = 0
+        while (suffix < n - prefix && suffix < m - prefix
+               && oldKeys[m - 1 - suffix] === keys[n - 1 - suffix])
+            ++suffix
+
+        // The run the two ends do not cover. Same rows, different contents: set().
+        var oldMid = m - suffix - prefix
+        var newMid = n - suffix - prefix
+        var overlap = Math.min(oldMid, newMid)
+        for (var k = 0; k < overlap; ++k)
+            rowModel.set(prefix + k, { "row": list[prefix + k] })
+        if (newMid > oldMid) {
+            for (var a = overlap; a < newMid; ++a)
+                rowModel.insert(prefix + a, { "row": list[prefix + a] })
+        } else if (oldMid > newMid) {
+            rowModel.remove(prefix + newMid, oldMid - newMid)
+        }
+
+        // Rows the diff kept can still have changed without their key changing -
+        // a default that follows uniformScale, a reset list that grew - so they
+        // are compared by signature and touched only when they differ.
+        for (var b = 0; b < prefix; ++b) {
+            if (oldSigs[b] !== sigs[b])
+                rowModel.set(b, { "row": list[b] })
+        }
+        for (var c = 0; c < suffix; ++c) {
+            if (oldSigs[m - 1 - c] !== sigs[n - 1 - c])
+                rowModel.set(n - 1 - c, { "row": list[n - 1 - c] })
+        }
+
+        root.rowKeys = keys
+        root.rowSigs = sigs
+        root.rows = list
+    }
+
     function rebuildRows() {
         var list = []
         if (!root.hasClip || root.isSubtitle) {
-            root.rows = list
+            root.applyRows(list)
             return
         }
         var uniform = Boolean(root.settingValue("uniformScale", true))
@@ -528,7 +608,7 @@ Item {
         // together is a backend that is appending instances it should not.
         ModelGuard.note("effectControls.stack", stack.length)
         ModelGuard.note("effectControls.built", list.length)
-        root.rows = list
+        root.applyRows(list)
     }
 
     Loader {
@@ -686,33 +766,33 @@ Item {
                     spacing: 0
 
                     Repeater {
-                        model: root.rows
-                        // The prime suspect, and the reason this recording
-                        // exists. gdb caught the freeze inside
-                        // QQuickRepeater::setModel -> clear() ->
-                        // QQmlDelegateModel::cancel(), reached from a
-                        // selectionDetailChanged cascade, and this is a
-                        // Repeater whose model is rebound by exactly that
-                        // cascade. If the count here is four figures when the
-                        // window freezes, the argument is over.
+                        model: rowModel
+                        // Patched, never rebound. The freeze this panel was
+                        // caught in was QQuickRepeater::setModel -> clear() ->
+                        // QQmlDelegateModel::cancel(), i.e. the cost of handing
+                        // a Repeater a new array; applyRows() sets and inserts
+                        // instead, so a structure change costs the rows that
+                        // changed rather than all of them. The count is still
+                        // recorded: if it is four figures when the window
+                        // freezes, the argument is over.
                         onCountChanged: ModelGuard.note("effectControls.rows",
                                                        count)
                         delegate: EffectTreeRow {
-                            required property var modelData
+                            required property var row
                             width: treeColumn.width
-                            rowData: modelData
+                            rowData: row
                             clipId: root.clipId
-                            currentValue: root.valueFor(modelData, root.effects,
+                            currentValue: root.valueFor(row, root.effects,
                                                         root.effectStack,
                                                         root.draftKey,
                                                         root.draftValue)
-                            expanded: root.isExpanded(modelData.key,
-                                                      modelData.openByDefault === true)
+                            expanded: root.isExpanded(row.key,
+                                                      row.openByDefault === true)
                             onExpandRequested: root.toggleExpanded(
-                                                   modelData.key,
-                                                   modelData.openByDefault === true)
+                                                   row.key,
+                                                   row.openByDefault === true)
                             onDraftChanged: (value) => {
-                                root.draftKey = modelData.key
+                                root.draftKey = row.key
                                 root.draftValue = value
                             }
                             onDraftCleared: root.draftKey = ""
@@ -725,7 +805,7 @@ Item {
                     width: Math.max(0, grid.width - root.dividerX - 1)
                     height: Math.max(grid.height,
                                      root.rows.length * Theme.ecRowHeight)
-                    rows: root.rows
+                    laneModel: rowModel
                     clipId: root.clipId
                     clipLabel: root.clipLabel
                     startMs: root.viewStartMs

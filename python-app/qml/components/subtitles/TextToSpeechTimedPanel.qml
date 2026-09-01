@@ -45,10 +45,43 @@ Rectangle {
         return pad(h) + ":" + pad(m) + ":" + pad(s)
     }
 
-    property var segments: subtitleSegments()
+    // Only ever recomputed while this tab is the one on screen. It used to be
+    // rebuilt from every clipsChanged, visible or not, and a twenty-thousand-cue
+    // subtitle track turned that into a ~1 s freeze on every timeline edit: the
+    // JS array has to be converted back into a QVariantList to become a
+    // ListView model, one QVariantMap per entry.
+    property var segments: []
+    property bool segmentsStale: true
+
+    function refreshSegments() {
+        if (!root.visible) {
+            root.segmentsStale = true
+            return
+        }
+        root.segmentsStale = false
+        root.segments = root.subtitleSegments()
+    }
+
+    onVisibleChanged: if (root.visible && root.segmentsStale) root.refreshSegments()
+    Component.onCompleted: root.refreshSegments()
+
+    // Coalesced: a single edit can emit clipsChanged more than once, and an
+    // import emits it once for the whole batch either way.
+    Timer {
+        id: segmentsTimer
+        interval: 60
+        repeat: false
+        onTriggered: root.refreshSegments()
+    }
+
     Connections {
         target: Backend
-        function onClipsChanged() { root.segments = root.subtitleSegments() }
+        function onClipsChanged() {
+            if (root.visible)
+                segmentsTimer.restart()
+            else
+                root.segmentsStale = true
+        }
     }
 
     ColumnLayout {

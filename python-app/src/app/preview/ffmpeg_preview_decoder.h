@@ -35,6 +35,15 @@ public:
                     int sourceWidth, int sourceHeight);
   void stop();
 
+  // The playback level, changeable while a session is running.
+  //
+  // Mute used to be expressible only as start()'s audioEnabled flag, which meant a
+  // track muted mid-playback kept playing until the next seek, and a track
+  // un-muted mid-playback had no stream to come back to. The stream now always
+  // runs when the source has audio and the level carries the mute instead, so both
+  // directions take effect on the next pump rather than on the next session.
+  void setAudioVolume(double volume);
+
   bool running() const;
   QString error() const { return m_error; }
   QImage frame() const;
@@ -43,6 +52,12 @@ public:
   // current session has produced one. The monitor drives its playhead from this
   // instead of from a wall clock started when Play was pressed.
   qint64 presentedSourceMs() const;
+
+  // Pixel width of that frame, or 0 when there is none. Playback runs at
+  // whatever resolution the frame budget allows; a paused still is decoded at
+  // the source's own. The monitor compares this against the width it actually
+  // draws before deciding the swap is worth a repaint.
+  int presentedWidth() const { return m_nativeVideo.presentedWidth(); }
 
   // Opens the audio output device now, so that the first Play does not.
   //
@@ -112,6 +127,9 @@ private:
   double m_streamFrameIntervalMs = 0.0;
   qint64 m_streamFramesShown = -1;
   std::unique_ptr<QAudioSink> m_audioSink;
+  // The level the current session is playing at, so a live change survives a sink
+  // that has not been created yet.
+  double m_audioVolume = 1.0;
   QIODevice *m_audioDevice = nullptr;
   QTimer m_audioDrainTimer;
   // The threaded output. Every write goes here unless it reports that starting a

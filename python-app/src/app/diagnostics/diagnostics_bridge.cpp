@@ -5,13 +5,17 @@
 #include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <QQmlApplicationEngine>
 #include <QTextStream>
 #include <QThread>
+#include <QTimer>
 #include <QVariantList>
 #include <QtGlobal>
 
 #include "app/diagnostics/crash_channel.h"
+#include "app/diagnostics/diagnostic_analyzer.h"
 #include "app/diagnostics/crash_reporter_host.h"
+#include "app/diagnostics/diagnostics_cli.h"
 #include "app/diagnostics/item_tree_census.h"
 #include "app/diagnostics/model_guard.h"
 #include "app/diagnostics/playback_trace.h"
@@ -32,6 +36,14 @@ void DiagnosticsBridge::attach(QQmlApplicationEngine *engine,
                                int censusIntervalMs) {
   m_engine = engine;
   ItemTreeCensus::startSampling(engine, censusIntervalMs);
+  if (censusIntervalMs > 0)
+    return;
+
+  // One baseline walk when periodic sampling is off, so a crash or hang report
+  // still carries an item histogram instead of "census: nothing sampled". Late
+  // enough to be after the panels have built and outside the launch stall, and
+  // once only - the cost of the repeating version is what took it out.
+  QTimer::singleShot(6000, engine, []() { ItemTreeCensus::sampleNow(); });
 }
 
 QVariantMap DiagnosticsBridge::statistics() const {
@@ -39,6 +51,12 @@ QVariantMap DiagnosticsBridge::statistics() const {
   merge(map, ItemTreeCensus::statistics());
   merge(map, ModelGuard::instance().statistics());
   merge(map, CrashReporterHost::statistics());
+  // Whether the playback trace is on, as a fact separate from whether it has
+  // recorded anything. An empty history means "the env var was not set" or
+  // "nothing has been played", and the two call for opposite advice.
+  map.insert(QStringLiteral("playbackTraceEnabled"), PlaybackTrace::enabled());
+  map.insert(QStringLiteral("playbackTraceEvents"),
+             PlaybackTrace::instance().history(4096).size());
   return map;
 }
 
@@ -91,6 +109,60 @@ QString DiagnosticsBridge::playbackTrace(int maxEntries) const {
   return lines.join(QLatin1Char('\n'));
 }
 
+QVariantList DiagnosticsBridge::findings() const {
+  return DiagnosticAnalyzer::asVariantList(DiagnosticAnalyzer::analyze(
+      statistics(), PlaybackTrace::instance().history(512)));
+}
+
+QString DiagnosticsBridge::verdict() const {
+  return DiagnosticAnalyzer::verdict(DiagnosticAnalyzer::analyze(
+      statistics(), PlaybackTrace::instance().history(512)));
+}
+
+QString DiagnosticsBridge::diagnosisText() const {
+  return DiagnosticAnalyzer::text(DiagnosticAnalyzer::analyze(
+      statistics(), PlaybackTrace::instance().history(512)));
+}
+
+QString DiagnosticsBridge::crashChannelText() const {
+  return diag::CrashChannel::describe().join(QLatin1Char('\n'));
+}
+
+QString DiagnosticsBridge::fullReport(const QString &note) const {
+  QStringList out;
+  out << QStringLiteral("Cut Pro diagnostic report");
+  out << QStringLiteral("when           %1")
+             .arg(QDateTime::currentDateTime().toString(Qt::ISODate));
+  out << QStringLiteral("pid            %1")
+             .arg(QCoreApplication::applicationPid());
+  if (!note.isEmpty())
+    out << QStringLiteral("note           %1").arg(note);
+
+  out << QString() << QStringLiteral("--- diagnosis ---") << diagnosisText();
+
+  out << QString() << QStringLiteral("--- measurements ---");
+  const QVariantMap stats = statistics();
+  for (auto it = stats.cbegin(); it != stats.cend(); ++it) {
+    // A stall trace is a list; printing it as "QVariantList" would lose the one
+    // thing in the map that names a function.
+    const QVariant value = it.value();
+    if (value.typeId() == QMetaType::QStringList)
+      out << QStringLiteral("%1  %2").arg(it.key(),
+                                          value.toStringList().join(
+                                              QStringLiteral(" <- ")));
+    else
+      out << QStringLiteral("%1  %2").arg(it.key(), value.toString());
+  }
+
+  out << QString() << QStringLiteral("--- item tree census ---") << censusText();
+  out << QString() << QStringLiteral("--- guarded models ---") << modelReport();
+  out << QString() << QStringLiteral("--- playback trace ---")
+      << playbackTrace(512);
+  out << QString() << QStringLiteral("--- crash channel ---")
+      << crashChannelText();
+  return out.join(QLatin1Char('\n'));
+}
+
 QString DiagnosticsBridge::writeSnapshot(const QString &note) {
   const QString directory = CrashReporterHost::reportDirectory();
   QDir().mkpath(directory);
@@ -105,28 +177,20 @@ QString DiagnosticsBridge::writeSnapshot(const QString &note) {
     return QString();
   }
   // Sampled first, so the file describes the moment it was asked for rather
-  // than up to one interval before it.
-  const ItemTreeCensus::Result census = ItemTreeCensus::sampleNow();
+  // than up to one interval before it. fullReport() reads the census through
+  // ItemTreeCensus::last(), which this call has just refreshed.
+  ItemTreeCensus::sampleNow();
   QTextStream stream(&file);
-  stream << "Cut Pro snapshot\n";
-  stream << "when           "
-         << QDateTime::currentDateTime().toString(Qt::ISODate) << '\n';
-  stream << "pid            " << QCoreApplication::applicationPid() << '\n';
-  if (!note.isEmpty())
-    stream << "note           " << note << '\n';
-  stream << '\n';
-  const QVariantMap stats = statistics();
-  for (auto it = stats.cbegin(); it != stats.cend(); ++it)
-    stream << it.key() << "  " << it.value().toString() << '\n';
-  stream << "\n--- item tree census ---\n" << census.text() << '\n';
-  stream << "\n--- guarded models ---\n"
-         << ModelGuard::instance().report() << '\n';
-  stream << "\n--- playback trace ---\n" << playbackTrace(256) << '\n';
-  stream << "\n--- crash channel ---\n";
-  for (const QString &line : diag::CrashChannel::describe())
-    stream << line << '\n';
+  // One text builder for the file, the report window and the clipboard: three
+  // formats of the same evidence is how they drift apart, and the file is the
+  // copy that gets attached to a bug.
+  stream << fullReport(note) << '\n';
   Q_EMIT statisticsChanged();
   return path;
+}
+
+QString DiagnosticsBridge::printReport(const QString &note) {
+  return DiagnosticsCli::printReport(this, note);
 }
 
 void DiagnosticsBridge::forceHang(int ms) {

@@ -20,18 +20,24 @@ Rectangle {
     property real peakR: 0
 
     function hasAudibleClipAt(position) {
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var clip = Backend.clips[i]
-            if (clip.enabled === false || clip.kind === "subtitle"
-                    || Backend.mutedTracks.indexOf(String(clip.track)) >= 0
+        // Re-evaluated on every playhead tick, so it walks the media clips only:
+        // reading Backend.clips per iteration re-wrapped the whole list each
+        // time, and a subtitle track made that twenty thousand wrappers per tick.
+        var clips = Backend.mediaClips
+        var muted = Backend.mutedTracks
+        for (var i = 0; i < clips.length; ++i) {
+            var clip = clips[i]
+            if (clip.enabled === false
+                    || muted.indexOf(String(clip.track)) >= 0
                     || position < clip.startMs
                     || position >= clip.startMs + clip.durationMs)
                 continue
-            for (var j = 0; j < Backend.media.length; ++j) {
-                var media = Backend.media[j]
-                if (media.id === clip.mediaId && Number(media.channels) > 0)
-                    return true
-            }
+            // O(1) in C++. This was a nested walk of the whole bin per candidate
+            // clip per tick, and a generated voice track fills the bin with one
+            // entry per spoken cue.
+            var media = Backend.mediaById(String(clip.mediaId || ""))
+            if (media && Number(media.channels) > 0)
+                return true
         }
         return false
     }

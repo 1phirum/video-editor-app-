@@ -18,10 +18,12 @@
 #include "app/core_app/signal_coalescer.h"
 
 #include <QObject>
+#include <QElapsedTimer>
 #include <QImage>
 #include <QHash>
 #include <QJsonObject>
 #include <QNetworkAccessManager>
+#include <QPair>
 #include <QProcess>
 #include <QFutureWatcher>
 #include <QSet>
@@ -93,6 +95,22 @@ class CUTPRO_BACKEND_API Backend : public QObject {
                  setCaptionBlurPadding NOTIFY captionStyleChanged)
   Q_PROPERTY(QVariantList media READ media NOTIFY mediaChanged)
   Q_PROPERTY(QVariantList clips READ clips NOTIFY clipsChanged)
+  // Everything except the subtitle cues. A imported subtitle track is tens of
+  // thousands of clips against a handful of real ones, and almost every QML
+  // scan over the timeline skips cues anyway - iterating this instead keeps
+  // those scans the size of the edit rather than the size of the transcript.
+  Q_PROPERTY(QVariantList mediaClips READ mediaClips NOTIFY clipsChanged)
+  // The media a human voice could be transcribed from: real video and audio,
+  // minus every generated-speech file. A timed voiceover adds one bin entry per
+  // distinct cue, so this is a handful of entries against thousands - and the
+  // Text panel used to work that out in QML by scanning the whole bin once per
+  // bin entry.
+  Q_PROPERTY(QVariantList transcribableMedia READ transcribableMedia NOTIFY
+                 mediaChanged)
+  // What the project bin shows: everything except entries a generator marked as
+  // its own working files. Same reason as above - the bin has no interest in one
+  // entry per spoken cue, and it should not have to walk them to find that out.
+  Q_PROPERTY(QVariantList visibleMedia READ visibleMedia NOTIFY mediaChanged)
   Q_PROPERTY(TimelineClipModel *timelineClipModel READ timelineClipModel CONSTANT)
   Q_PROPERTY(bool hasSubtitleClips READ hasSubtitleClips NOTIFY clipsChanged)
   // Effect-track items only, so the monitor and the timeline can walk a handful
@@ -251,6 +269,18 @@ public:
   int captionBlurPadding() const { return m_captionStyle.blurPadding; }
   QVariantList media() const { return m_media; }
   QVariantList clips() const { return m_clips; }
+  QVariantList mediaClips() const;
+  QVariantList transcribableMedia() const;
+  QVariantList visibleMedia() const;
+  // O(1) by id, answered from the same cache the list above is built from.
+  Q_INVOKABLE bool isTranscribableMedia(const QString &mediaId) const;
+  // O(1) by id. QML used to hand-roll this as a linear scan in half a dozen
+  // places, each of which walked the subtitle cues to find a video clip.
+  Q_INVOKABLE QVariantMap clipById(const QString &id) const;
+  // O(1) by id, same as clipById and for the same reason: half a dozen QML
+  // functions looked a clip's source up by walking the whole bin, which a
+  // generated voice track fills with one entry per spoken cue.
+  Q_INVOKABLE QVariantMap mediaById(const QString &id) const;
   TimelineClipModel *timelineClipModel() { return &m_timelineClipModel; }
   bool hasSubtitleClips() const;
   QVariantList timelineEffects() const;
@@ -387,6 +417,12 @@ public:
   createSequence(const QString &name = QStringLiteral("Sequence 01"));
   Q_INVOKABLE QString addClip(const QString &mediaId, qint64 startMs = -1,
                               const QString &track = QString());
+  // Places an image (or video) as a logo/graphic overlay on a fresh V track
+  // above everything, flagged overlay:true with centered transform defaults so
+  // it composites over the base picture and can be dragged/resized in the
+  // monitor. Accepts an existing media id or a filesystem path/URL to import.
+  Q_INVOKABLE QString addImageOverlay(const QString &pathOrMediaId,
+                                      qint64 startMs = -1);
   Q_INVOKABLE QStringList addMediaToTimeline(
       const QString &mediaId, qint64 startMs = -1,
       const QString &track = QString());
@@ -406,6 +442,17 @@ public:
   Q_INVOKABLE bool deleteClipRight(const QString &clipId, qint64 positionMs);
   Q_INVOKABLE bool removeClip(const QString &clipId);
   Q_INVOKABLE bool removeClips(const QStringList &clipIds);
+  // "Extract Audio": the embedded sound of each video clip becomes its own
+  // A-track clip. The new clip is independent - CapCut's detached audio, not
+  // Premiere's linked pair - so moving or deleting it leaves the video alone.
+  // The video clip is marked separateAudio, which is what the export builder,
+  // the program monitor and the waveform gate read to stop taking audio from
+  // it, so nothing is heard twice. Returns the ids of the new audio clips.
+  Q_INVOKABLE QStringList extractClipAudio(const QStringList &clipIds);
+  // The other direction. Accepts either half: the extracted A-track clip is
+  // removed, its audio settings go back onto the video clip, and the video
+  // carries its own sound again.
+  Q_INVOKABLE bool restoreClipAudio(const QStringList &clipIds);
   Q_INVOKABLE QString addTrack(const QString &kind, bool sticky = true);
   Q_INVOKABLE bool removeLastTrack(const QString &kind);
   // Placement rules for the drop handlers, answered against the live track
@@ -531,6 +578,9 @@ public:
       const QString &path, const QString &mediaKind, qint64 sourcePositionMs,
       qint64 durationMs, int sourceWidth, int sourceHeight, double frameRate,
       bool audioEnabled, double volume, const QString &audioPath = QString());
+  // Applies to the session that is already playing. 0 is mute; the stream keeps
+  // running, so un-muting is instant and does not need a restart.
+  Q_INVOKABLE void setPreviewVolume(double volume);
   // exact = false asks for the cheap frame: the seek lands on the keyframe at or
   // before the position, which is what a moving playhead can afford. Pass true
   // once the playhead settles to decode forward to the requested frame itself.
@@ -556,6 +606,32 @@ public:
   // time display, the subtitle overlay and the still drawn on pause - ahead of
   // the image.
   Q_INVOKABLE qint64 previewPresentedSourceMs() const;
+
+  // How long ago that picture was handed to QML, in milliseconds, or -1 when
+  // there is none. The monitor's UI tick runs every 50 ms and the source
+  // publishes a frame every 33-40, so a tick that notices a new picture noticed
+  // it up to a frame or two late. Anchoring the playback clock at "now" threw
+  // that delay away on every single frame, which is why the playhead sat one or
+  // two frames behind the image and the pause handler had to jump forward to
+  // catch up. Back-dating the anchor by this age is what removes the gap
+  // instead of correcting it after the fact.
+  Q_INVOKABLE qint64 previewPresentedAgeMs() const;
+
+  // The newest picture whose source position the playback clock has already
+  // reached, or -1. A frame can be published in the couple of milliseconds
+  // between the pause click and the decoder being stopped: it was queued, never
+  // painted, and anchoring the pause onto it steps the image forward at the
+  // click. That is the "the frame is ahead when I pause" report. Asking for the
+  // frame at or before the clock keeps the pause on the picture the eye had.
+  Q_INVOKABLE qint64 previewPresentedSourceMsAtOrBefore(qint64 sourceMs) const;
+
+  // Pixel width of the picture on screen, or 0 when there is none. The still
+  // rendered on pause is the same frame decoded at the source's own resolution,
+  // which is a sharpness upgrade the monitor only asks for when the playback
+  // frame carries fewer pixels than the panel draws. Otherwise the swap changes
+  // nothing except the moment it lands - 100-400 ms after the freeze - and that
+  // reads as the frozen frame twitching.
+  Q_INVOKABLE int previewPresentedFrameWidth() const;
 
   // Report the timeline position of the picture on screen, so the playback trace
   // can print the playhead-versus-image gap as a number. The mapping from a
@@ -692,10 +768,29 @@ private:
   QString thumbnailForMedia(const QString &path, const QString &kind,
                             qint64 durationMs) const;
   QStringList expandImportPaths(const QStringList &paths) const;
-  QVariantMap mediaById(const QString &id) const;
   int mediaIndex(const QString &id) const;
   int clipIndex(const QString &id) const;
   QStringList expandedLinkedClipIds(const QStringList &clipIds) const;
+  // The lowest A track with nothing across [startMs, endMs), or one past the last
+  // existing lane when they are all busy. Extracted audio has to land where it
+  // cannot overwrite anything: it keeps the video clip's own times, so any lane
+  // already occupied there is not a candidate.
+  QString freeAudioTrack(qint64 startMs, qint64 endMs) const;
+  // Every clip carrying the same sound as the one at this index: the extracted
+  // A-track clip of a video clip, the video clip an extracted clip came out of,
+  // and the members of a legacy link group. Used to keep an audio setting on one
+  // half from disagreeing with the other; it is not a selection or delete group.
+  QVector<int> audioPeerIndexes(int index) const;
+  // A link group left behind by an older build's Extract Audio. Those pairs are
+  // no longer treated as linked - CapCut's detached audio is independent - so the
+  // commands that act on a whole group have to leave them alone, or a project
+  // saved before the change would still delete the video with the audio.
+  bool isDetachedAudioGroup(const QString &group) const;
+  // The whole project as plain values. This is the cheap form: the clip, media
+  // and transcript lists go in by reference, so building it costs a handful of
+  // small map inserts no matter how long the timeline is. Everything else -
+  // undo, the SQLite mirror, the .cutpro file - is derived from this.
+  QVariantMap stateVariant() const;
   // The whole project as one object. Kept separate from serializeState() so the
   // SQLite mirror can take it directly: that path used to serialise to JSON text
   // and immediately parse the text back into a QVariantMap, three full passes
@@ -706,12 +801,18 @@ private:
   // the file the user may open in an editor is worth that cost.
   QByteArray serializeState(bool pretty = false) const;
   bool restoreState(const QByteArray &json, bool fromHistory = false);
+  // The single restore implementation. restoreState() is the file/JSON door into
+  // it; undo and redo come in here directly, because their snapshots never had
+  // to become text in the first place.
+  bool restoreStateVariant(const QVariantMap &state, bool fromHistory = false);
   void rememberState();
-  // Undo depth is bounded by bytes as well as by count: one snapshot of a
-  // 2581-clip subtitle track is megabytes, and a hundred of those is a few
-  // hundred megabytes held for a depth nobody reaches.
+  // Undo depth is bounded by cost as well as by count. Snapshots are value maps
+  // now, not JSON text, so an unchanged list costs one shared reference and a
+  // changed one costs a fresh spine - the estimate below prices a state by the
+  // spines it can own rather than by megabytes of text it no longer builds.
   static constexpr int kMaxUndoStates = 100;
   static constexpr qint64 kMaxUndoBytes = 96 * 1024 * 1024;
+  static qint64 approximateStateBytes(const QVariantMap &state);
   // How often the action log may carry a full state snapshot. Nothing reads that
   // column, so this is a floor on how much a row costs, not a recovery window.
   static constexpr qint64 kActionSnapshotIntervalMs = 30000;
@@ -720,6 +821,14 @@ private:
   void emitAllStateChanged();
   void updateExportProgress();
   void rebuildSequenceTranscript();
+  // Asks for one rebuild once the timeline stops changing. The rebuild walks
+  // every clip, so running it inside a burst of edits costs the whole walk per
+  // edit and throws all but the last result away; the timed-speech import is a
+  // burst thousands of turns long. The timer restarts on every request, so a
+  // burst pays for one rebuild at its end and a lone edit pays for one a moment
+  // later.
+  void scheduleSequenceTranscriptRebuild();
+  QTimer m_transcriptRebuildTimer;
   // Windowed transcription. The worker streams one JSON object per line while it
   // runs, so a long source publishes segments as it goes instead of after hours
   // of silence - and a cancel keeps whatever has already landed.
@@ -740,6 +849,10 @@ private:
   void pruneEmptyTracks(bool releaseUserTracks = false);
   void beginTimedSpeechImport(const QVariantList &outputs);
   void importNextTimedSpeechOutput();
+  // Existing occupancy of A1..A64, read once, in one pass over the timeline.
+  void buildSpeechLaneIndex();
+  // The first lane that is free for [startMs, endMs), A64 when none is.
+  QString reserveSpeechLane(qint64 startMs, qint64 endMs);
   void configureAutoSave();
   void performAutoSave();
   QString projectDatabasePath() const;
@@ -756,10 +869,11 @@ private:
   // Ceiling on queued background thumbnail jobs for large media.
   static constexpr int kMaxPendingLargePreviews = 16;
   void finishDeferredMediaPreview();
-  // The snapshot is passed in rather than serialised here: callers that already
-  // built one for the undo stack must not pay for a second copy.
+  // The snapshot is the cheap value form, and it is only turned into JSON text
+  // on the rare row that actually carries one - the throttle below discards it
+  // otherwise, and serialising a discarded snapshot was the whole problem.
   void recordAction(const QString &type, const QVariantMap &payload = {},
-                    const QByteArray &snapshot = QByteArray());
+                    const QVariantMap &stateSnapshot = QVariantMap());
   qint64 m_lastActionSnapshotMs = 0;
 
   QString m_projectId;
@@ -780,6 +894,19 @@ private:
   QNetworkAccessManager m_fontNetwork;
   QVariantMap m_colorSettings;
   QVariantList m_media;
+  // Facts derived from m_media, pinned to the exact list version they were built
+  // from - the same trick m_clipCachePin plays for the clips, and for the same
+  // reason. mediaIndex() was a linear scan that converted a QVariantMap per
+  // element, and rebuildSequenceTranscript() called it once per clip: importing
+  // a twenty-thousand-cue voiceover made that product grow on both sides at
+  // once, which is what froze the window for sixteen seconds at a time.
+  mutable QVariantList m_mediaCachePin;
+  mutable QHash<QString, int> m_cachedMediaIndex;
+  mutable QVariantList m_cachedTranscribableMedia;
+  mutable QVariantList m_cachedVisibleMedia;
+  mutable QSet<QString> m_cachedTranscribableIds;
+  mutable bool m_mediaCacheReady = false;
+  void ensureMediaCaches() const;
   void handleTimelinePlacementStep(const QVariantMap &item);
   bool startDemucsForClip(const QString &clipId);
   // Appends a batch of freshly probed media to the bin in one step. Emitting
@@ -796,6 +923,24 @@ private:
   bool m_timelinePlacementActive = false;
   QStringList m_timelinePlacementAddedIds;
   QVariantList m_clips;
+  // Facts derived from m_clips that QML reads through bindings. Recomputing
+  // them on every read is what made a twenty-thousand-cue subtitle track slow:
+  // one Backend.durationMs binding walked the whole list, and there are several
+  // such bindings. The cache is pinned to the exact list version it was built
+  // from - m_clipCachePin shares m_clips' buffer, so any mutation is forced to
+  // detach and the two data pointers stop matching. That is what makes this
+  // safe without touching the forty-odd places that mutate m_clips: none of
+  // them has to remember to invalidate anything.
+  mutable QVariantList m_clipCachePin;
+  mutable QHash<QString, int> m_cachedClipIndex;
+  mutable QVariantList m_cachedTimelineEffects;
+  mutable QVariantList m_cachedMediaClips;
+  mutable QVector<int> m_cachedVideoClips;
+  mutable qint64 m_cachedDurationMs = 0;
+  mutable bool m_cachedHasSubtitleClips = false;
+  mutable bool m_cachedHasRenderableClips = false;
+  mutable bool m_clipCacheReady = false;
+  void ensureClipCaches() const;
   TimelineClipModel m_timelineClipModel;
   int m_videoTrackCount = 1;
   int m_audioTrackCount = 1;
@@ -817,8 +962,12 @@ private:
   qint64 m_playheadMs = 0;
   bool m_playing = false;
   bool m_dirty = false;
-  QVector<QByteArray> m_undo;
-  QVector<QByteArray> m_redo;
+  // Value snapshots, not JSON text. Serialising the whole project on every
+  // undoable edit cost ~945 ms with a 19831-cue subtitle track on the timeline;
+  // these share the lists they were taken from, so an edit that touches one clip
+  // copies one list spine and nothing else.
+  QVector<QVariantMap> m_undo;
+  QVector<QVariantMap> m_redo;
   QString m_lastError;
   ProjectDatabase m_projectDatabase;
   QProcess m_exportProcess;
@@ -876,6 +1025,21 @@ private:
   ScrubFrameService m_scrubFrames;
   VideoPreviewHelper m_videoPreviewHelper;
   quint64 m_previewFrameRevision = 0;
+  // The picture QML was actually handed, recorded on the GUI thread when the
+  // frame reaches the image provider rather than on the decode thread when it is
+  // published. Those are not the same instant: the decode thread publishes and
+  // the GUI thread picks the frame up one queued call later, so the decoder's own
+  // presentedSourceMs() can already name a frame that nothing has drawn yet.
+  qint64 m_paintedSourceMs = -1;
+  // The one before it, which is the picture still on screen when the newest
+  // frame was published but not yet painted.
+  qint64 m_previousPaintedSourceMs = -1;
+  // Wall clock, same epoch as QML's Date.now(), of the moment m_paintedSourceMs
+  // was handed over.
+  qint64 m_paintedWallMs = 0;
+  // Pixel width of the picture QML was handed, for the pause path's decision
+  // about whether a full-resolution still would look any different.
+  int m_paintedFrameWidth = 0;
   // Nesting depth of timeline gestures. A drag over the tracks raises this and
   // the drop lowers it; the filmstrip watches it so no thumbnail decode is even
   // requested while the pointer is moving.
@@ -915,7 +1079,43 @@ private:
   QTimer m_projectDatabaseSaveTimer;
   QTimer m_ttsImportTimer;
   QVariantList m_pendingTtsOutputs;
+  // One audio lane's occupancy, prepared once per import.
+  //
+  // Placing a generated cue used to rescan every clip on the timeline for every
+  // candidate lane: with 19831 cues over a 19831-clip subtitle track that is
+  // hundreds of millions of QVariantMap conversions, and it ran on the GUI thread
+  // in batches of two. The question is monotonic instead - cues are imported in
+  // ascending start order - so each lane keeps its existing clips sorted and a
+  // cursor that only ever moves forward past the ones already behind the playhead
+  // of the import.
+  struct SpeechLane {
+    QVector<QPair<qint64, qint64>> intervals;  // existing clips, sorted by start
+    int cursor = 0;
+    qint64 appendedEndMs = -1;  // end of the last cue this import placed here
+    bool blocked = false;       // a locked track this import must not touch
+  };
+  QVector<SpeechLane> m_ttsLanes;
+  // Path -> media id for this import. Identical cue text is synthesized once and
+  // therefore lands in one file, so the second clip that needs it reuses the media
+  // entry instead of adding a seventeen-key duplicate of it.
+  QHash<QString, QString> m_ttsMediaByPath;
   int m_pendingTtsIndex = 0;
   int m_pendingTtsAdded = 0;
   bool m_ttsImportActive = false;
+  // How often the half-built timeline is published, as opposed to how often the
+  // import runs.
+  //
+  // Every clipsChanged during this import re-derives everything downstream of the
+  // clip list: the preview helper re-indexes every clip and every bin entry, the
+  // timeline model re-projects its viewport, the transcript is rebuilt. That is
+  // the right work to do for an edit, and the wrong work to do thousands of times
+  // for one import - it is what the watchdog caught the window sitting inside for
+  // sixteen seconds. Placement still runs on every turn against a millisecond
+  // budget; only the notification is rationed, so the clip count climbs a few
+  // times a second instead of hundreds of times a second and the frames in
+  // between belong to the window.
+  QElapsedTimer m_ttsPublishClock;
+  int m_ttsPublishedMediaCount = 0;
+  int m_ttsPublishedVideoTracks = 0;
+  int m_ttsPublishedAudioTracks = 0;
 };

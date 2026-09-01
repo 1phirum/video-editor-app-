@@ -1,5 +1,7 @@
 #include "app/timeline/timeline_clip_model.h"
 
+#include "app/preview/gui_thread_watchdog.h"
+
 #include <QHash>
 #include <QSet>
 #include <QtGlobal>
@@ -40,6 +42,7 @@ QHash<int, QByteArray> TimelineClipModel::roleNames() const {
 }
 
 void TimelineClipModel::setClips(const QVariantList &clips) {
+  CUTPRO_GUI_SCOPE("TimelineClipModel::setClips");
   m_allClips = clips;
   m_spans.resize(m_allClips.size());
   for (int i = 0; i < m_allClips.size(); ++i) {

@@ -109,6 +109,14 @@ void PreviewAudioSinkWorker::begin(double volume) {
     m_pump->start();
 }
 
+void PreviewAudioSinkWorker::setVolume(double volume) {
+  m_volume = qBound(0.0, volume, 1.0);
+  // Remembered even when there is no sink yet, so the next begin() opens at the
+  // level the user is currently on rather than at the one they left.
+  if (m_sink)
+    m_sink->setVolume(m_volume);
+}
+
 void PreviewAudioSinkWorker::resetQueue() {
   {
     QMutexLocker locker(&m_mutex);
@@ -203,6 +211,11 @@ void PreviewAudioSink::warm() {
 
 void PreviewAudioSink::begin(double volume) {
   QMetaObject::invokeMethod(m_worker, "begin", Qt::QueuedConnection,
+                            Q_ARG(double, volume));
+}
+
+void PreviewAudioSink::setVolume(double volume) {
+  QMetaObject::invokeMethod(m_worker, "setVolume", Qt::QueuedConnection,
                             Q_ARG(double, volume));
 }
 

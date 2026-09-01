@@ -1,0 +1,294 @@
+19:43:20.263 GUI turn monitor on, budget 20 ms - every event-loop turn longer than this is reported with its marked scope (CUTPRO_TURN_BUDGET_MS=0 turns it off)
+19:43:20.329 CrashReporterHost: watching pid 16064 from pid 18760 | reports -> C:/Users/USER/AppData/Local/Antigravity/Cut Pro/crash-reports
+19:43:20.345 Cut Pro: native C++/Qt backend, coreVersion = 0.1.2 | built = Aug 31 2026 19:42:43 | executable = C:/premier-pro/python-app/dist/Cut Pro 2026/cutpro.exe
+19:43:20.704 GUI thread unresponsive for 442 ms, "churning through": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+19:43:20.705   the innermost frame has only been open 347 ms of the 442 ms stall, so the thread is entering and leaving frames rather than stuck in one: the fix is to do it fewer times, not to move it off the thread.
+19:43:21.154 GUI thread unresponsive for 892 ms, "wedged in": "QQmlApplicationEngine::load(qrc:/qml/main.qml)"
+19:43:21.183   GUI thread backtrace, innermost first (14 frames):
+19:43:21.183     #0  "ntdll.dll!NtWaitForSingleObject+0x14"
+19:43:21.183     #1  "KERNELBASE.dll!WaitForSingleObjectEx+0xaf"
+19:43:21.183     #2  "Qt6Core.dll!QWaitCondition::wait(QMutex*, QDeadlineTimer)+0x9a"
+19:43:21.183     #3  "Qt6Qml.dll+0x2afd89 (nearest export: QQmlJS::Parser::parse(int)+0x137a9)"
+19:43:21.183     #4  "Qt6Qml.dll!QQmlTypeLoader::loadThread(QQmlRefPointer<QQmlDataBlob> const&)+0x6d6"
+19:43:21.183     #5  "Qt6Qml.dll!QQmlTypeLoader::getType(QUrl const&, QQmlTypeLoader::Mode)+0x22b"
+19:43:21.183     #6  "Qt6Qml.dll!QQmlComponentPrivate::loadUrl(QUrl const&, QQmlComponent::CompilationMode)+0x1a4"
+19:43:21.183     #7  "Qt6Qml.dll!QQmlApplicationEnginePrivate::startLoad(QUrl const&, QByteArray const&, bool)+0x93"
+19:43:21.183     #8  "Qt6Qml.dll!QQmlApplicationEngine::load(QUrl const&)+0x3d"
+19:43:21.183     #9  "cutpro.exe+0x2d8e"
+19:43:21.183     #10  "cutpro.exe+0x12ef"
+19:43:21.183     #11  "cutpro.exe+0x1406"
+19:43:21.183     #12  "KERNEL32.DLL!BaseThreadInitThunk+0x17"
+19:43:21.183     #13  "ntdll.dll!RtlUserThreadStart+0x2c"
+19:43:21.637 Using Qt multimedia with FFmpeg version 7.1.3 LGPL version 2.1 or later
+19:43:30.752 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ebb80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:43:30.752 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ebb80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:43:33.389 monitor: source key  -> clip_0c6fafdc1dbe|D:/capcut/At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4|video|0|0|35744891|
+19:43:33.390 playback: session.stop decoder idle, picture at -1 ms, published -1 ms from MonitorPanel.qml:1099 (onActiveSourceKeyChanged) <- TimelinePanel.qml:1739
+19:43:33.559 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea8c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:43:33.559 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea8c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:43:33.856 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ebb80] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:43:33.856 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ebb80] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:43:33.864 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea080] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:43:33.864 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea080] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:43:39.655 playback: playing false -> true at playhead 0 ms [+6265 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:43:39.655 monitor: playing -> true at 0
+19:43:39.655 monitor: playback session at playhead 0 clip clip_0c6fafdc1dbe
+19:43:39.656 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 0 ms, kind video [+1 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:43:39.999 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:43:40.000 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:43:40.153 [h264 @ 000001b7a3ea97c0] Late SEI
+19:43:40.153 [h264 @ 000001b7a3ea97c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:43:40.153 [h264 @ 000001b7a3ea97c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:43:40.235 preview playback: first frame after 576 ms, at source 0 ms (requested 0 ms)
+19:43:40.235 playback: frame at source 0 ms, advanced 0 ms of media in -1 ms of wall clock
+19:43:40.262 playback: playhead is 4 ms AHEAD of the picture (playhead 20 ms, picture 16 ms)
+19:43:40.369 preview cost: frame is 14 ms against a 9 ms budget at 60 fps - lowering the preview to 1562 px
+19:43:40.513 preview cost: frame is 16 ms against a 9 ms budget at 60 fps - lowering the preview to 1164 px
+19:43:40.638 preview cost: frame is 15 ms and the picture is already at 960 px - pacing the preview at 30 fps instead of 60
+19:43:41.248 playback: playing true -> false at playhead 911 ms [+1591 ms] from MonitorPanel.qml:1933 (onClicked)
+19:43:41.248 monitor: playing -> false at 911
+19:43:41.248 playback: session.stop decoder running, picture at 933 ms, published 933 ms [+0 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:43:44.144 playback: playing false -> true at playhead 933 ms [+2895 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:43:44.145 monitor: playing -> true at 933
+19:43:44.145 monitor: playback session at playhead 933 clip clip_0c6fafdc1dbe
+19:43:44.145 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 933 ms, kind video [+1 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:43:44.545 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eae00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:43:44.545 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eae00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:43:44.658 [h264 @ 000001b79dd27e80] Late SEI
+19:43:44.659 [h264 @ 000001b79dd27e80]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:43:44.659 [h264 @ 000001b79dd27e80] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:43:44.905 preview playback: first frame after 753 ms, at source 933 ms (requested 933 ms)
+19:43:44.905 playback: frame at source 933 ms, advanced 0 ms of media in 3664 ms of wall clock
+19:43:44.912 playback: playhead is 6 ms AHEAD of the picture (playhead 939 ms, picture 933 ms)
+19:43:45.955 playback: playhead is 13 ms AHEAD of the picture (playhead 1979 ms, picture 1966 ms)
+19:43:46.979 playback: playhead is 3 ms AHEAD of the picture (playhead 3003 ms, picture 3000 ms)
+19:43:47.330 playback: playing true -> false at playhead 3309 ms [+3185 ms] from MonitorPanel.qml:1933 (onClicked)
+19:43:47.331 monitor: playing -> false at 3309
+19:43:47.331 playback: session.stop decoder running, picture at 3333 ms, published 3333 ms [+0 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:43:49.107 playback: playing false -> true at playhead 3333 ms [+1775 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:43:49.108 monitor: playing -> true at 3333
+19:43:49.108 monitor: playback session at playhead 3333 clip clip_0c6fafdc1dbe
+19:43:49.109 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 3333 ms, kind video [+1 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:43:49.509 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:43:49.510 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:43:49.637 [h264 @ 000001b7a3e16340] Late SEI
+19:43:49.638 [h264 @ 000001b7a3e16340]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:43:49.638 [h264 @ 000001b7a3e16340] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:43:50.176 preview playback: first frame after 1064 ms, at source 3333 ms (requested 3333 ms)
+19:43:50.176 playback: frame at source 3333 ms, advanced 0 ms of media in 2869 ms of wall clock
+19:43:50.227 playback: playhead is 13 ms AHEAD of the picture (playhead 3379 ms, picture 3366 ms)
+19:43:51.259 playback: playhead is 13 ms AHEAD of the picture (playhead 4413 ms, picture 4400 ms)
+19:43:52.246 [h264 @ 000001b7a3e16340] Late SEI
+19:43:52.246 [h264 @ 000001b7a3e16340]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:43:52.246 [h264 @ 000001b7a3e16340] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:43:52.268 playback: playhead is 20 ms AHEAD of the picture (playhead 5420 ms, picture 5400 ms)
+19:43:53.269 playback: playhead is 24 ms AHEAD of the picture (playhead 6424 ms, picture 6400 ms)
+19:43:54.147 playback: playing true -> false at playhead 7271 ms [+5039 ms] from MonitorPanel.qml:1933 (onClicked)
+19:43:54.148 monitor: playing -> false at 7271
+19:43:54.148 playback: session.stop decoder running, picture at 7300 ms, published 7300 ms [+0 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:43:55.920 playback: playing false -> true at playhead 7300 ms [+1771 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:43:55.921 monitor: playing -> true at 7300
+19:43:55.921 monitor: playback session at playhead 7300 clip clip_0c6fafdc1dbe
+19:43:55.921 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 7300 ms, kind video [+1 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:43:56.182 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:43:56.183 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:43:56.290 [h264 @ 000001b7df400a40] Late SEI
+19:43:56.291 [h264 @ 000001b7df400a40]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:43:56.291 [h264 @ 000001b7df400a40] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:43:56.482 preview playback: first frame after 560 ms, at source 7300 ms (requested 7300 ms)
+19:43:56.483 playback: frame at source 7300 ms, advanced 0 ms of media in 2338 ms of wall clock
+19:43:56.528 playback: playhead is 6 ms AHEAD of the picture (playhead 7339 ms, picture 7333 ms)
+19:43:57.577 playback: playhead is 24 ms AHEAD of the picture (playhead 8390 ms, picture 8366 ms)
+19:43:58.248 playback: playing true -> false at playhead 9038 ms [+2327 ms] from MonitorPanel.qml:1933 (onClicked)
+19:43:58.248 monitor: playing -> false at 9038
+19:43:58.248 playback: session.stop decoder running, picture at 9033 ms, published 9033 ms [+0 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:44:00.254 playback: playing false -> true at playhead 9033 ms [+2004 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:00.254 monitor: playing -> true at 9033
+19:44:00.254 monitor: playback session at playhead 9033 clip clip_0c6fafdc1dbe
+19:44:00.254 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 9033 ms, kind video [+0 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:00.505 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eb600] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:44:00.506 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eb600] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:44:00.609 [h264 @ 000001b7a3f1fd00] Late SEI
+19:44:00.609 [h264 @ 000001b7a3f1fd00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:00.609 [h264 @ 000001b7a3f1fd00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:00.913 preview playback: first frame after 658 ms, at source 9033 ms (requested 9033 ms)
+19:44:00.913 playback: frame at source 9033 ms, advanced 0 ms of media in 2694 ms of wall clock
+19:44:00.960 playback: playhead is 3 ms AHEAD of the picture (playhead 9069 ms, picture 9066 ms)
+19:44:01.188 preview cost: frame is 5 ms of a 18 ms budget - raising the preview to 1200 px
+19:44:01.489 playback: playing true -> false at playhead 9569 ms [+1234 ms] from MonitorPanel.qml:1933 (onClicked)
+19:44:01.489 monitor: playing -> false at 9569
+19:44:01.490 playback: session.stop decoder running, picture at 9600 ms, published 9600 ms [+1 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:44:05.185 playback: playing false -> true at playhead 9600 ms [+3694 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:05.185 monitor: playing -> true at 9600
+19:44:05.185 monitor: playback session at playhead 9600 clip clip_0c6fafdc1dbe
+19:44:05.185 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 9600 ms, kind video [+0 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:05.488 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eb8c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:44:05.488 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eb8c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:44:05.588 [h264 @ 000001b79d665a80] Late SEI
+19:44:05.588 [h264 @ 000001b79d665a80]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:05.588 [h264 @ 000001b79d665a80] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:05.940 preview playback: first frame after 752 ms, at source 9600 ms (requested 9600 ms)
+19:44:05.940 playback: frame at source 9600 ms, advanced 0 ms of media in 4459 ms of wall clock
+19:44:05.947 playback: playhead is 5 ms AHEAD of the picture (playhead 9605 ms, picture 9600 ms)
+19:44:06.661 playback: playing true -> false at playhead 10310 ms [+1475 ms] from MonitorPanel.qml:1933 (onClicked)
+19:44:06.661 monitor: playing -> false at 10310
+19:44:06.661 playback: session.stop decoder running, picture at 10300 ms, published 10300 ms [+0 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:44:08.793 playback: playing false -> true at playhead 10300 ms [+2130 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:08.794 monitor: playing -> true at 10300
+19:44:08.794 monitor: playback session at playhead 10300 clip clip_0c6fafdc1dbe
+19:44:08.794 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 10300 ms, kind video [+1 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:09.074 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eb0c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:44:09.075 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eb0c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:44:09.183 [h264 @ 000001b7e1937f40] Late SEI
+19:44:09.184 [h264 @ 000001b7e1937f40]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:09.184 [h264 @ 000001b7e1937f40] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:09.568 preview playback: first frame after 772 ms, at source 10300 ms (requested 10300 ms)
+19:44:09.568 playback: frame at source 10300 ms, advanced 0 ms of media in 2928 ms of wall clock
+19:44:09.600 playback: playhead is 31 ms AHEAD of the picture (playhead 10331 ms, picture 10300 ms)
+19:44:10.520 playback: playing true -> false at playhead 11238 ms [+1725 ms] from MonitorPanel.qml:1933 (onClicked)
+19:44:10.520 monitor: playing -> false at 11238
+19:44:10.521 playback: session.stop decoder running, picture at 11233 ms, published 11233 ms [+1 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:44:10.525 [h264 @ 000001b7e1939940] Late SEI
+19:44:10.526 [h264 @ 000001b7e1939940]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:10.526 [h264 @ 000001b7e1939940] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:13.201 playback: playing false -> true at playhead 11233 ms [+2680 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:13.201 monitor: playing -> true at 11233
+19:44:13.201 monitor: playback session at playhead 11233 clip clip_0c6fafdc1dbe
+19:44:13.202 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 11233 ms, kind video [+0 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:13.460 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eb8c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:44:13.460 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eb8c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:44:13.546 [h264 @ 000001b7a3a52480] Late SEI
+19:44:13.546 [h264 @ 000001b7a3a52480]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:13.546 [h264 @ 000001b7a3a52480] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:13.969 preview playback: first frame after 765 ms, at source 11233 ms (requested 11233 ms)
+19:44:13.969 playback: frame at source 11233 ms, advanced 0 ms of media in 3466 ms of wall clock
+19:44:14.008 [h264 @ 000001b7a3a51200] Late SEI
+19:44:14.008 [h264 @ 000001b7a3a51200]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:14.008 [h264 @ 000001b7a3a51200] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:14.011 playback: playhead is 3 ms AHEAD of the picture (playhead 11269 ms, picture 11266 ms)
+19:44:14.564 playback: playing true -> false at playhead 11819 ms [+1362 ms] from MonitorPanel.qml:1933 (onClicked)
+19:44:14.564 monitor: playing -> false at 11819
+19:44:14.564 playback: session.stop decoder running, picture at 11800 ms, published 11800 ms [+0 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:44:16.401 playback: playing false -> true at playhead 11800 ms [+1836 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:16.401 monitor: playing -> true at 11800
+19:44:16.401 monitor: playback session at playhead 11800 clip clip_0c6fafdc1dbe
+19:44:16.402 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 11800 ms, kind video [+0 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:16.630 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eb8c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:44:16.631 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eb8c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:44:16.722 [h264 @ 000001b7df701800] Late SEI
+19:44:16.722 [h264 @ 000001b7df701800]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:16.722 [h264 @ 000001b7df701800] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:16.806 preview playback: first frame after 401 ms, at source 11800 ms (requested 11800 ms)
+19:44:16.806 playback: frame at source 11800 ms, advanced 0 ms of media in 2266 ms of wall clock
+19:44:16.817 playback: playhead is 10 ms AHEAD of the picture (playhead 11810 ms, picture 11800 ms)
+19:44:16.831 playback: playing true -> false at playhead 11810 ms [+428 ms] from MonitorPanel.qml:1933 (onClicked)
+19:44:16.831 monitor: playing -> false at 11810
+19:44:16.831 playback: session.stop decoder running, picture at 11800 ms, published 11800 ms [+0 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:44:17.216 playback: playing false -> true at playhead 11800 ms [+384 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:17.216 monitor: playing -> true at 11800
+19:44:17.216 monitor: playback session at playhead 11800 clip clip_0c6fafdc1dbe
+19:44:17.217 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 11800 ms, kind video [+1 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:17.423 playback: playing true -> false at playhead 11800 ms [+205 ms] from MonitorPanel.qml:1933 (onClicked)
+19:44:17.423 monitor: playing -> false at 11800
+19:44:17.423 playback: session.stop decoder running, picture at -1 ms, published -1 ms [+0 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:44:17.449 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] STSZ atom truncated
+19:44:17.449 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] stream 1, contradictionary STSC and STCO
+19:44:17.449 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] error reading header
+19:44:17.898 playback: playing false -> true at playhead 11800 ms [+474 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:17.899 monitor: playing -> true at 11800
+19:44:17.899 monitor: playback session at playhead 11800 clip clip_0c6fafdc1dbe
+19:44:17.899 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 11800 ms, kind video [+0 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:18.157 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eb8c0] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:44:18.158 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eb8c0] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:44:18.242 [h264 @ 000001b7a3b35c80] Late SEI
+19:44:18.242 [h264 @ 000001b7a3b35c80]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:18.242 [h264 @ 000001b7a3b35c80] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:18.336 preview playback: first frame after 436 ms, at source 11800 ms (requested 11800 ms)
+19:44:18.337 playback: frame at source 11800 ms, advanced 0 ms of media in 1531 ms of wall clock
+19:44:18.358 playback: playhead is 20 ms AHEAD of the picture (playhead 11820 ms, picture 11800 ms)
+19:44:19.131 playback: playing true -> false at playhead 12569 ms [+1232 ms] from MonitorPanel.qml:1933 (onClicked)
+19:44:19.132 monitor: playing -> false at 12569
+19:44:19.132 playback: session.stop decoder running, picture at 12566 ms, published 12566 ms [+1 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:44:21.393 playback: playing false -> true at playhead 12566 ms [+2259 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:21.393 monitor: playing -> true at 12566
+19:44:21.393 monitor: playback session at playhead 12566 clip clip_0c6fafdc1dbe
+19:44:21.394 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 12566 ms, kind video [+1 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:21.650 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:44:21.651 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:44:21.730 [h264 @ 000001b79daadbc0] Late SEI
+19:44:21.730 [h264 @ 000001b79daadbc0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:21.730 [h264 @ 000001b79daadbc0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:21.869 preview playback: first frame after 473 ms, at source 12566 ms (requested 12566 ms)
+19:44:21.869 playback: frame at source 12566 ms, advanced 0 ms of media in 2764 ms of wall clock
+19:44:21.900 playback: playhead is 28 ms AHEAD of the picture (playhead 12594 ms, picture 12566 ms)
+19:44:22.453 playback: playing true -> false at playhead 13094 ms [+1059 ms] from MonitorPanel.qml:1933 (onClicked)
+19:44:22.454 monitor: playing -> false at 13094
+19:44:22.454 playback: session.stop decoder running, picture at 13133 ms, published 13133 ms [+0 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:44:31.188 playback: playing false -> true at playhead 18324191 ms [+8734 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:31.189 monitor: playing -> true at 18324191
+19:44:31.189 monitor: playback session at playhead 18324191 clip clip_0c6fafdc1dbe
+19:44:31.189 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 18324191 ms, kind video [+0 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:31.395 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:44:31.395 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:44:31.485 [h264 @ 000001b79daaf1c0] Late SEI
+19:44:31.485 [h264 @ 000001b79daaf1c0]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:31.485 [h264 @ 000001b79daaf1c0] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:31.868 preview playback: first frame after 678 ms, at source 18324200 ms (requested 18324191 ms)
+19:44:31.869 playback: frame at source 18324200 ms, advanced 18311067 ms of media in 9430 ms of wall clock
+19:44:31.892 playback: playhead is 22 ms AHEAD of the picture (playhead 18324222 ms, picture 18324200 ms)
+19:44:32.204 [h264 @ 000001b79daad800] Late SEI
+19:44:32.204 [h264 @ 000001b79daad800]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:32.206 [h264 @ 000001b79daad800] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:32.942 playback: playhead is 3 ms AHEAD of the picture (playhead 18325269 ms, picture 18325266 ms)
+19:44:33.381 playback: playing true -> false at playhead 18325685 ms [+2192 ms] from MonitorPanel.qml:1933 (onClicked)
+19:44:33.381 monitor: playing -> false at 18325685
+19:44:33.382 playback: session.stop decoder running, picture at 18325700 ms, published 18325700 ms [+0 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:44:36.393 playback: playing false -> true at playhead 18325700 ms [+3011 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:36.394 monitor: playing -> true at 18325700
+19:44:36.394 monitor: playback session at playhead 18325700 clip clip_0c6fafdc1dbe
+19:44:36.394 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 18325700 ms, kind video [+0 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:36.638 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:44:36.638 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:44:36.720 [h264 @ 000001b7deba5c40] Late SEI
+19:44:36.720 [h264 @ 000001b7deba5c40]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:36.720 [h264 @ 000001b7deba5c40] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:36.854 preview playback: first frame after 457 ms, at source 18325700 ms (requested 18325700 ms)
+19:44:36.854 playback: frame at source 18325700 ms, advanced 0 ms of media in 3484 ms of wall clock
+19:44:36.858 playback: playhead is 3 ms AHEAD of the picture (playhead 18325703 ms, picture 18325700 ms)
+19:44:37.860 playback: playhead is 3 ms AHEAD of the picture (playhead 18326703 ms, picture 18326700 ms)
+19:44:38.380 playback: playing true -> false at playhead 18327204 ms [+1985 ms] from MonitorPanel.qml:1933 (onClicked)
+19:44:38.380 monitor: playing -> false at 18327204
+19:44:38.380 playback: session.stop decoder running, picture at 18327200 ms, published 18327200 ms [+0 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:44:40.409 playback: playing false -> true at playhead 18327200 ms [+2029 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:40.410 monitor: playing -> true at 18327200
+19:44:40.410 monitor: playback session at playhead 18327200 clip clip_0c6fafdc1dbe
+19:44:40.411 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 18327200 ms, kind video [+1 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:40.672 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:44:40.672 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1ea340] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:44:40.760 [h264 @ 000001b7a3a52840] Late SEI
+19:44:40.761 [h264 @ 000001b7a3a52840]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:40.761 [h264 @ 000001b7a3a52840] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:40.981 preview playback: first frame after 567 ms, at source 18327200 ms (requested 18327200 ms)
+19:44:40.981 playback: frame at source 18327200 ms, advanced 0 ms of media in 2624 ms of wall clock
+19:44:41.019 playback: playhead is 3 ms AHEAD of the picture (playhead 18327236 ms, picture 18327233 ms)
+19:44:41.829 playback: playing true -> false at playhead 18328032 ms [+1418 ms] from MonitorPanel.qml:1933 (onClicked)
+19:44:41.830 monitor: playing -> false at 18328032
+19:44:41.830 playback: session.stop decoder running, picture at 18328033 ms, published 18328033 ms [+0 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:44:43.393 playback: playing false -> true at playhead 18328033 ms [+1562 ms] from MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:43.393 monitor: playing -> true at 18328033
+19:44:43.393 monitor: playback session at playhead 18328033 clip clip_0c6fafdc1dbe
+19:44:43.393 playback: session.start At 4yo He Was At Genius, At 14 He Joined The Magic Academy And Broke Every Record Registered..mp4 at source 18328033 ms, kind video [+0 ms] from MonitorPanel.qml:684 (startProcessPlayback) <- MonitorPanel.qml:1016 (onPlayingChanged) <- MonitorPanel.qml:545 (startPlayback) <- MonitorPanel.qml:1935 (onClicked)
+19:44:43.634 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eae00] st: 1 edit list: 1 Missing key frame while searching for timestamp: 0
+19:44:43.634 [mov,mp4,m4a,3gp,3g2,mj2 @ 000001b79d1eae00] st: 1 edit list 1 Cannot find an index entry before timestamp: 0.
+19:44:43.719 [h264 @ 000001b7deba3b00] Late SEI
+19:44:43.720 [h264 @ 000001b7deba3b00]  is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.
+19:44:43.720 [h264 @ 000001b7deba3b00] If you want to help, upload a sample of this file to https://streams.videolan.org/upload/ and contact the ffmpeg-devel mailing list. (ffmpeg-devel@ffmpeg.org)
+19:44:44.021 preview playback: first frame after 625 ms, at source 18328033 ms (requested 18328033 ms)
+19:44:44.021 playback: frame at source 18328033 ms, advanced 0 ms of media in 2203 ms of wall clock
+19:44:44.033 preview cost: frame is 7 ms of a 18 ms budget - raising the preview to 1500 px
+19:44:44.061 playback: playhead is 2 ms AHEAD of the picture (playhead 18328068 ms, picture 18328066 ms)
+19:44:44.537 playback: playing true -> false at playhead 18328517 ms [+1143 ms] from MonitorPanel.qml:1933 (onClicked)
+19:44:44.537 monitor: playing -> false at 18328517
+19:44:44.538 playback: session.stop decoder running, picture at 18328533 ms, published 18328533 ms [+0 ms] from MonitorPanel.qml:1041 (onPlayingChanged) <- MonitorPanel.qml:1933 (onClicked)
+19:44:52.031 playback: session.stop decoder idle, picture at 18328533 ms, published 18328533 ms [+7492 ms] from MonitorPanel.qml:1125 (onDestruction)
+19:45:06.959 QWaitCondition: Destroyed while threads are still waiting

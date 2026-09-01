@@ -103,20 +103,24 @@ cutpro_module(cutpro_diagnostics
     SOURCES
     src/app/diagnostics/crash_channel.cpp
     src/app/diagnostics/crash_reporter_host.cpp
+    src/app/diagnostics/diagnostic_analyzer.cpp
     src/app/diagnostics/model_guard.cpp
     src/app/diagnostics/playback_trace.cpp
     src/app/preview/gui_dispatch.cpp
     src/app/preview/gui_stall_report.cpp
     src/app/preview/gui_stall_tracer.cpp
     src/app/preview/gui_thread_watchdog.cpp
+    src/app/preview/gui_turn_monitor.cpp
     src/app/diagnostics/crash_channel.h
     src/app/diagnostics/crash_reporter_host.h
+    src/app/diagnostics/diagnostic_analyzer.h
     src/app/diagnostics/model_guard.h
     src/app/diagnostics/playback_trace.h
     src/app/preview/gui_dispatch.h
     src/app/preview/gui_stall_report.h
     src/app/preview/gui_stall_tracer.h
     src/app/preview/gui_thread_watchdog.h
+    src/app/preview/gui_turn_monitor.h
 )
 if(WIN32)
     # GuiStallTracer symbolises a suspended thread's stack; the minidump side
@@ -142,7 +146,9 @@ cutpro_module(cutpro_media SOURCES
     src/app/media/media_scan.h
 )
 
-cutpro_module(cutpro_subtitles SOURCES
+cutpro_module(cutpro_subtitles
+    LINK cutpro_diagnostics
+    SOURCES
     src/app/subtitles/khmer_support.cpp
     src/app/subtitles/subtitle_io.cpp
     src/app/subtitles/subtitle_timeline.cpp
@@ -181,7 +187,9 @@ cutpro_module(cutpro_lumetri SOURCES
     src/app/lumetri/lumetri_pipeline.h
 )
 
-cutpro_module(cutpro_timeline SOURCES
+cutpro_module(cutpro_timeline
+    LINK cutpro_diagnostics
+    SOURCES
     src/app/timeline/keyframe_engine.cpp
     src/app/timeline/large_media_policy.cpp
     src/app/timeline/long_media_timeline_handler.cpp
@@ -331,8 +339,10 @@ cutpro_module(cutpro_backend
 # to stay usable from a console process. Only the launcher links this.
 qt_add_library(cutpro_scene SHARED
     src/app/diagnostics/diagnostics_bridge.cpp
+    src/app/diagnostics/diagnostics_cli.cpp
     src/app/diagnostics/item_tree_census.cpp
     src/app/diagnostics/diagnostics_bridge.h
+    src/app/diagnostics/diagnostics_cli.h
     src/app/diagnostics/item_tree_census.h
 )
 target_include_directories(cutpro_scene PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")

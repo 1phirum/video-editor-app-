@@ -85,20 +85,18 @@ Rectangle {
 
     function firstVisualMedia() {
         var firstClip = null
-        for (var i = 0; i < Backend.clips.length; ++i) {
-            var clip = Backend.clips[i]
-            if (clip.kind === "audio" || clip.kind === "subtitle")
+        var clips = Backend.mediaClips
+        for (var i = 0; i < clips.length; ++i) {
+            var clip = clips[i]
+            if (clip.kind === "audio")
                 continue
             if (!firstClip || clip.startMs < firstClip.startMs)
                 firstClip = clip
         }
         if (!firstClip)
             return null
-        for (var j = 0; j < Backend.media.length; ++j) {
-            if (Backend.media[j].id === firstClip.mediaId)
-                return Backend.media[j]
-        }
-        return null
+        var media = Backend.mediaById(String(firstClip.mediaId || ""))
+        return media && media.id ? media : null
     }
 
     function mediaUrl(path) {

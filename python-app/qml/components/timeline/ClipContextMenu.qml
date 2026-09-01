@@ -25,9 +25,20 @@ Menu {
     // command visible for those clips even when metadata probing was delayed.
     readonly property bool hasAudio: clipData.kind === "video"
                                      || (mediaData && Number(mediaData.channels || 0) > 0)
+    // True once this clip's sound lives on its own A track. The video clip keeps
+    // the separateAudio flag and the extracted clip names the video it came out
+    // of, so the command reads as a toggle from either one - without the two
+    // being linked.
+    readonly property bool audioExtracted: Boolean(clipData
+                                                   && (clipData.separateAudio === true
+                                                       || (clipData.kind === "audio"
+                                                           && (clipData.extractedFromClipId
+                                                               || clipData.linkedRole === "audio"))))
     signal splitRequested(string clipId)
     signal deleteRequested(string clipId, bool ripple)
     signal vocalRemovalRequested(string clipId)
+    signal extractAudioRequested(string clipId)
+    signal restoreAudioRequested(string clipId)
 
     implicitWidth: 260
     delegate: DarkMenuItem {}
@@ -47,6 +58,16 @@ Menu {
         onTriggered: Backend.requestEffectsBrowser(root.clipData.id)
     }
     MenuSeparator {}
+    DarkMenuItem {
+        visible: root.hasVideo && root.hasAudio && !root.audioExtracted
+        text: "Extract Audio"
+        onTriggered: root.extractAudioRequested(root.clipData.id)
+    }
+    DarkMenuItem {
+        visible: root.audioExtracted
+        text: "Restore Clip Audio"
+        onTriggered: root.restoreAudioRequested(root.clipData.id)
+    }
     DarkMenuItem {
         visible: root.hasAudio
         text: root.effects.vocalRemoval
