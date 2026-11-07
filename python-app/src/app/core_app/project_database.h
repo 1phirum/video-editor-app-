@@ -1,0 +1,91 @@
+#pragma once
+
+#include <QObject>
+#include <QString>
+#include <QVariantList>
+#include <QVariantMap>
+
+#include "core/module_api.h"
+
+// SQLite-backed persistence for all project data.
+// Replaces the single flat JSON file with a proper relational store so each
+// entity (media, clip, marker, transcript segment, settings …) can be queried,
+// updated and deleted independently without round-tripping the entire document.
+//
+// Schema version history
+//   1 – initial (projects, sequences, media, clips, markers,
+//               transcript_segments, track_states, muted_tracks, settings)
+class CUTPRO_BACKEND_API ProjectDatabase : public QObject {
+  Q_OBJECT
+public:
+  explicit ProjectDatabase(QObject *parent = nullptr);
+  ~ProjectDatabase() override;
+
+  // Open (or create) the database at *path*.  Call once before any other
+  // method.  Returns false and sets lastError() on failure.
+  bool open(const QString &path);
+  void close();
+  bool isOpen() const;
+
+  QString lastError() const { return m_lastError; }
+
+  // --- Whole-project helpers -------------------------------------------------
+  // Serialize the complete in-memory state map (same shape as serializeState)
+  // into the database, replacing everything that belongs to that project.
+  bool saveProject(const QVariantMap &state);
+
+  // Load a project by id and return its state map, or an empty map on failure.
+  QVariantMap loadProject(const QString &projectId);
+
+  // List all stored projects: [{id, name, location, updatedAt}, …]
+  QVariantList listProjects();
+
+  // Delete a project and all its child records.
+  bool deleteProject(const QString &projectId);
+
+  // --- Individual entity accessors (used for incremental saves) -------------
+  bool upsertMedia(const QString &projectId, const QVariantMap &media);
+  bool removeMedia(const QString &projectId, const QString &mediaId);
+
+  bool upsertClip(const QString &sequenceId, const QVariantMap &clip);
+  bool removeClip(const QString &sequenceId, const QString &clipId);
+  QVariantList clipsForSequence(const QString &sequenceId);
+
+  bool upsertMarker(const QString &sequenceId, const QVariantMap &marker);
+  bool removeMarker(const QString &sequenceId, const QString &markerId);
+
+  bool setTranscript(const QString &sequenceId, const QVariantList &segments,
+                     const QString &language);
+  QVariantList transcriptForSequence(const QString &sequenceId,
+                                     QString *language = nullptr);
+
+  bool setSetting(const QString &key, const QVariant &value);
+  QVariant getSetting(const QString &key,
+                      const QVariant &defaultValue = QVariant()) const;
+  QVariantMap allSettings() const;
+
+  // Append an audit entry and optional full state snapshot. This is kept
+  // separate from the current-state tables so the complete edit history is
+  // recoverable without affecting normal project queries.
+  bool appendAction(const QString &projectId, const QString &sequenceId,
+                    const QString &type, const QVariantMap &payload,
+                    const QByteArray &stateSnapshot = {});
+  QVariantList actions(const QString &projectId, int limit = 500);
+
+  // Drop the whole-state snapshots of every project except *keepProjectId* and
+  // the *keep* most recently touched ones. Only the untitled session database
+  // needs this: it is one file shared by every launch, each launch is its own
+  // project id, and each of those leaves a full state snapshot behind that
+  // nothing will ever load again - which on a subtitle-heavy timeline is
+  // megabytes per launch. The action log is deliberately untouched; the history
+  // is the point of the file, and its rows are small.
+  bool pruneStateSnapshots(const QString &keepProjectId, int keep = 8);
+
+private:
+  bool createSchema();
+  bool execSql(const QString &sql);
+  void setError(const QString &msg);
+
+  QString m_connectionName;
+  QString m_lastError;
+};

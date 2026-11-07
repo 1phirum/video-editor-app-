@@ -1,0 +1,79 @@
+python-app/build-subtitle-verify/
+python-app/build-verify/
+python-app/build/
+python-app/dist/
+ffmpeg-9.0.1-full_build-shared
+# Adobe's cursor artwork is used locally only â€” keep it out of the remote.
+python-app/assets/cursors/
+# Same for Premiere's tool-rail glyphs (the app's own icons stay tracked).
+python-app/assets/icons/pr-*.svg
+python-app/.backup-*/
+# License signing key material must never be committed. It lives in a file the
+# vendor keeps outside the repo (e.g. ~/.cutpro/license_priv.key).
+*.key
+license_priv*
+# The license-key generator is an internal vendor tool. Its built binary ends
+# up in build/ and dist/ (already ignored), but keep an explicit rule so it
+# never gets committed or shipped from anywhere.
+license_gen*.exe
+.vscode/
+.claude/
+/agent-app/
+/assets/
+/image/
+/agent.md
+
+# Generated builds, deployments, installers, and Python caches.
+**/build*/
+**/dist/
+**/out/
+**/__pycache__/
+**/.pytest_cache/
+**/.backup-*/
+*.py[cod]
+*.log
+*.exe
+*.dll
+*.pdb
+*.obj
+*.o
+*.a
+*.lib
+*.qm
+*.qsb
+
+# Local media and downloaded model weights.
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.webm
+*.wav
+*.mp3
+*.flac
+*.ttml
+*.srt
+*.rnnn
+*.onnx
+*.gguf
+*.ggml
+*.pt
+*.pth
+*.safetensors
+
+# Local plans, agent setup, and downloaded reference material.
+/agent-kit/
+/codex-kit/
+/designs/
+/AGENTS.md
+/plan.md
+/EXPORT_ACCELERATION_PREVIEW_PLAN.md
+/python-app/docs/
+/python-app/reference/
+
+# Private credential files and signing material.
+.env
+.env.*
+*.pfx
+*.p12
+*.pem

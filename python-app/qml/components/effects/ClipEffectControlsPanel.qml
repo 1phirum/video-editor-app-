@@ -1,0 +1,966 @@
+pragma ComponentBehavior: Bound
+// qmllint disable
+
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import CutPro 1.0
+import "../../theme"
+import "../common"
+import "../export"
+import "../lumetri"
+import "../project"
+import "../subtitles"
+import "../timeline"
+
+// Effect Controls, laid out the way Premiere Pro does it: a fixed row grid on
+// the left and keyframe lanes on the right, both driven by one flat row model,
+// so lane N always lines up with row N and the separators run straight across.
+Item {
+    id: root
+
+    readonly property var clipData: Backend.selectedClip
+    readonly property var effects: root.clipData && root.clipData.effects
+                                   ? root.clipData.effects : ({})
+    readonly property var mediaData: root.mediaForClip(root.clipData)
+    readonly property bool hasClip: Boolean(root.clipData && root.clipData.id)
+    readonly property string clipId:
+        root.hasClip ? String(root.clipData.id) : ""
+    readonly property bool isSubtitle:
+        root.hasClip && root.clipData.kind === "subtitle"
+    // An effect-track bar. It carries an effect stack like a clip does, but none
+    // of the intrinsic clip controls - Motion, Opacity, Crop, Time Remapping -
+    // have any picture of their own to act on.
+    readonly property bool isEffectItem:
+        root.hasClip && root.clipData.kind === "effect"
+    readonly property bool hasVisual: root.hasClip && !root.isSubtitle
+                                      && root.clipData.kind !== "audio"
+    readonly property int channelCount:
+        Number(root.mediaData ? (root.mediaData.channels || 0) : 0)
+    readonly property bool hasAudio: root.channelCount > 0
+    readonly property var effectStack: root.clipData && root.clipData.effectStack
+                                       ? root.clipData.effectStack : []
+    readonly property string clipLabel: root.hasClip
+        ? String(root.clipData.name
+                 || (root.mediaData ? root.mediaData.name : qsTr("Clip"))) : ""
+    readonly property real clipStartMs:
+        root.hasClip ? Number(root.clipData.startMs || 0) : 0
+    readonly property real clipSpanMs: root.hasClip
+        ? Math.max(1, Number(root.clipData.durationMs || 1)) : 1
+
+    // ---- Visible window --------------------------------------------------
+    // Premiere scopes this timeline to the whole clip, which reads well because
+    // a Premiere clip is usually seconds long. The sources this project is cut
+    // from are not: a 25 h 48 m clip across the ~690 px of lane this panel has
+    // is 134 seconds per pixel, so two keyframes a minute apart land on the same
+    // pixel, a one-pixel drag moves a keyframe by two minutes, and the ruler
+    // labels collapse into a solid bar. So the lanes show a window into the
+    // clip rather than the clip, and the window is what both children are given.
+    // The clip's own extent goes down separately, so edits still clamp to the
+    // clip and only the view moves.
+    readonly property real minViewSpanMs: 2000
+    // Ten minutes is roughly where a keyframe is still a pixel or two wide at
+    // this panel's width, so it is the widest window worth opening on.
+    readonly property real fitSpanMs: 600000
+    property real viewStartMs: 0
+    property real viewSpanMs: 1000
+    readonly property real viewEndMs: root.viewStartMs + root.viewSpanMs
+    readonly property bool windowed: root.viewSpanMs < root.clipSpanMs - 1
+
+    // One frame of this clip's own media, so the ruler's sub-second ticks land
+    // on real frames instead of on a hardcoded 25 fps.
+    readonly property real frameMs: {
+        var rate = Number(root.mediaData ? (root.mediaData.frameRate || 0) : 0)
+        return rate > 0.01 ? 1000 / rate : 40
+    }
+
+    // Whole clip when the whole clip is legible, otherwise fitSpanMs around the
+    // playhead - which is where the user is working, and is already inside the
+    // clip whenever this panel has a selection.
+    function fitToClip() {
+        root.viewSpanMs = Math.max(root.minViewSpanMs,
+                                   Math.min(root.clipSpanMs, root.fitSpanMs))
+        root.viewStartMs = root.clipStartMs
+        root.centerOn(Number(Backend.playheadMs))
+    }
+
+    function showWholeClip() {
+        root.viewSpanMs = Math.max(root.minViewSpanMs, root.clipSpanMs)
+        root.viewStartMs = root.clipStartMs
+        root.clampView()
+    }
+
+    function clampView() {
+        var span = Math.max(root.minViewSpanMs,
+                            Math.min(root.viewSpanMs, root.clipSpanMs))
+        root.viewSpanMs = span
+        root.viewStartMs = Math.max(
+                    root.clipStartMs,
+                    Math.min(root.clipStartMs + root.clipSpanMs - span,
+                             root.viewStartMs))
+    }
+
+    function centerOn(ms) {
+        root.viewStartMs = ms - root.viewSpanMs / 2
+        root.clampView()
+    }
+
+    // Anchored zoom: the time under the pointer stays under the pointer, which
+    // is what makes a wheel-zoom feel like a lens rather than a jump.
+    function zoomBy(factor, anchorMs) {
+        var span = Math.max(root.minViewSpanMs,
+                            Math.min(root.clipSpanMs, root.viewSpanMs * factor))
+        var ratio = (anchorMs - root.viewStartMs) / Math.max(1, root.viewSpanMs)
+        root.viewSpanMs = span
+        root.viewStartMs = anchorMs - ratio * span
+        root.clampView()
+    }
+
+    function panBy(deltaMs) {
+        root.viewStartMs += deltaMs
+        root.clampView()
+    }
+
+    // Button zoom anchors on the playhead when it is on screen, because that is
+    // the frame the user is looking at; otherwise on the middle of the window.
+    function zoomAtPlayhead(factor) {
+        var ms = Number(Backend.playheadMs)
+        root.zoomBy(factor, ms >= root.viewStartMs && ms <= root.viewEndMs
+                    ? ms : root.viewStartMs + root.viewSpanMs / 2)
+    }
+
+    onClipIdChanged: root.fitToClip()
+    // A trim on the selected clip can leave the window hanging past the new end.
+    onClipSpanMsChanged: root.clampView()
+
+    // Follows the playhead only once it leaves the window, and then pages by
+    // recentring: a window that recentres on every tick turns playback into a
+    // sliding ruler nothing can be aimed at.
+    Connections {
+        target: Backend
+        function onPlayheadChanged() {
+            if (!root.hasClip)
+                return
+            var ms = Number(Backend.playheadMs)
+            if (ms < root.viewStartMs || ms > root.viewEndMs)
+                root.centerOn(ms)
+        }
+    }
+
+    // Split between the parameter tree and the keyframe lanes.
+    property real dividerX: 336
+    // Flat row model shared by both halves of the panel.
+    //
+    // `rows` is the plain array the builders produce and the only thing anything
+    // reads for arithmetic (row count, lane heights). `rowModel` is what the two
+    // Repeaters bind, and it is patched rather than replaced - see applyRows().
+    property var rows: []
+    // Kept beside the model so a rebuild can tell which rows actually changed
+    // without asking the model back for anything: the keys give the structure and
+    // the signatures give the contents.
+    property var rowKeys: []
+    property var rowSigs: []
+    property var expandedMap: ({})
+    // One live gesture at a time: the row being dragged reads its value from
+    // here so the backend (and the undo stack) only sees the finished edit.
+    property string draftKey: ""
+    property real draftValue: 0
+
+    function mediaForClip(clip) {
+        if (!clip || !clip.mediaId)
+            return null
+        var media = Backend.mediaById(String(clip.mediaId))
+        return media && media.id ? media : null
+    }
+
+    function settingValue(key, fallback) {
+        var current = root.effects[key]
+        return current === undefined || current === null ? fallback : current
+    }
+
+    function definitionForId(definitionId) {
+        for (var i = 0; i < Backend.effectDefinitions.length; ++i) {
+            if (Backend.effectDefinitions[i].id === definitionId)
+                return Backend.effectDefinitions[i]
+        }
+        return ({ id: definitionId, name: qsTr("Missing effect"),
+                  mediaType: "video", parameters: [] })
+    }
+
+    // Row value: the live draft while a gesture is running, otherwise the
+    // stored setting (or applied-effect parameter), otherwise the default.
+    function valueFor(row, effectMap, stack, gestureKey, gestureValue) {
+        if (row.key === gestureKey)
+            return gestureValue
+        if (String(row.instanceId || "") !== "") {
+            for (var i = 0; i < stack.length; ++i) {
+                if (String(stack[i].id) !== String(row.instanceId))
+                    continue
+                var params = stack[i].parameters || ({})
+                var stored = params[row.id]
+                return stored === undefined || stored === null ? row.def : stored
+            }
+            return row.def
+        }
+        var value = effectMap[row.id]
+        return value === undefined || value === null ? row.def : value
+    }
+
+    function isExpanded(key, fallback) {
+        var state = root.expandedMap[key]
+        return state === undefined ? fallback === true : state === true
+    }
+
+    function toggleExpanded(key, fallback) {
+        var next = {}
+        for (var existing in root.expandedMap)
+            next[existing] = root.expandedMap[existing]
+        next[key] = !root.isExpanded(key, fallback)
+        root.expandedMap = next
+    }
+
+    function timecode(milliseconds) {
+        var ms = Math.max(0, Number(milliseconds))
+        var frames = Math.floor((ms % 1000) / Math.max(1, root.frameMs))
+        var total = Math.floor(ms / 1000)
+        function pad(value) { return value < 10 ? "0" + value : String(value) }
+        return pad(Math.floor(total / 3600)) + ":" + pad(Math.floor(total / 60) % 60)
+               + ":" + pad(total % 60) + ":" + pad(frames)
+    }
+
+    // Span readout for the footer. A bare timecode cannot say whether the lanes
+    // are showing ten minutes or a whole day, and that is the one thing the user
+    // needs to know before dragging a keyframe.
+    function durationLabel(milliseconds) {
+        var total = Math.round(Math.max(0, Number(milliseconds)) / 1000)
+        if (total < 60)
+            return total + "s"
+        if (total < 3600)
+            return Math.floor(total / 60) + "m " + (total % 60) + "s"
+        return Math.floor(total / 3600) + "h "
+                + Math.floor((total % 3600) / 60) + "m"
+    }
+
+    // ---- Row constructors -----------------------------------------------
+    function bandRow(id, label) {
+        return { kind: "band", key: "band:" + id, id: id, label: label,
+                 expandable: true, openByDefault: true, resettable: false }
+    }
+    function groupRow(id, label, openByDefault) {
+        return { kind: "group", key: "grp:" + id, id: id, label: label,
+                 instanceId: "", resetKeys: [], expandable: true,
+                 openByDefault: openByDefault === true }
+    }
+    function paramRow(id, label, def, from, to, decimals, unit) {
+        return { kind: "param", key: "p::" + id, id: id, instanceId: "",
+                 channel: id, label: label, def: def, from: from, to: to,
+                 decimals: decimals, unit: unit, kf: true, expandable: true }
+    }
+    function boolRow(id, label, def) {
+        return { kind: "bool", key: "b::" + id, id: id, instanceId: "",
+                 label: label, def: def }
+    }
+    function selectRow(id, label, def, options) {
+        return { kind: "select", key: "s::" + id, id: id, instanceId: "",
+                 label: label, def: def, options: options }
+    }
+    function masksRow(id, label, def) {
+        return { kind: "masks", key: "m::" + id, id: id, instanceId: "",
+                 label: label, def: def }
+    }
+    function noteRow(key, label) {
+        return { kind: "note", key: "n:" + key, id: "", instanceId: "",
+                 label: label, resettable: false }
+    }
+    function withDisabled(row, disabled) {
+        row.disabled = disabled === true
+        return row
+    }
+    // The revealed slider shares its parameter's key so a drag on either one
+    // feeds the same draft.
+    function sliderRowFor(row) {
+        return { kind: "slider", key: row.key, id: row.id,
+                 instanceId: row.instanceId || "",
+                 channel: row.channel || row.id, label: row.label,
+                 def: row.def, from: row.from, to: row.to,
+                 decimals: row.decimals, kf: row.kf === true,
+                 disabled: row.disabled === true, resettable: false }
+    }
+
+    function instanceGroupRow(instance, definition, index, count) {
+        return { kind: "group", key: "grp:" + instance.id,
+                 id: String(definition.id || ""), instanceId: String(instance.id),
+                 label: String(definition.name || qsTr("Effect")),
+                 expandable: true, openByDefault: true, resetKeys: [],
+                 bypassed: instance.enabled === false,
+                 canMoveUp: index > 0, canMoveDown: index + 1 < count }
+    }
+
+    function instanceParamRow(instance, parameter) {
+        var key = "p:" + instance.id + ":" + parameter.id
+        var type = String(parameter.type || "number")
+        var label = String(parameter.name || parameter.id || "")
+        var off = instance.enabled === false
+        if (type === "mask") {
+            return { kind: "blurmask", key: key, id: String(parameter.id),
+                     instanceId: String(instance.id), label: label,
+                     resettable: false, disabled: off }
+        }
+        if (type === "bool") {
+            return { kind: "bool", key: key, id: String(parameter.id),
+                     instanceId: String(instance.id), label: label,
+                     def: parameter.default, disabled: off }
+        }
+        return { kind: "param", key: key, id: String(parameter.id),
+                 instanceId: String(instance.id), label: label,
+                 // Animation channel. The instance id is in the name because two
+                 // Custom Blurs on one clip, or a Gaussian Blur beside one, both
+                 // call their parameter "amount".
+                 channel: Backend.keyframeEngine.instanceChannel(
+                              String(instance.id), String(parameter.id)),
+                 def: Number(parameter.default || 0),
+                 from: Number(parameter.minimum || 0),
+                 to: Number(parameter.maximum === undefined ? 100 : parameter.maximum),
+                 decimals: Number(parameter.decimals || 0),
+                 unit: String(parameter.unit || ""),
+                 kf: true, expandable: true, disabled: off }
+    }
+
+    function blendModeOptions() {
+        var names = [["normal", "Normal"], ["dissolve", "Dissolve"],
+                     ["darken", "Darken"], ["multiply", "Multiply"],
+                     ["colorBurn", "Color Burn"], ["linearBurn", "Linear Burn"],
+                     ["darkerColor", "Darker Color"], ["lighten", "Lighten"],
+                     ["screen", "Screen"], ["colorDodge", "Color Dodge"],
+                     ["linearDodge", "Linear Dodge (Add)"],
+                     ["lighterColor", "Lighter Color"], ["overlay", "Overlay"],
+                     ["softLight", "Soft Light"], ["hardLight", "Hard Light"],
+                     ["vividLight", "Vivid Light"], ["linearLight", "Linear Light"],
+                     ["pinLight", "Pin Light"], ["hardMix", "Hard Mix"],
+                     ["difference", "Difference"], ["exclusion", "Exclusion"],
+                     ["subtract", "Subtract"], ["divide", "Divide"],
+                     ["hue", "Hue"], ["saturation", "Saturation"],
+                     ["color", "Color"], ["luminosity", "Luminosity"]]
+        var options = []
+        for (var i = 0; i < names.length; ++i)
+            options.push({ value: names[i][0], label: names[i][1] })
+        return options
+    }
+
+    function stackSignature(stack) {
+        var parts = []
+        for (var i = 0; i < stack.length; ++i) {
+            parts.push(String(stack[i].id) + ":" + String(stack[i].definitionId)
+                       + ":" + (stack[i].enabled === false ? "0" : "1"))
+        }
+        return parts.join(",")
+    }
+
+    // Everything that changes the shape of the tree — not the values in it.
+    readonly property string structureKey:
+        root.clipId + "|" + root.hasVisual + "|" + root.hasAudio + "|"
+        + root.channelCount + "|"
+        + Boolean(root.settingValue("uniformScale", true)) + "|"
+        + root.stackSignature(root.effectStack) + "|"
+        + JSON.stringify(root.expandedMap)
+
+    // Rebuilding the row list re-creates every EffectTreeRow on the left and
+    // every keyframe lane on the right - a few hundred QML objects for a clip
+    // with effects on it. It used to run inside emit selectionChanged(), which
+    // put all of it inside the timeline's drop handler: the GUI thread was
+    // measured unresponsive for 401-458 ms there, and deactivating this panel
+    // made that stall disappear entirely.
+    //
+    // One turn of deferral takes it out of the gesture, and restarting the timer
+    // collapses a burst - a drop that selects a clip and then moves the playhead
+    // is one rebuild, not three. Nothing downstream can tell the difference,
+    // because the rows are rebuilt from properties that are already correct.
+    Timer {
+        id: rebuildTimer
+        interval: 0
+        repeat: false
+        onTriggered: {
+            // Names this turn for the watchdog. Without it the rebuild reports as
+            // "no marked scope", which is how it stayed unattributed for so long.
+            Backend.markGuiScope("ClipEffectControlsPanel.rebuildRows")
+            root.rebuildRows()
+        }
+    }
+
+    onStructureKeyChanged: rebuildTimer.restart()
+    // The first build stays synchronous: this panel is incubated asynchronously
+    // by its Loader, so it is already off the critical path, and doing it here
+    // avoids showing an empty grid for a frame on open.
+    Component.onCompleted: {
+        root.fitToClip()
+        root.rebuildRows()
+    }
+
+    // The model both Repeaters bind. dynamicRoles because a row is one whole
+    // object in one role rather than a fixed set of typed roles - the builders
+    // above emit eight different row shapes and a static-role model would have to
+    // declare the union of their fields.
+    ListModel {
+        id: rowModel
+        dynamicRoles: true
+    }
+
+    // Patches rowModel towards `list` instead of handing a Repeater a new array.
+    //
+    // This is the frame-drop fix. Writing a Repeater's model runs
+    // QQuickRepeater::setModel -> clear() -> QQmlDelegateModel::cancel(), which
+    // force-completes every pending asynchronous incubation and then re-creates
+    // every delegate synchronously on the GUI thread; with two Repeaters over the
+    // same array that is two full delegate sets per rebuild. The watchdog caught
+    // it at 176 ms, and earlier runs at 154, 312 and 637 ms - five to nineteen
+    // dropped frames for a structure change that usually moves one row.
+    //
+    // An expand, a collapse or an effect appearing changes one contiguous run, so
+    // the diff is a common prefix, a common suffix and one insert/remove in
+    // between. Rows outside that run keep their delegates and are only re-set
+    // when their contents changed, because a set() the delegate did not need is
+    // still a re-evaluation of all of its bindings.
+    function applyRows(list) {
+        var n = list.length
+        var oldKeys = root.rowKeys
+        var oldSigs = root.rowSigs
+        var m = oldKeys.length
+        var keys = []
+        var sigs = []
+        for (var i = 0; i < n; ++i) {
+            keys.push(String(list[i].key))
+            sigs.push(JSON.stringify(list[i]))
+        }
+
+        var prefix = 0
+        while (prefix < n && prefix < m && oldKeys[prefix] === keys[prefix])
+            ++prefix
+        var suffix = 0
+        while (suffix < n - prefix && suffix < m - prefix
+               && oldKeys[m - 1 - suffix] === keys[n - 1 - suffix])
+            ++suffix
+
+        // The run the two ends do not cover. Same rows, different contents: set().
+        var oldMid = m - suffix - prefix
+        var newMid = n - suffix - prefix
+        var overlap = Math.min(oldMid, newMid)
+        for (var k = 0; k < overlap; ++k)
+            rowModel.set(prefix + k, { "row": list[prefix + k] })
+        if (newMid > oldMid) {
+            for (var a = overlap; a < newMid; ++a)
+                rowModel.insert(prefix + a, { "row": list[prefix + a] })
+        } else if (oldMid > newMid) {
+            rowModel.remove(prefix + newMid, oldMid - newMid)
+        }
+
+        // Rows the diff kept can still have changed without their key changing -
+        // a default that follows uniformScale, a reset list that grew - so they
+        // are compared by signature and touched only when they differ.
+        for (var b = 0; b < prefix; ++b) {
+            if (oldSigs[b] !== sigs[b])
+                rowModel.set(b, { "row": list[b] })
+        }
+        for (var c = 0; c < suffix; ++c) {
+            if (oldSigs[m - 1 - c] !== sigs[n - 1 - c])
+                rowModel.set(n - 1 - c, { "row": list[n - 1 - c] })
+        }
+
+        root.rowKeys = keys
+        root.rowSigs = sigs
+        root.rows = list
+    }
+
+    function rebuildRows() {
+        var list = []
+        if (!root.hasClip || root.isSubtitle) {
+            root.applyRows(list)
+            return
+        }
+        var uniform = Boolean(root.settingValue("uniformScale", true))
+        var stack = root.effectStack
+
+        // A group plus its parameters. Collapsed groups still carry the reset
+        // keys so the row's undo button works without expanding it.
+        function pushSection(group, params) {
+            var keys = []
+            for (var k = 0; k < params.length; ++k) {
+                var candidate = params[k]
+                if (candidate.kind === "param" || candidate.kind === "bool"
+                        || candidate.kind === "select" || candidate.kind === "masks")
+                    keys.push({ id: candidate.id, def: candidate.def })
+            }
+            if (String(group.instanceId || "") === "")
+                group.resetKeys = keys
+            list.push(group)
+            if (!root.isExpanded(group.key, group.openByDefault))
+                return
+            for (var i = 0; i < params.length; ++i) {
+                var row = params[i]
+                list.push(row)
+                if (row.kind === "param" && root.isExpanded(row.key, false))
+                    list.push(root.sliderRowFor(row))
+            }
+        }
+
+        function pushInstances(mediaType) {
+            for (var i = 0; i < stack.length; ++i) {
+                var instance = stack[i]
+                var definition = root.definitionForId(instance.definitionId)
+                var kind = String(definition.mediaType || "video") === "audio"
+                           ? "audio" : "video"
+                if (kind !== mediaType)
+                    continue
+                var declared = definition.parameters || []
+                var params = []
+                for (var p = 0; p < declared.length; ++p)
+                    params.push(root.instanceParamRow(instance, declared[p]))
+                if (params.length === 0)
+                    params.push(root.noteRow("empty:" + instance.id, qsTr("No parameters")))
+                pushSection(root.instanceGroupRow(instance, definition, i,
+                                                  stack.length), params)
+            }
+        }
+
+        if (root.hasVisual) {
+            var videoBand = root.bandRow("video", qsTr("Video"))
+            list.push(videoBand)
+            if (root.isExpanded(videoBand.key, true)) {
+                if (!root.isEffectItem) {
+                    pushSection(root.groupRow("motion", qsTr("Motion"), true), [
+                        root.paramRow("positionX", qsTr("Position X"), 0, -100, 100, 1, ""),
+                        root.paramRow("positionY", qsTr("Position Y"), 0, -100, 100, 1, ""),
+                        root.paramRow("scale", qsTr("Scale"), 100, 10, 400, 1, "%"),
+                        root.withDisabled(root.paramRow("scaleWidth", qsTr("Scale Width"),
+                                                        100, 10, 600, 1, "%"), uniform),
+                        root.withDisabled(root.paramRow("scaleHeight", qsTr("Scale Height"),
+                                                        100, 10, 600, 1, "%"), uniform),
+                        root.boolRow("uniformScale", qsTr("Uniform Scale"), true),
+                        root.paramRow("rotation", qsTr("Rotation"), 0, -180, 180, 1, "°"),
+                        root.paramRow("anchorPointX", qsTr("Anchor Point X"), 0.5, 0, 1, 2, ""),
+                        root.paramRow("anchorPointY", qsTr("Anchor Point Y"), 0.5, 0, 1, 2, ""),
+                        root.paramRow("antiFlicker", qsTr("Anti-flicker Filter"), 0, 0, 1, 2, ""),
+                        root.boolRow("horizontalFlip", qsTr("Flip Horizontal"), false),
+                        root.boolRow("verticalFlip", qsTr("Flip Vertical"), false)
+                    ])
+                    pushSection(root.groupRow("opacity", qsTr("Opacity"), true), [
+                        root.paramRow("opacity", qsTr("Opacity"), 100, 0, 100, 1, "%"),
+                        root.masksRow("maskType", qsTr("Mask"), "none"),
+                        root.paramRow("maskFeather", qsTr("Mask Feather"), 0, 0, 250, 0, "px"),
+                        root.paramRow("maskOpacity", qsTr("Mask Opacity"), 100, 0, 100, 1, "%"),
+                        root.paramRow("maskExpansion", qsTr("Mask Expansion"), 0, -250, 250, 0, "px"),
+                        root.boolRow("maskInverted", qsTr("Inverted"), false),
+                        root.selectRow("blendMode", qsTr("Blend Mode"), "normal",
+                                       root.blendModeOptions())
+                    ])
+                    pushSection(root.groupRow("crop", qsTr("Crop"), false), [
+                        root.paramRow("cropLeft", qsTr("Left"), 0, 0, 49, 1, "%"),
+                        root.paramRow("cropRight", qsTr("Right"), 0, 0, 49, 1, "%"),
+                        root.paramRow("cropTop", qsTr("Top"), 0, 0, 49, 1, "%"),
+                        root.paramRow("cropBottom", qsTr("Bottom"), 0, 0, 49, 1, "%")
+                    ])
+                    pushSection(root.groupRow("time", qsTr("Time Remapping"), false), [
+                        root.paramRow("speed", qsTr("Speed"), 100, 1, 10000, 1, "%")
+                    ])
+                }
+                pushInstances("video")
+            }
+        }
+
+        if (root.hasAudio) {
+            var audioBand = root.bandRow("audio", qsTr("Audio"))
+            list.push(audioBand)
+            if (root.isExpanded(audioBand.key, true)) {
+                pushSection(root.groupRow("volume", qsTr("Volume"), true), [
+                    root.paramRow("volumeDb", qsTr("Level"), 0, -60, 12, 1, "dB"),
+                    root.boolRow("volumeBypass", qsTr("Bypass"), false)
+                ])
+                pushSection(root.groupRow("channelVolume", qsTr("Channel Volume"), false), [
+                    root.paramRow("channelVolumeLeft", qsTr("Left"), 0, -60, 15, 1, "dB"),
+                    root.paramRow("channelVolumeRight", qsTr("Right"), 0, -60, 15, 1, "dB")
+                ])
+                pushSection(root.groupRow("panner", qsTr("Panner"), false), [
+                    root.paramRow("balance", qsTr("Balance"), 0, -100, 100, 0, "%"),
+                    root.paramRow("pan", qsTr("Pan"), 0, -1, 1, 2, "")
+                ])
+                var cleanup = [
+                    root.paramRow("noiseReduction", qsTr("Noise Reduction"), 0, 0, 100, 0, "%"),
+                    root.paramRow("highPassHz", qsTr("High Pass"), 0, 0, 1000, 0, "Hz"),
+                    root.paramRow("lowPassHz", qsTr("Low Pass"), 0, 0, 22000, 0, "Hz"),
+                    root.boolRow("compressor", qsTr("Compressor"), false),
+                    root.withDisabled(root.boolRow("vocalRemoval",
+                                                   qsTr("Remove Vocals (AI)"), false),
+                                      root.channelCount < 1)
+                ]
+                if (root.channelCount < 1)
+                    cleanup.push(root.noteRow("vocals", qsTr("Audio track required")))
+                pushSection(root.groupRow("cleanup", qsTr("Audio Cleanup"), false), cleanup)
+                pushInstances("audio")
+            }
+        }
+
+        // Both halves of the story, recorded at the moment the rebuild ends:
+        // the input (how many effect instances the backend says this clip has)
+        // and the output (how many rows they produced). A row count that has
+        // run away with a sane stack is a bug in the builder above; both large
+        // together is a backend that is appending instances it should not.
+        ModelGuard.note("effectControls.stack", stack.length)
+        ModelGuard.note("effectControls.built", list.length)
+        root.applyRows(list)
+    }
+
+    Loader {
+        anchors.fill: parent
+        active: root.isSubtitle
+        sourceComponent: SubtitleBlurControls {}
+    }
+
+    Text {
+        anchors.centerIn: parent
+        width: Math.max(0, parent.width - 36)
+        visible: !root.hasClip
+        text: qsTr("Select a timeline clip or drop an effect onto it.")
+        color: Theme.textMuted
+        font.pixelSize: Theme.fsSm
+        wrapMode: Text.WordWrap
+        horizontalAlignment: Text.AlignHCenter
+    }
+
+    ColumnLayout {
+        anchors.fill: parent
+        visible: root.hasClip && !root.isSubtitle
+        spacing: 0
+
+        // ---- Source / sequence selector, as in Premiere's title bar ------
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 26
+            color: Theme.bgPanel
+
+            Row {
+                anchors.left: parent.left
+                anchors.leftMargin: 10
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 9
+
+                Text {
+                    text: qsTr("Source • %1").arg(root.clipLabel)
+                    color: Theme.textMuted
+                    font.pixelSize: Theme.fsSm
+                    elide: Text.ElideRight
+                }
+                Item {
+                    width: 1
+                    height: 18
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: 1
+                        height: 12
+                        color: "#4d4d4d"
+                    }
+                }
+                Item {
+                    width: sequenceLabel.implicitWidth
+                    height: 18
+                    Text {
+                        id: sequenceLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: (Backend.sequenceName || qsTr("Sequence")) + " • " + root.clipLabel
+                        color: Theme.textPrimary
+                        font.pixelSize: Theme.fsSm
+                        font.weight: Font.DemiBold
+                    }
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        width: parent.width
+                        height: 2
+                        color: Theme.accent
+                    }
+                }
+            }
+
+            Rectangle {
+                anchors.bottom: parent.bottom
+                width: parent.width
+                height: 1
+                color: Theme.border
+            }
+        }
+
+        // ---- Timecode ruler over the lanes ------------------------------
+        Item {
+            Layout.fillWidth: true
+            Layout.preferredHeight: Theme.rulerHeight
+
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.bgPanel
+            }
+            EffectTimeRuler {
+                x: root.dividerX + 1
+                width: Math.max(0, parent.width - root.dividerX - 1)
+                height: parent.height
+                startMs: root.viewStartMs
+                spanMs: root.viewSpanMs
+                clipStartMs: root.clipStartMs
+                clipSpanMs: root.clipSpanMs
+                frameMs: root.frameMs
+                onZoomRequested: (factor, anchorMs) => root.zoomBy(factor, anchorMs)
+                onPanRequested: (deltaMs) => root.panBy(deltaMs)
+            }
+            Rectangle {
+                x: root.dividerX
+                width: 1
+                height: parent.height
+                color: dividerHandle.pressed ? Theme.accent
+                                               : (dividerHandle.containsMouse
+                                                  ? Qt.lighter(Theme.accent, 1.15)
+                                                  : "#1b1c1f")
+            }
+        }
+
+        // ---- The grid: parameter rows left, keyframe lanes right ---------
+        Item {
+            id: gridHost
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.bgPanel
+            }
+            Rectangle {
+                x: root.dividerX + 1
+                width: Math.max(0, parent.width - root.dividerX - 1)
+                height: parent.height
+                color: Theme.bgPrimary
+            }
+
+            Flickable {
+                id: grid
+                anchors.fill: parent
+                clip: true
+                contentWidth: grid.width
+                contentHeight: root.rows.length * Theme.ecRowHeight
+                boundsBehavior: Flickable.StopAtBounds
+
+                ScrollBar.vertical: ScrollBar {
+                    id: vbar
+                    policy: ScrollBar.AsNeeded
+                    width: 8
+                    contentItem: Rectangle {
+                        implicitWidth: 8
+                        radius: 3
+                        color: vbar.pressed ? Theme.textSecondary : "#5f5f5f"
+                        opacity: vbar.active || vbar.hovered ? 0.9 : 0.4
+                    }
+                    background: Rectangle { color: "transparent" }
+                }
+
+                Column {
+                    id: treeColumn
+                    x: 0
+                    width: root.dividerX
+                    spacing: 0
+
+                    Repeater {
+                        model: rowModel
+                        // Patched, never rebound. The freeze this panel was
+                        // caught in was QQuickRepeater::setModel -> clear() ->
+                        // QQmlDelegateModel::cancel(), i.e. the cost of handing
+                        // a Repeater a new array; applyRows() sets and inserts
+                        // instead, so a structure change costs the rows that
+                        // changed rather than all of them. The count is still
+                        // recorded: if it is four figures when the window
+                        // freezes, the argument is over.
+                        onCountChanged: ModelGuard.note("effectControls.rows",
+                                                       count)
+                        delegate: EffectTreeRow {
+                            required property var row
+                            width: treeColumn.width
+                            rowData: row
+                            clipId: root.clipId
+                            currentValue: root.valueFor(row, root.effects,
+                                                        root.effectStack,
+                                                        root.draftKey,
+                                                        root.draftValue)
+                            expanded: root.isExpanded(row.key,
+                                                      row.openByDefault === true)
+                            onExpandRequested: root.toggleExpanded(
+                                                   row.key,
+                                                   row.openByDefault === true)
+                            onDraftChanged: (value) => {
+                                root.draftKey = row.key
+                                root.draftValue = value
+                            }
+                            onDraftCleared: root.draftKey = ""
+                        }
+                    }
+                }
+
+                EffectKeyframeTimeline {
+                    x: root.dividerX + 1
+                    width: Math.max(0, grid.width - root.dividerX - 1)
+                    height: Math.max(grid.height,
+                                     root.rows.length * Theme.ecRowHeight)
+                    laneModel: rowModel
+                    clipId: root.clipId
+                    clipLabel: root.clipLabel
+                    startMs: root.viewStartMs
+                    spanMs: root.viewSpanMs
+                    clipStartMs: root.clipStartMs
+                    clipSpanMs: root.clipSpanMs
+                    onZoomRequested: (factor, anchorMs) => root.zoomBy(factor,
+                                                                       anchorMs)
+                    onPanRequested: (deltaMs) => root.panBy(deltaMs)
+                }
+            }
+
+            Rectangle {
+                x: root.dividerX
+                width: 1
+                height: parent.height
+                color: dividerHandle.pressed ? Theme.accent
+                                               : (dividerHandle.containsMouse
+                                                  ? Qt.lighter(Theme.accent, 1.15)
+                                                  : "#1b1c1f")
+            }
+            MouseArea {
+                id: dividerHandle
+                x: root.dividerX - 3
+                width: 7
+                height: parent.height
+                hoverEnabled: true
+                AppCursor.name: "SplitterHorizontal"
+                property real pressX: 0
+                onPressed: (mouse) => {
+                    dividerHandle.pressX =
+                            dividerHandle.mapToItem(gridHost, mouse.x, 0).x
+                }
+                onPositionChanged: (mouse) => {
+                    if (!dividerHandle.pressed)
+                        return
+                    var here = dividerHandle.mapToItem(gridHost, mouse.x, 0).x
+                    root.dividerX = Math.max(
+                                250, Math.min(gridHost.width - 150,
+                                              root.dividerX + here
+                                              - dividerHandle.pressX))
+                    dividerHandle.pressX = here
+                }
+                Rectangle {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    width: parent.pressed || parent.containsMouse ? 3 : 1
+                    color: parent.pressed ? Theme.accent
+                                          : (parent.containsMouse
+                                             ? Qt.lighter(Theme.accent, 1.15)
+                                             : "#1b1c1f")
+                    opacity: parent.pressed || parent.containsMouse ? 0.95 : 0.8
+                }
+            }
+        }
+
+        // ---- Footer ------------------------------------------------------
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 24
+            color: Theme.bgPanel
+
+            Rectangle {
+                anchors.top: parent.top
+                width: parent.width
+                height: 1
+                color: Theme.border
+            }
+
+            LumetriActionButton {
+                x: 8
+                anchors.verticalCenter: parent.verticalCenter
+                implicitWidth: 64
+                height: 18
+                text: qsTr("Reset All")
+                enabled: root.hasClip
+                onClicked: Backend.resetSelectedClipEffectSettings(root.clipId)
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("Reset every built-in parameter on this clip")
+            }
+
+            Text {
+                x: root.dividerX + 8
+                anchors.verticalCenter: parent.verticalCenter
+                text: root.timecode(Backend.playheadMs)
+                color: Theme.textSecondary
+                font.family: Theme.monoFont
+                font.pixelSize: Theme.fsXs
+            }
+
+            // Zoom controls. Without them a windowed timeline is a trap: the
+            // lanes would show ten minutes of a twenty-six hour clip with no
+            // visible way to reach the rest of it.
+            Row {
+                anchors.right: parent.right
+                anchors.rightMargin: 10
+                anchors.verticalCenter: parent.verticalCenter
+                height: 18
+                spacing: 6
+
+                Text {
+                    height: 18
+                    verticalAlignment: Text.AlignVCenter
+                    text: root.windowed
+                          ? qsTr("%1 view").arg(root.durationLabel(root.viewSpanMs))
+                          : qsTr("whole clip")
+                    color: Theme.textMuted
+                    font.pixelSize: Theme.fsXs
+                }
+
+                LumetriActionButton {
+                    implicitWidth: 24
+                    height: 18
+                    text: "−"
+                    enabled: root.hasClip && root.windowed
+                    onClicked: root.zoomAtPlayhead(1.6)
+                    ToolTip.visible: hovered
+                    ToolTip.text: qsTr("Zoom out (Ctrl+wheel over the lanes)")
+                }
+                LumetriActionButton {
+                    implicitWidth: 24
+                    height: 18
+                    text: "+"
+                    enabled: root.hasClip
+                             && root.viewSpanMs > root.minViewSpanMs
+                    onClicked: root.zoomAtPlayhead(0.625)
+                    ToolTip.visible: hovered
+                    ToolTip.text: qsTr("Zoom in (Ctrl+wheel over the lanes)")
+                }
+                LumetriActionButton {
+                    implicitWidth: 34
+                    height: 18
+                    text: qsTr("Fit")
+                    enabled: root.hasClip
+                    onClicked: root.fitToClip()
+                    ToolTip.visible: hovered
+                    ToolTip.text: qsTr("Window around the playhead")
+                }
+                LumetriActionButton {
+                    implicitWidth: 34
+                    height: 18
+                    text: qsTr("All")
+                    enabled: root.hasClip && root.windowed
+                    onClicked: root.showWholeClip()
+                    ToolTip.visible: hovered
+                    ToolTip.text: qsTr("Show the whole clip")
+                }
+
+                Text {
+                    height: 18
+                    verticalAlignment: Text.AlignVCenter
+                    text: root.timecode(root.clipSpanMs)
+                    color: Theme.textMuted
+                    font.family: Theme.monoFont
+                    font.pixelSize: Theme.fsXs
+                }
+            }
+        }
+    }
+}

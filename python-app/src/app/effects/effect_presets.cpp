@@ -1,0 +1,367 @@
+#include "app/effects/effect_presets.h"
+
+#include <QString>
+
+namespace {
+// One entry of a preset's recipe: an effect id out of EffectRegistry plus the
+// parameter values it should be created with. Anything left out keeps the
+// registry default, so a step only ever names what the preset actually changes.
+QVariantMap step(const QString &effectId,
+                 const QVariantMap &parameters = QVariantMap{}) {
+  return {{"effectId", effectId}, {"parameters", parameters}};
+}
+
+// Shaped like EffectRegistry::effect() on purpose - the browser cannot tell the
+// difference, and does not have to. "parameters" is empty because a preset has
+// no controls of its own: what it drops on the clip does.
+QVariantMap preset(const QString &id, const QString &name,
+                   const QString &category, const QString &description,
+                   const QString &mediaType, const QVariantList &steps,
+                   const QString &icon) {
+  return {{"id", id},
+          {"name", name},
+          {"category", category},
+          {"description", description},
+          {"mediaType", mediaType},
+          {"icon", icon},
+          {"kind", "preset"},
+          {"parameters", QVariantList{}},
+          {"previewSupported", false},
+          {"steps", steps}};
+}
+
+// The Lumetri equivalent. Always "video": the grade only exists for picture
+// clips, and Backend::setClipColorSetting refuses anything off a V track.
+QVariantMap look(const QString &id, const QString &name,
+                 const QString &category, const QString &description,
+                 const QVariantMap &settings) {
+  return {{"id", id},
+          {"name", name},
+          {"category", category},
+          {"description", description},
+          {"mediaType", "video"},
+          {"icon", "sun"},
+          {"kind", "lumetri"},
+          {"parameters", QVariantList{}},
+          {"previewSupported", false},
+          {"settings", settings}};
+}
+} // namespace
+
+QVariantList EffectPresets::effectPresets() {
+  static const QVariantList cached = []() {
+    return QVariantList{
+      preset("preset_auto_enhance", "Auto Enhance", "Preset / Quick Fixes",
+             "A little more contrast, a little more colour and one pass of "
+             "sharpening - the safe first move on flat camera footage.", "video",
+             {step("brightness_contrast", {{"brightness", 4},
+                                           {"contrast", 12},
+                                           {"saturation", 108}}),
+              step("unsharp_mask", {{"radius", 3}, {"amount", 0.8}})},
+             "sun"),
+      preset("preset_clean_up", "Clean Up Video", "Preset / Quick Fixes",
+             "Take sensor noise and gradient banding out, then put back the "
+             "edge detail the denoiser softened. For high-ISO night footage.",
+             "video",
+             {step("video_denoise",
+                   {{"luma", 5}, {"chroma", 4}, {"temporal", 8}}),
+              step("deband", {{"threshold", 4}, {"range", 16}}),
+              step("sharpen", {{"amount", 0.6}})},
+             "sliders-horizontal"),
+      preset("preset_fix_flat", "Fix Flat Footage", "Preset / Quick Fixes",
+             "Pull the black and white points in to where the picture actually "
+             "starts and stops, then lift the muted colours.", "video",
+             {step("levels", {{"inputBlack", 4}, {"inputWhite", 96}}),
+              step("vibrance", {{"intensity", 22}}),
+              step("brightness_contrast", {{"contrast", 10}})},
+             "sliders-horizontal"),
+      preset("preset_cinematic", "Cinematic Contrast", "Preset / Looks",
+             "Cool shadows, warm highlights, held-back saturation and a soft "
+             "corner falloff - the modern feature-film default.", "video",
+             {step("brightness_contrast", {{"contrast", 14},
+                                           {"saturation", 96}}),
+              step("color_balance", {{"shadowsBlue", 12},
+                                     {"midtonesGreen", -3},
+                                     {"highlightsRed", 8}}),
+              step("vignette", {{"strength", 22}})},
+             "film"),
+      preset("preset_vintage_film", "Vintage Film", "Preset / Looks",
+             "Washed-out contrast, a sepia cast, real grain and heavy corners. "
+             "Sits well on interviews and archive-style cutaways.", "video",
+             {step("brightness_contrast", {{"contrast", -6},
+                                           {"saturation", 90}}),
+              step("sepia"),
+              step("film_grain", {{"amount", 22}}),
+              step("vignette", {{"strength", 40}})},
+             "film"),
+      preset("preset_retro_vhs", "Retro VHS", "Preset / Looks",
+             "Channel fringing, coarse grain, a hint of blur and oversaturated "
+             "colour - tape, not film.", "video",
+             {step("brightness_contrast", {{"contrast", -8},
+                                           {"saturation", 130}}),
+              step("chromatic_aberration", {{"horizontal", 5}}),
+              step("box_blur", {{"radius", 1}}),
+              step("film_grain", {{"amount", 28}})},
+             "image"),
+      preset("preset_noir", "Film Noir", "Preset / Looks",
+             "Black and white with the contrast pushed hard and the corners "
+             "closed down.", "video",
+             {step("monochrome"),
+              step("levels", {{"inputBlack", 8}, {"inputWhite", 92}}),
+              step("brightness_contrast", {{"contrast", 22}}),
+              step("vignette", {{"strength", 45}})},
+             "moon"),
+      preset("preset_soft_focus", "Soft Focus Glow", "Preset / Looks",
+             "Blurs the flat areas and leaves the edges alone, then lifts the "
+             "whole frame slightly. Flattering on faces.", "video",
+             {step("smart_blur",
+                   {{"radius", 3}, {"strength", 0.9}, {"threshold", 0}}),
+              step("brightness_contrast", {{"brightness", 6},
+                                           {"contrast", -4},
+                                           {"saturation", 104}})},
+             "sun"),
+      preset("preset_punchy_hdr", "Punchy HDR", "Preset / Looks",
+             "Wide-radius sharpening plus vibrance and a tighter range. Loud on "
+             "purpose - good for product shots and drone plates.", "video",
+             {step("unsharp_mask",
+                   {{"radius", 5}, {"amount", 1.6}, {"colorAmount", 0.4}}),
+              step("vibrance", {{"intensity", 30}}),
+              step("levels", {{"inputBlack", 3}, {"inputWhite", 97}})},
+             "sun"),
+      preset("preset_warm_sunset", "Warm Sunset", "Preset / Looks",
+             "Warms the whole frame toward late afternoon and lifts the "
+             "colours that carry it.", "video",
+             {step("color_temperature", {{"temperature", 8600}, {"mix", 70}}),
+              step("vibrance", {{"intensity", 18}}),
+              step("vignette", {{"strength", 18}})},
+             "sun"),
+      preset("preset_cool_moonlight", "Cool Moonlight", "Preset / Looks",
+             "Cools and darkens the frame and pushes it toward blue - day "
+             "footage read as night.", "video",
+             {step("color_temperature", {{"temperature", 4200}, {"mix", 75}}),
+              step("brightness_contrast", {{"brightness", -6},
+                                           {"contrast", 8},
+                                           {"saturation", 88}}),
+              step("tint", {{"hue", 220}, {"saturation", 22}, {"mix", 85}})},
+             "moon"),
+      preset("preset_podcast_voice", "Podcast Voice", "Preset / Audio",
+             "Rumble out, sibilance down, level controlled and the whole thing "
+             "normalised to -16 LUFS. The standard spoken-word chain.", "audio",
+             {step("high_pass", {{"frequency", 95}}),
+              step("deesser",
+                   {{"intensity", 45}, {"maximum", 60}, {"focus", 55}}),
+              step("compressor",
+                   {{"threshold", -18}, {"ratio", 3}, {"makeup", 3}}),
+              step("loudness_normalize",
+                   {{"target", -16}, {"truePeak", -1.5}})},
+             "volume-2"),
+      preset("preset_voice_cleanup", "Voice Cleanup", "Preset / Audio",
+             "Broadband noise, clicks and room tone between phrases. For "
+             "dialogue recorded somewhere it shouldn't have been.", "audio",
+             {step("audio_denoise", {{"strength", 45}}),
+              step("declick",
+                   {{"window", 55}, {"threshold", 2}, {"burst", 2}}),
+              step("high_pass", {{"frequency", 85}}),
+              step("noise_gate", {{"threshold", -34},
+                                  {"ratio", 4},
+                                  {"attack", 15},
+                                  {"release", 180}})},
+             "volume-2"),
+      preset("preset_bass_boost", "Bass Boost", "Preset / Audio",
+             "Reinforces the lowest octave and shelves the bass up, with a "
+             "limiter after it so the extra weight cannot clip.", "audio",
+             {step("sub_boost",
+                   {{"amount", 65}, {"cutoff", 110}, {"boost", 2.5}}),
+              step("bass", {{"gain", 4}, {"frequency", 90}}),
+              step("limiter", {{"ceiling", -1}})},
+             "volume-2"),
+      preset("preset_radio_voice", "Radio Voice", "Preset / Audio",
+             "Band-limited to a telephone-ish 300 Hz - 3.4 kHz and squashed "
+             "hard. An effect, not a repair.", "audio",
+             {step("high_pass", {{"frequency", 300}}),
+              step("low_pass", {{"frequency", 3400}}),
+              step("compressor",
+                   {{"threshold", -20}, {"ratio", 6}, {"makeup", 5}})},
+             "volume-2"),
+      preset("preset_concert_hall", "Concert Hall", "Preset / Audio",
+             "A large, fairly bright room with a wet mix you can hear. Puts a "
+             "dry recording somewhere.", "audio",
+             {step("reverb",
+                   {{"roomSize", 75}, {"damping", 40}, {"mix", 45}}),
+              step("treble", {{"gain", 2}, {"frequency", 4000}})},
+             "volume-2"),
+      preset("preset_lofi_tape", "Lo-Fi Tape", "Preset / Audio",
+             "Fewer bits, no top end and a slow wobble in the level. Music bed "
+             "treatment.", "audio",
+             {step("bit_crusher",
+                   {{"bits", 10}, {"sampleReduction", 2}, {"mix", 45}}),
+              step("low_pass", {{"frequency", 8000}}),
+              step("tremolo", {{"rate", 0.6}, {"depth", 12}})},
+             "volume-2"),
+      preset("preset_loud_and_clear", "Loud & Clear", "Preset / Audio",
+             "Transients expanded, air added on top, then normalised to -14 "
+             "LUFS. The chain for something that has to cut through.", "audio",
+             {step("clarity", {{"intensity", 3}}),
+              step("exciter", {{"amount", 1.5}, {"frequency", 7500}}),
+              step("loudness_normalize",
+                   {{"target", -14}, {"truePeak", -1}})},
+             "volume-2")};
+  }();
+  return cached;
+}
+
+QVariantList EffectPresets::lumetriPresets() {
+  static const QVariantList cached = []() {
+    return QVariantList{
+      look("lumetri_teal_orange", "Teal & Orange", "Lumetri / Cinematic",
+           "Cool the shadows, warm the highlights and keep the middle where it "
+           "was. The split-tone every trailer is graded with.",
+           {{"temperature", 12},
+            {"contrast", 12},
+            {"saturation", 108},
+            {"shadowWheelX", -22},
+            {"highlightWheelX", 18},
+            {"curveShadows", -6},
+            {"curveHighlights", 6}}),
+      look("lumetri_warm_film", "Warm Film", "Lumetri / Film Emulation",
+           "Warm, slightly faded and gently vignetted, with the highlights "
+           "tinted the way print stock tints them.",
+           {{"temperature", 18},
+            {"tint", 4},
+            {"contrast", 8},
+            {"fade", 6},
+            {"saturation", 96},
+            {"creativeShadowTint", -6},
+            {"creativeHighlightTint", 8},
+            {"vignette", 14}}),
+      look("lumetri_faded_film", "Faded Film", "Lumetri / Film Emulation",
+           "Lifted blacks and low contrast - the flat, dusty look of a print "
+           "that has been left in the light.",
+           {{"fade", 24},
+            {"contrast", -8},
+            {"blacks", 14},
+            {"saturation", 88},
+            {"creativeHighlightTint", 6}}),
+      look("lumetri_bleach_bypass", "Bleach Bypass", "Lumetri / Film Emulation",
+           "Most of the colour gone and the contrast up hard, as if the bleach "
+           "step were skipped in the lab.",
+           {{"saturation", 55},
+            {"contrast", 28},
+            {"highlights", 12},
+            {"shadows", -8},
+            {"whites", 10},
+            {"sharpen", 12}}),
+      look("lumetri_cross_process", "Cross Process", "Lumetri / Stylized",
+           "Per-channel curves pulled against each other: cyan shadows, warm "
+           "midtones, clipped blue highlights.",
+           {{"contrast", 14},
+            {"saturation", 104},
+            {"redCurveShadows", -12},
+            {"greenCurveMidtones", 8},
+            {"blueCurveShadows", 14},
+            {"blueCurveHighlights", -10}}),
+      look("lumetri_moody_blue", "Moody Blue", "Lumetri / Cinematic",
+           "Cold, dark and slightly desaturated, with the midtones pushed to "
+           "blue and the corners closed in.",
+           {{"temperature", -18},
+            {"tint", -4},
+            {"contrast", 12},
+            {"shadows", -10},
+            {"saturation", 92},
+            {"midtoneWheelX", -12},
+            {"vignette", 22}}),
+      look("lumetri_golden_hour", "Golden Hour", "Lumetri / Cinematic",
+           "Warm, bright and tinted in the highlights - the last hour of "
+           "daylight, applied to footage shot at noon.",
+           {{"temperature", 26},
+            {"tint", 8},
+            {"exposure", 0.1},
+            {"highlights", 8},
+            {"saturation", 106},
+            {"creativeHighlightTint", 12},
+            {"vignette", 10}}),
+      look("lumetri_vibrant_pop", "Vibrant Pop", "Lumetri / Stylized",
+           "Vibrance first so skin tones survive, then saturation and contrast "
+           "over the top. For social cuts.",
+           {{"vibrance", 32},
+            {"saturation", 112},
+            {"contrast", 14},
+            {"whites", 6}}),
+      look("lumetri_soft_portrait", "Soft Portrait", "Lumetri / Corrective",
+           "Opens the shadows, holds the highlights back and takes the edge off "
+           "the contrast. Made for faces.",
+           {{"exposure", 0.15},
+            {"contrast", -6},
+            {"highlights", -8},
+            {"shadows", 10},
+            {"saturation", 102},
+            {"sharpen", 4},
+            {"vignette", 12}}),
+      look("lumetri_high_contrast", "High Contrast Punch",
+           "Lumetri / Corrective",
+           "Blacks down, whites up, colour lifted and a touch of sharpening. "
+           "The fix for footage that looks like fog.",
+           {{"contrast", 26},
+            {"blacks", -12},
+            {"whites", 12},
+            {"vibrance", 18},
+            {"sharpen", 8}}),
+      look("lumetri_mono_contrast", "Black & White Contrast",
+           "Lumetri / Stylized",
+           "Colour removed in the grade rather than by an effect, so the "
+           "contrast and the corners are still yours to move.",
+           {{"saturation", 0},
+            {"contrast", 25},
+            {"blacks", -10},
+            {"whites", 8},
+            {"vignette", 35}}),
+      look("lumetri_night_shift", "Day For Night", "Lumetri / Stylized",
+           "Cold, dim and drained, with the highlights held down so nothing "
+           "reads as sunlight.",
+           {{"temperature", -30},
+            {"exposure", -0.4},
+            {"contrast", 18},
+            {"highlights", -22},
+            {"blacks", -14},
+            {"saturation", 78},
+            {"midtoneWheelX", -18},
+            {"vignette", 30}}),
+      look("lumetri_neutral_reset", "Neutral Start", "Lumetri / Corrective",
+           "Every slider back to zero. Not a look - the way out of one, without "
+           "having to drag each control back by hand.",
+           {{"temperature", 0},
+            {"tint", 0},
+            {"exposure", 0},
+            {"contrast", 0},
+            {"highlights", 0},
+            {"shadows", 0},
+            {"whites", 0},
+            {"blacks", 0},
+            {"saturation", 100},
+            {"vibrance", 0},
+            {"sharpen", 0},
+            {"fade", 0},
+            {"creativeShadowTint", 0},
+            {"creativeHighlightTint", 0},
+            {"curveShadows", 0},
+            {"curveMidtones", 0},
+            {"curveHighlights", 0},
+            {"redCurveShadows", 0},
+            {"redCurveMidtones", 0},
+            {"redCurveHighlights", 0},
+            {"greenCurveShadows", 0},
+            {"greenCurveMidtones", 0},
+            {"greenCurveHighlights", 0},
+            {"blueCurveShadows", 0},
+            {"blueCurveMidtones", 0},
+            {"blueCurveHighlights", 0},
+            {"shadowWheelX", 0},
+            {"shadowWheelY", 0},
+            {"midtoneWheelX", 0},
+            {"midtoneWheelY", 0},
+            {"highlightWheelX", 0},
+            {"highlightWheelY", 0},
+            {"vignette", 0}})};
+  }();
+  return cached;
+}

@@ -1,0 +1,10 @@
+RNNoise speech model: original Xiph RNNoise / std.rnnn
+Source: https://github.com/richardpl/arnndn-models/blob/master/std.rnnn
+Original implementation: https://github.com/xiph/rnnoise
+
+The upstream README identifies std.rnnn as the original Xiph RNNoise model.
+That README and the Xiph BSD license are included in UPSTREAM-README.md and
+COPYING respectively. The upstream tools are not distributed here.
+
+Processing uses the application's existing FFmpeg arnndn filter. No remote
+service, Python runtime or model download is required to clean audio.

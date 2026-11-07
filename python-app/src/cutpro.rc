@@ -1,0 +1,15 @@
+// Windows resource script: gives cutpro.exe its own icon.
+//
+// The runtime QIcon that main.cpp installs only reaches windows the app has
+// already opened - the titlebar and the taskbar button of a running process.
+// Explorer, the Start menu, a pinned taskbar shortcut and the Alt+Tab entry all
+// read the icon out of the executable's resource table instead, which is what
+// this file writes. Without it those places fall back to the generic MinGW
+// executable icon no matter what the running app looks like.
+//
+// The first icon in the table is the one Windows treats as the application icon,
+// so IDI_ICON1 (id 1) is deliberate rather than incidental. The .ico it points at
+// carries the 16/32/48/64/128/256 px sizes Windows picks between, generated from
+// assets/image.png; the path is relative to this file.
+
+IDI_ICON1 ICON "../assets/cutpro.ico"
